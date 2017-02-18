@@ -3,6 +3,7 @@
 
 
 #include <memory>
+#include <string>
 
 #include <cppfs/cppfs_api.h>
 

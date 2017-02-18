@@ -3,6 +3,7 @@
 
 #ifdef WIN32
     #include <winsock2.h>
+	#include <ws2tcpip.h>
 #else
     #include <sys/socket.h>
     #include <netinet/in.h>
@@ -93,7 +94,7 @@ void SshFileSystem::connect()
         if (::connect(m_socket, address->ai_addr, address->ai_addrlen) == -1)
         {
             // Error!
-            close(m_socket);
+            _close(m_socket);
             continue;
         }
     }

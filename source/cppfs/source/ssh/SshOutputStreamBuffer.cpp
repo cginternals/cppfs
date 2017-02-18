@@ -1,12 +1,18 @@
 
 #include <cppfs/ssh/SshOutputStreamBuffer.h>
 
+#include <algorithm>
 #include <iostream>
 
 #include <libssh2.h>
 #include <libssh2_sftp.h>
 
 #include <cppfs/ssh/SshFileSystem.h>
+
+
+#ifdef min
+	#undef min
+#endif
 
 
 namespace cppfs

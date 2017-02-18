@@ -9,8 +9,13 @@
 #include <cppfs/LoginCredentials.h>
 #include <cppfs/Url.h>
 #include <cppfs/FileHandle.h>
-#include <cppfs/local/LocalFileSystem.h>
 #include <cppfs/ssh/SshFileSystem.h>
+
+#ifdef SYSTEM_WINDOWS
+	#include <cppfs/windows/WinFileSystem.h>
+#else
+	#include <cppfs/local/LocalFileSystem.h>
+#endif
 
 
 using namespace cppassist;
@@ -84,7 +89,11 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
         std::string localPath = url.path();
 
         // Open local file system
-        static std::shared_ptr<LocalFileSystem> fs(new LocalFileSystem);
+#ifdef SYSTEM_WINDOWS
+		static std::shared_ptr<WinFileSystem> fs(new WinFileSystem);
+#else
+		static std::shared_ptr<LocalFileSystem> fs(new LocalFileSystem);
+#endif
 
         // Open path
         return fs->open(localPath);

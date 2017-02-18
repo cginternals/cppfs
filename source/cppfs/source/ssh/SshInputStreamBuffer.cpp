@@ -1,12 +1,18 @@
 
 #include <cppfs/ssh/SshInputStreamBuffer.h>
 
+#include <algorithm>
 #include <cstring>
 
 #include <libssh2.h>
 #include <libssh2_sftp.h>
 
 #include <cppfs/ssh/SshFileSystem.h>
+
+
+#ifdef max
+	#undef max
+#endif
 
 
 namespace cppfs
