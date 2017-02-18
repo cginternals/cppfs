@@ -212,7 +212,8 @@ void Url::analyze() const
     // Get address and path
     pos = m_location.find("/");
 
-    if (pos != std::string::npos)
+    // [TODO] Find a better solution, e.g., a real regex to deal with different paths/urls
+    if (m_protocol != "" && m_protocol != "file://" && pos != std::string::npos)
     {
         m_address = m_location.substr(0, pos);
         m_path    = m_location.substr(pos);
