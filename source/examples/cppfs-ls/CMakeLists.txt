@@ -3,6 +3,8 @@
 # External dependencies
 # 
 
+find_package(cppassist REQUIRED)
+
 
 # 
 # Executable name and options
@@ -67,6 +69,7 @@ target_include_directories(${target}
 target_link_libraries(${target}
     PRIVATE
     ${DEFAULT_LIBRARIES}
+    cppassist::cppassist
     ${META_PROJECT_NAME}::cppfs
 )
 
