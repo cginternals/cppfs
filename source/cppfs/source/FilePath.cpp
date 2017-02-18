@@ -3,6 +3,8 @@
 
 #include <sstream>
 #include <algorithm>
+#include <vector>
+#include <string>
 
 
 namespace cppfs
