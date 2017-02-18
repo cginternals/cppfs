@@ -9,7 +9,7 @@
 # 
 
 # Target name
-set(target fstest)
+set(target cppfs-ls)
 
 # Exit here if required dependencies are not met
 message(STATUS "Example ${target}")

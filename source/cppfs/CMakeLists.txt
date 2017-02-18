@@ -3,6 +3,10 @@
 # External dependencies
 # 
 
+find_package(cppassist REQUIRED)
+find_package(LibSSH2 REQUIRED)
+find_package(ZLIB REQUIRED)
+
 
 # 
 # Library name and options
@@ -29,10 +33,53 @@ set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
 set(headers
     ${include_path}/cppfs.h
+    ${include_path}/system.h
+    ${include_path}/fs.h
+    ${include_path}/FileHandle.h
+    ${include_path}/FileIterator.h
+    ${include_path}/AbstractFileSystem.h
+    ${include_path}/AbstractFileHandleBackend.h
+    ${include_path}/AbstractFileIteratorBackend.h
+    ${include_path}/InputStream.h
+    ${include_path}/OutputStream.h
+    ${include_path}/LoginCredentials.h
+    ${include_path}/FilePath.h
+    ${include_path}/Url.h
+
+    ${include_path}/local/LocalFileSystem.h
+    ${include_path}/local/LocalFileHandle.h
+    ${include_path}/local/LocalFileIterator.h
+
+    ${include_path}/ssh/SshFileSystem.h
+    ${include_path}/ssh/SshFileHandle.h
+    ${include_path}/ssh/SshFileIterator.h
+    ${include_path}/ssh/SshInputStreamBuffer.h
+    ${include_path}/ssh/SshOutputStreamBuffer.h
 )
 
 set(sources
-    ${source_path}/cppfs.cpp
+    ${source_path}/system.cpp
+    ${source_path}/fs.cpp
+    ${source_path}/FileHandle.cpp
+    ${source_path}/FileIterator.cpp
+    ${source_path}/AbstractFileSystem.cpp
+    ${source_path}/AbstractFileHandleBackend.cpp
+    ${source_path}/AbstractFileIteratorBackend.cpp
+    ${source_path}/InputStream.cpp
+    ${source_path}/OutputStream.cpp
+    ${source_path}/LoginCredentials.cpp
+    ${source_path}/FilePath.cpp
+    ${source_path}/Url.cpp
+
+    ${source_path}/local/LocalFileSystem.cpp
+    ${source_path}/local/LocalFileHandle.cpp
+    ${source_path}/local/LocalFileIterator.cpp
+
+    ${source_path}/ssh/SshFileSystem.cpp
+    ${source_path}/ssh/SshFileHandle.cpp
+    ${source_path}/ssh/SshFileIterator.cpp
+    ${source_path}/ssh/SshInputStreamBuffer.cpp
+    ${source_path}/ssh/SshOutputStreamBuffer.cpp
 )
 
 # Group source files
@@ -89,6 +136,7 @@ target_include_directories(${target}
     ${PROJECT_BINARY_DIR}/source/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
+    ${LIBSSH2_INCLUDE_DIR}
 
     PUBLIC
     ${DEFAULT_INCLUDE_DIRECTORIES}
@@ -106,6 +154,10 @@ target_include_directories(${target}
 
 target_link_libraries(${target}
     PRIVATE
+    cppassist::cppassist
+    ${LIBSSH2_LIBRARY}
+    ${LIBCRYPTO_LIBRARY}
+    ${ZLIB_LIBRARY}
 
     PUBLIC
     ${DEFAULT_LIBRARIES}

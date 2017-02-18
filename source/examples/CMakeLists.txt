@@ -5,4 +5,4 @@ if(NOT OPTION_BUILD_EXAMPLES)
 endif()
 
 # Example applications
-add_subdirectory(fstest)
+add_subdirectory(cppfs-ls)
