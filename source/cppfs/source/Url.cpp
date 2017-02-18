@@ -217,6 +217,10 @@ void Url::analyze() const
         m_address = m_location.substr(0, pos);
         m_path    = m_location.substr(pos);
     }
+    else
+    {
+        m_path = m_location;
+    }
 
     // Get login and host
     pos = m_address.find("@");
