@@ -6,3 +6,5 @@ endif()
 
 # Example applications
 add_subdirectory(cppfs-ls)
+add_subdirectory(cppfs-cat)
+add_subdirectory(cppfs-cp)

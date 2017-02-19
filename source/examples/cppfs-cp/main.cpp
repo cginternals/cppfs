@@ -11,7 +11,6 @@
 #include <cppfs/fs.h>
 #include <cppfs/LoginCredentials.h>
 #include <cppfs/FileHandle.h>
-#include <cppfs/FileIterator.h>
 
 
 using namespace cppassist;
@@ -22,12 +21,12 @@ int main(int argc, char * argv[])
 {
     // Declare program
     CommandLineProgram program(
-        "cppfs-ls",
-        "cppfs-ls " CPPFS_VERSION,
-        "List all files in a directory."
+        "cppfs-cp",
+        "cppfs-cp " CPPFS_VERSION,
+        "Copy file."
     );
 
-    CommandLineAction action("list", "List files in directory");
+    CommandLineAction action("cp", "Copy file");
     program.add(&action);
 
     CommandLineSwitch swHelp("--help", "-h", "Print help text", CommandLineSwitch::Optional);
@@ -36,8 +35,11 @@ int main(int argc, char * argv[])
     CommandLineOption opConfig("--config", "-c", "file", "Load configuration from file", CommandLineOption::Optional);
     action.add(&opConfig);
 
-    CommandLineParameter paramPath("path", CommandLineParameter::Optional);
-    action.add(&paramPath);
+    CommandLineParameter paramSrc("src", CommandLineParameter::NonOptional);
+    action.add(&paramSrc);
+
+    CommandLineParameter paramDst("dst", CommandLineParameter::NonOptional);
+    action.add(&paramDst);
 
     // Parse command line
     program.parse(argc, argv);
@@ -57,27 +59,28 @@ int main(int argc, char * argv[])
         login.load(configFile);
     }
 
-    // Get path
-    std::string path = paramPath.value();
-    if (path.empty()) path = ".";
+    // Get source and destination path
+    std::string src = paramSrc.value();
+    std::string dst = paramDst.value();
 
-    // Open directory
-    FileHandle dir = fs::open(path, &login);
+    // Open file handles
+    FileHandle srcFile = fs::open(src, &login);
+    FileHandle dstFile = fs::open(dst, &login);
 
-    if (dir.isDirectory())
+    if (srcFile.isFile())
     {
-        // List files
-        for (auto it = dir.begin(); it != dir.end(); ++it)
-        {
-            std::cout << "- " << *it << std::endl;
-        }
+        // Copy file
+        srcFile.copy(dstFile);
+
+        // Done
+        return 0;
     }
 
     else
     {
-        std::cout << "'" << path << "' is not a valid directory." << std::endl;
+        // Error
+        std::cout << "'" << src << "' is not a valid file." << std::endl;
     }
 
-    // Done
     return 0;
 }

@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <sstream>
 
 #include <cppassist/cmdline/CommandLineProgram.h>
 #include <cppassist/cmdline/CommandLineAction.h>
@@ -11,7 +12,6 @@
 #include <cppfs/fs.h>
 #include <cppfs/LoginCredentials.h>
 #include <cppfs/FileHandle.h>
-#include <cppfs/FileIterator.h>
 
 
 using namespace cppassist;
@@ -22,12 +22,12 @@ int main(int argc, char * argv[])
 {
     // Declare program
     CommandLineProgram program(
-        "cppfs-ls",
-        "cppfs-ls " CPPFS_VERSION,
-        "List all files in a directory."
+        "cppfs-cat",
+        "cppfs-cat " CPPFS_VERSION,
+        "Print file to console."
     );
 
-    CommandLineAction action("list", "List files in directory");
+    CommandLineAction action("cat", "Print file to console");
     program.add(&action);
 
     CommandLineSwitch swHelp("--help", "-h", "Print help text", CommandLineSwitch::Optional);
@@ -36,7 +36,7 @@ int main(int argc, char * argv[])
     CommandLineOption opConfig("--config", "-c", "file", "Load configuration from file", CommandLineOption::Optional);
     action.add(&opConfig);
 
-    CommandLineParameter paramPath("path", CommandLineParameter::Optional);
+    CommandLineParameter paramPath("path", CommandLineParameter::NonOptional);
     action.add(&paramPath);
 
     // Parse command line
@@ -59,25 +59,31 @@ int main(int argc, char * argv[])
 
     // Get path
     std::string path = paramPath.value();
-    if (path.empty()) path = ".";
 
-    // Open directory
-    FileHandle dir = fs::open(path, &login);
-
-    if (dir.isDirectory())
+    // Open file
+    FileHandle file = fs::open(path, &login);
+    if (file.isFile())
     {
-        // List files
-        for (auto it = dir.begin(); it != dir.end(); ++it)
+        // Open input stream
+        std::istream * inputStream = file.createInputStream();
+        if (inputStream)
         {
-            std::cout << "- " << *it << std::endl;
+            // Read entire file
+            std::stringstream buffer;
+            buffer << inputStream->rdbuf();
+
+            // Output content
+            std::cout << buffer.str() << std::endl;
+
+            // Destroy input stream
+            delete inputStream;
+
+            // Done
+            return 0;
         }
     }
 
-    else
-    {
-        std::cout << "'" << path << "' is not a valid directory." << std::endl;
-    }
-
-    // Done
+    // Error
+    std::cout << "'" << path << "' is not a valid file." << std::endl;
     return 0;
 }
