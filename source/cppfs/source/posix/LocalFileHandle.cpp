@@ -1,5 +1,5 @@
 
-#include <cppfs/local/LocalFileHandle.h>
+#include <cppfs/posix/LocalFileHandle.h>
 
 #include <fstream>
 #include <dirent.h>
@@ -9,8 +9,8 @@
 
 #include <cppfs/cppfs.h>
 #include <cppfs/FilePath.h>
-#include <cppfs/local/LocalFileSystem.h>
-#include <cppfs/local/LocalFileIterator.h>
+#include <cppfs/posix/LocalFileSystem.h>
+#include <cppfs/posix/LocalFileIterator.h>
 
 
 namespace cppfs

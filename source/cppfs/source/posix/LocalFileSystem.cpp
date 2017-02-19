@@ -1,8 +1,8 @@
 
-#include <cppfs/local/LocalFileSystem.h>
+#include <cppfs/posix/LocalFileSystem.h>
 
 #include <cppfs/FileHandle.h>
-#include <cppfs/local/LocalFileHandle.h>
+#include <cppfs/posix/LocalFileHandle.h>
 
 
 namespace cppfs

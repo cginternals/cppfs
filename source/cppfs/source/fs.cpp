@@ -12,9 +12,9 @@
 #include <cppfs/ssh/SshFileSystem.h>
 
 #ifdef SYSTEM_WINDOWS
-	#include <cppfs/windows/WinFileSystem.h>
+    #include <cppfs/windows/LocalFileSystem.h>
 #else
-	#include <cppfs/local/LocalFileSystem.h>
+    #include <cppfs/posix/LocalFileSystem.h>
 #endif
 
 
@@ -72,11 +72,7 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
         std::string localPath = url.path();
 
         // Open local file system
-#ifdef SYSTEM_WINDOWS
-		static std::shared_ptr<WinFileSystem> fs(new WinFileSystem);
-#else
-		static std::shared_ptr<LocalFileSystem> fs(new LocalFileSystem);
-#endif
+        static std::shared_ptr<LocalFileSystem> fs(new LocalFileSystem);
 
         // Open path
         return fs->open(localPath);

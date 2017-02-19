@@ -1,17 +1,17 @@
 
-#include <cppfs/windows/WinFileIterator.h>
+#include <cppfs/windows/LocalFileIterator.h>
 
 #include <Windows.h>
 
 #include <cppfs/FilePath.h>
-#include <cppfs/windows/WinFileSystem.h>
+#include <cppfs/windows/LocalFileSystem.h>
 
 
 namespace cppfs
 {
 
 
-WinFileIterator::WinFileIterator(std::shared_ptr<WinFileSystem> fs, const std::string & path)
+LocalFileIterator::LocalFileIterator(std::shared_ptr<LocalFileSystem> fs, const std::string & path)
 : m_fs(fs)
 , m_path(path)
 , m_index(-1)
@@ -25,7 +25,7 @@ WinFileIterator::WinFileIterator(std::shared_ptr<WinFileSystem> fs, const std::s
 	readNextEntry();
 }
 
-WinFileIterator::~WinFileIterator()
+LocalFileIterator::~LocalFileIterator()
 {
 	// Close search
 	if (m_findHandle)
@@ -37,9 +37,9 @@ WinFileIterator::~WinFileIterator()
 	delete static_cast<WIN32_FIND_DATA *>(m_findData);
 }
 
-AbstractFileIteratorBackend * WinFileIterator::clone() const
+AbstractFileIteratorBackend * LocalFileIterator::clone() const
 {
-    auto * twin = new WinFileIterator(m_fs, m_path);
+    auto * twin = new LocalFileIterator(m_fs, m_path);
 
     while (twin->m_index < m_index)
     {
@@ -49,27 +49,27 @@ AbstractFileIteratorBackend * WinFileIterator::clone() const
     return twin;
 }
 
-AbstractFileSystem * WinFileIterator::fs() const
+AbstractFileSystem * LocalFileIterator::fs() const
 {
     return static_cast<AbstractFileSystem *>(m_fs.get());
 }
 
-bool WinFileIterator::valid() const
+bool LocalFileIterator::valid() const
 {
     return (m_findHandle != nullptr);
 }
 
-std::string WinFileIterator::path() const
+std::string LocalFileIterator::path() const
 {
     return m_path;
 }
 
-int WinFileIterator::index() const
+int LocalFileIterator::index() const
 {
     return m_index;
 }
 
-std::string WinFileIterator::name() const
+std::string LocalFileIterator::name() const
 {
     // Check directory and entry handle
     if (!m_findHandle)
@@ -81,12 +81,12 @@ std::string WinFileIterator::name() const
 	return std::string(static_cast<WIN32_FIND_DATA *>(m_findData)->cFileName);
 }
 
-void WinFileIterator::next()
+void LocalFileIterator::next()
 {
     readNextEntry();
 }
 
-void WinFileIterator::readNextEntry()
+void LocalFileIterator::readNextEntry()
 {
 	std::string filename;
 

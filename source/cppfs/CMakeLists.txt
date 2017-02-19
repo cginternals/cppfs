@@ -32,6 +32,12 @@ set(export_macro "${target_id}_API")
 set(include_path "${CMAKE_CURRENT_SOURCE_DIR}/include/${target}")
 set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+    set(localfs "windows")
+else()
+    set(localfs "posix")
+endif()
+
 set(headers
     ${include_path}/cppfs.h
     ${include_path}/system.h
@@ -47,26 +53,16 @@ set(headers
     ${include_path}/FilePath.h
     ${include_path}/Url.h
 
+    ${include_path}/${localfs}/LocalFileSystem.h
+    ${include_path}/${localfs}/LocalFileHandle.h
+    ${include_path}/${localfs}/LocalFileIterator.h
+
     ${include_path}/ssh/SshFileSystem.h
     ${include_path}/ssh/SshFileHandle.h
     ${include_path}/ssh/SshFileIterator.h
     ${include_path}/ssh/SshInputStreamBuffer.h
     ${include_path}/ssh/SshOutputStreamBuffer.h
 )
-
-if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
-    set(headers ${headers}
-        ${include_path}/windows/WinFileSystem.h
-        ${include_path}/windows/WinFileHandle.h
-        ${include_path}/windows/WinFileIterator.h
-    )
-else()
-    set(headers ${headers}
-        ${include_path}/local/LocalFileSystem.h
-        ${include_path}/local/LocalFileHandle.h
-        ${include_path}/local/LocalFileIterator.h
-    )
-endif()
 
 set(sources
     ${source_path}/system.cpp
@@ -82,26 +78,16 @@ set(sources
     ${source_path}/FilePath.cpp
     ${source_path}/Url.cpp
 
+    ${source_path}/${localfs}/LocalFileSystem.cpp
+    ${source_path}/${localfs}/LocalFileHandle.cpp
+    ${source_path}/${localfs}/LocalFileIterator.cpp
+
     ${source_path}/ssh/SshFileSystem.cpp
     ${source_path}/ssh/SshFileHandle.cpp
     ${source_path}/ssh/SshFileIterator.cpp
     ${source_path}/ssh/SshInputStreamBuffer.cpp
     ${source_path}/ssh/SshOutputStreamBuffer.cpp
 )
-
-if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
-    set(sources ${sources}
-        ${source_path}/windows/WinFileSystem.cpp
-        ${source_path}/windows/WinFileHandle.cpp
-        ${source_path}/windows/WinFileIterator.cpp
-    )
-else()
-    set(sources ${sources}
-        ${source_path}/local/LocalFileSystem.cpp
-        ${source_path}/local/LocalFileHandle.cpp
-        ${source_path}/local/LocalFileIterator.cpp
-    )
-endif()
 
 # Group source files
 set(header_group "Header Files (API)")

@@ -11,14 +11,14 @@ namespace cppfs
 {
 
 
-class WinFileSystem;
+class LocalFileSystem;
 
 
 /**
 *  @brief
 *    File iterator for the local file system
 */
-class CPPFS_API WinFileIterator : public AbstractFileIteratorBackend
+class CPPFS_API LocalFileIterator : public AbstractFileIteratorBackend
 {
 public:
     /**
@@ -30,13 +30,13 @@ public:
     *  @param[in] path
     *    Path to file or directory
     */
-    WinFileIterator(std::shared_ptr<WinFileSystem> fs, const std::string & path);
+    LocalFileIterator(std::shared_ptr<LocalFileSystem> fs, const std::string & path);
 
     /**
     *  @brief
     *    Destructor
     */
-    virtual ~WinFileIterator();
+    virtual ~LocalFileIterator();
 
     // Virtual AbstractFileIteratorBackend functions
     virtual AbstractFileIteratorBackend * clone() const override;
@@ -53,11 +53,11 @@ protected:
 
 
 protected:
-    std::shared_ptr<WinFileSystem>   m_fs;         ///< File system that created this iterator
-    std::string                      m_path;       ///< Path to file or directory
-    int                              m_index;      ///< Index of the current entry
-	void                           * m_findHandle; ///< Search handle
-	void                           * m_findData;   ///< Information about the current file
+    std::shared_ptr<LocalFileSystem>   m_fs;         ///< File system that created this iterator
+    std::string                        m_path;       ///< Path to file or directory
+    int                                m_index;      ///< Index of the current entry
+	void                             * m_findHandle; ///< Search handle
+	void                             * m_findData;   ///< Information about the current file
 };
 
 

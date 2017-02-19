@@ -1,10 +1,10 @@
 
-#include <cppfs/local/LocalFileIterator.h>
+#include <cppfs/posix/LocalFileIterator.h>
 
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include <cppfs/local/LocalFileSystem.h>
+#include <cppfs/posix/LocalFileSystem.h>
 
 
 namespace cppfs

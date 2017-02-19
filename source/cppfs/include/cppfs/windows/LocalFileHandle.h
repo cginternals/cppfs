@@ -11,14 +11,14 @@ namespace cppfs
 {
 
 
-class WinFileSystem;
+class LocalFileSystem;
 
 
 /**
 *  @brief
 *    File handle for the local file system
 */
-class CPPFS_API WinFileHandle : public AbstractFileHandleBackend
+class CPPFS_API LocalFileHandle : public AbstractFileHandleBackend
 {
 public:
     /**
@@ -30,13 +30,13 @@ public:
     *  @param[in] path
     *    Path to file or directory
     */
-    WinFileHandle(std::shared_ptr<WinFileSystem> fs, const std::string & path);
+    LocalFileHandle(std::shared_ptr<LocalFileSystem> fs, const std::string & path);
 
     /**
     *  @brief
     *    Destructor
     */
-    virtual ~WinFileHandle();
+    virtual ~LocalFileHandle();
 
     // Virtual AbstractFileHandleBackend functions
     virtual AbstractFileHandleBackend * clone() const override;
@@ -72,9 +72,9 @@ protected:
 
 
 protected:
-    std::shared_ptr<WinFileSystem>   m_fs;       ///< File system that created this handle
-    std::string                      m_path;     ///< Path to file or directory
-    mutable void                   * m_fileInfo; ///< Information about the current file (created on demand)
+    std::shared_ptr<LocalFileSystem>   m_fs;       ///< File system that created this handle
+    std::string                        m_path;     ///< Path to file or directory
+    mutable void                     * m_fileInfo; ///< Information about the current file (created on demand)
 };
 
 

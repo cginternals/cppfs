@@ -1,5 +1,5 @@
 
-#include <cppfs/windows/WinFileHandle.h>
+#include <cppfs/windows/LocalFileHandle.h>
 
 #include <fstream>
 
@@ -7,22 +7,22 @@
 
 #include <cppfs/cppfs.h>
 #include <cppfs/FilePath.h>
-#include <cppfs/windows/WinFileSystem.h>
-#include <cppfs/windows/WinFileIterator.h>
+#include <cppfs/windows/LocalFileSystem.h>
+#include <cppfs/windows/LocalFileIterator.h>
 
 
 namespace cppfs
 {
 
 
-WinFileHandle::WinFileHandle(std::shared_ptr<WinFileSystem> fs, const std::string & path)
+LocalFileHandle::LocalFileHandle(std::shared_ptr<LocalFileSystem> fs, const std::string & path)
 : m_fs(fs)
 , m_path(path)
 , m_fileInfo(nullptr)
 {
 }
 
-WinFileHandle::~WinFileHandle()
+LocalFileHandle::~LocalFileHandle()
 {
     if (m_fileInfo)
     {
@@ -30,17 +30,17 @@ WinFileHandle::~WinFileHandle()
     }
 }
 
-AbstractFileHandleBackend * WinFileHandle::clone() const
+AbstractFileHandleBackend * LocalFileHandle::clone() const
 {
-    return new WinFileHandle(m_fs, m_path);
+    return new LocalFileHandle(m_fs, m_path);
 }
 
-AbstractFileSystem * WinFileHandle::fs() const
+AbstractFileSystem * LocalFileHandle::fs() const
 {
     return static_cast<AbstractFileSystem *>(m_fs.get());
 }
 
-void WinFileHandle::updateFileInfo()
+void LocalFileHandle::updateFileInfo()
 {
     // Reset file information
     if (m_fileInfo)
@@ -50,19 +50,19 @@ void WinFileHandle::updateFileInfo()
     }
 }
 
-std::string WinFileHandle::path() const
+std::string LocalFileHandle::path() const
 {
     return m_path;
 }
 
-bool WinFileHandle::exists() const
+bool LocalFileHandle::exists() const
 {
     readFileInfo();
 
     return (m_fileInfo != nullptr);
 }
 
-bool WinFileHandle::isFile() const
+bool LocalFileHandle::isFile() const
 {
     readFileInfo();
 
@@ -74,7 +74,7 @@ bool WinFileHandle::isFile() const
     return false;
 }
 
-bool WinFileHandle::isDirectory() const
+bool LocalFileHandle::isDirectory() const
 {
     readFileInfo();
 
@@ -86,7 +86,7 @@ bool WinFileHandle::isDirectory() const
     return false;
 }
 
-std::vector<std::string> WinFileHandle::listFiles() const
+std::vector<std::string> LocalFileHandle::listFiles() const
 {
     std::vector<std::string> entries;
 
@@ -120,12 +120,12 @@ std::vector<std::string> WinFileHandle::listFiles() const
     return entries;
 }
 
-AbstractFileIteratorBackend * WinFileHandle::begin() const
+AbstractFileIteratorBackend * LocalFileHandle::begin() const
 {
-    return new WinFileIterator(m_fs, m_path);
+    return new LocalFileIterator(m_fs, m_path);
 }
 
-unsigned int WinFileHandle::size() const
+unsigned int LocalFileHandle::size() const
 {
     readFileInfo();
 
@@ -140,7 +140,7 @@ unsigned int WinFileHandle::size() const
     return 0;
 }
 
-unsigned int WinFileHandle::accessTime() const
+unsigned int LocalFileHandle::accessTime() const
 {
     readFileInfo();
 
@@ -154,7 +154,7 @@ unsigned int WinFileHandle::accessTime() const
     return 0;
 }
 
-unsigned int WinFileHandle::modificationTime() const
+unsigned int LocalFileHandle::modificationTime() const
 {
     readFileInfo();
 
@@ -168,34 +168,34 @@ unsigned int WinFileHandle::modificationTime() const
     return 0;
 }
 
-unsigned int WinFileHandle::userId() const
+unsigned int LocalFileHandle::userId() const
 {
     return 0;
 }
 
-void WinFileHandle::setUserId(unsigned int)
+void LocalFileHandle::setUserId(unsigned int)
 {
 }
 
-unsigned int WinFileHandle::groupId() const
+unsigned int LocalFileHandle::groupId() const
 {
     return 0;
 }
 
-void WinFileHandle::setGroupId(unsigned int)
+void LocalFileHandle::setGroupId(unsigned int)
 {
 }
 
-unsigned long WinFileHandle::permissions() const
+unsigned long LocalFileHandle::permissions() const
 {
     return 0ul;
 }
 
-void WinFileHandle::setPermissions(unsigned long)
+void LocalFileHandle::setPermissions(unsigned long)
 {
 }
 
-bool WinFileHandle::makeDirectory()
+bool LocalFileHandle::makeDirectory()
 {
     // Check directory
     if (exists()) return false;
@@ -211,7 +211,7 @@ bool WinFileHandle::makeDirectory()
     return true;
 }
 
-bool WinFileHandle::removeDirectory()
+bool LocalFileHandle::removeDirectory()
 {
     // Check directory
     if (!isDirectory()) return false;
@@ -227,7 +227,7 @@ bool WinFileHandle::removeDirectory()
     return true;
 }
 
-bool WinFileHandle::copy(AbstractFileHandleBackend * dest)
+bool LocalFileHandle::copy(AbstractFileHandleBackend * dest)
 {
     // Check source file
     if (!isFile()) return false;
@@ -254,7 +254,7 @@ bool WinFileHandle::copy(AbstractFileHandleBackend * dest)
     return true;
 }
 
-bool WinFileHandle::move(AbstractFileHandleBackend * dest)
+bool LocalFileHandle::move(AbstractFileHandleBackend * dest)
 {
     // Check source file
     if (!exists()) return false;
@@ -284,7 +284,7 @@ bool WinFileHandle::move(AbstractFileHandleBackend * dest)
     return true;
 }
 
-bool WinFileHandle::rename(const std::string & filename)
+bool LocalFileHandle::rename(const std::string & filename)
 {
     // Check file
     if (!exists()) return false;
@@ -307,7 +307,7 @@ bool WinFileHandle::rename(const std::string & filename)
     return true;
 }
 
-bool WinFileHandle::remove()
+bool LocalFileHandle::remove()
 {
     // Check source file
     if (!isFile()) return false;
@@ -323,17 +323,17 @@ bool WinFileHandle::remove()
     return true;
 }
 
-std::istream * WinFileHandle::createInputStream(std::ios_base::openmode mode) const
+std::istream * LocalFileHandle::createInputStream(std::ios_base::openmode mode) const
 {
     return new std::ifstream(m_path, mode);
 }
 
-std::ostream * WinFileHandle::createOutputStream(std::ios_base::openmode mode)
+std::ostream * LocalFileHandle::createOutputStream(std::ios_base::openmode mode)
 {
     return new std::ofstream(m_path, mode);
 }
 
-void WinFileHandle::readFileInfo() const
+void LocalFileHandle::readFileInfo() const
 {
     // Check if file info has already been read
     if (m_fileInfo) return;
