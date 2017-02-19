@@ -81,6 +81,30 @@ public:
 
     /**
     *  @brief
+    *    Load login credentials from file
+    *
+    *  @param[in] path
+    *    Path to file
+    *
+    *  @return
+    *    'true' on success, else 'false'
+    */
+    bool load(const std::string & path);
+
+    /**
+    *  @brief
+    *    Save login credentials to file
+    *
+    *  @param[in] path
+    *    Path to file
+    *
+    *  @return
+    *    'true' on success, else 'false'
+    */
+    bool save(const std::string & path) const;
+
+    /**
+    *  @brief
     *    Check if a value is set for a given key
     *
     *  @param[in] key

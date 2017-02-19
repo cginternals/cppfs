@@ -4,10 +4,12 @@
 #include <cppassist/cmdline/CommandLineProgram.h>
 #include <cppassist/cmdline/CommandLineAction.h>
 #include <cppassist/cmdline/CommandLineSwitch.h>
+#include <cppassist/cmdline/CommandLineOption.h>
 #include <cppassist/cmdline/CommandLineParameter.h>
 
 #include <cppfs/cppfs-version.h>
 #include <cppfs/fs.h>
+#include <cppfs/LoginCredentials.h>
 #include <cppfs/FileHandle.h>
 #include <cppfs/FileIterator.h>
 
@@ -46,6 +48,9 @@ int main(int argc, char * argv[])
     CommandLineSwitch swHelp("--help", "-h", "Print help text", CommandLineSwitch::Optional);
     action.add(&swHelp);
 
+    CommandLineOption opConfig("--config", "-c", "file", "Load configuration from file", CommandLineOption::Optional);
+    action.add(&opConfig);
+
     CommandLineParameter paramPath("path", CommandLineParameter::Optional);
     action.add(&paramPath);
 
@@ -58,12 +63,21 @@ int main(int argc, char * argv[])
         return 0;
     }
 
+    // Get login credentials
+    LoginCredentials login;
+
+    std::string configFile = opConfig.value();
+    if (!configFile.empty())
+    {
+        login.load(configFile);
+    }
+
     // Get path
     std::string path = paramPath.value();
     if (path.empty()) path = ".";
 
     // Open directory
-    FileHandle dir = fs::open(path);
+    FileHandle dir = fs::open(path, &login);
 
     if (dir.isDirectory())
     {

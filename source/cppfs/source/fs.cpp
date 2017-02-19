@@ -54,23 +54,6 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
             if (credentials->isSet("password"))   pass = credentials->value("password");
             if (credentials->isSet("publicKey"))  publicKey = credentials->value("publicKey");
             if (credentials->isSet("privateKey")) privateKey = credentials->value("privateKey");
-
-                // Read password from file
-            if (credentials->isSet("passwordFile"))
-            {
-                std::string filename = credentials->value("passwordFile");
-                FileHandle file = open(filename);
-
-                if (file.isFile())
-                {
-                    pass = readFile(filename);
-
-                    while (pass[pass.length()-1] == '\r' || pass[pass.length()-1] == '\n')
-                    {
-                        pass = pass.substr(0, pass.length() - 1);
-                    }
-                }
-            }
         }
 
         // Create SSH connection
