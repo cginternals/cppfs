@@ -5,6 +5,7 @@
 
 find_package(cppassist REQUIRED)
 find_package(LibSSH2 REQUIRED)
+find_package(LibCrypto)
 find_package(ZLIB)
 
 
@@ -176,10 +177,6 @@ target_link_libraries(${target}
     PRIVATE
     cppassist::cppassist
     ${LIBSSH2_LIBRARY}
-    ${LIBCRYPTO_LIBRARY}
-#    ${ZLIB_LIBRARY}
-    wsock32.lib
-    ws2_32.lib
 
     PUBLIC
     ${DEFAULT_LIBRARIES}
@@ -187,6 +184,27 @@ target_link_libraries(${target}
     INTERFACE
 )
 
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+    target_link_libraries(${target}
+        PRIVATE
+        wsock32.lib
+        ws2_32.lib
+    )
+endif()
+
+if(LibCrypto_FOUND)
+    target_link_libraries(${target}
+        PRIVATE
+        ${LIBCRYPTO_LIBRARY}
+    )
+endif()
+
+if(ZLIB_FOUND)
+    target_link_libraries(${target}
+        PRIVATE
+        ${ZLIB_LIBRARY}
+    )
+endif()
 
 # 
 # Compile definitions

@@ -94,7 +94,11 @@ void SshFileSystem::connect()
         if (::connect(m_socket, address->ai_addr, address->ai_addrlen) == -1)
         {
             // Error!
-            _close(m_socket);
+            #ifdef WIN32
+                _close(m_socket);
+            #else
+                close(m_socket);
+            #endif
             continue;
         }
     }
