@@ -3,7 +3,7 @@
 
 #ifdef WIN32
     #include <winsock2.h>
-	#include <ws2tcpip.h>
+    #include <ws2tcpip.h>
 #else
     #include <sys/socket.h>
     #include <netinet/in.h>
@@ -118,6 +118,16 @@ void SshFileSystem::connect()
     {
         // Open session
         int res = libssh2_session_handshake((LIBSSH2_SESSION *)m_session, m_socket);
+        /*
+        if (res == LIBSSH2_ERROR_SOCKET_NONE)       std::cout << "LIBSSH2_ERROR_SOCKET_NONE" << std::endl;
+        if (res == LIBSSH2_ERROR_BANNER_SEND)       std::cout << "LIBSSH2_ERROR_BANNER_SEND" << std::endl;
+        if (res == LIBSSH2_ERROR_KEX_FAILURE)       std::cout << "LIBSSH2_ERROR_KEX_FAILURE" << std::endl;
+        if (res == LIBSSH2_ERROR_SOCKET_SEND)       std::cout << "LIBSSH2_ERROR_SOCKET_SEND" << std::endl;
+        if (res == LIBSSH2_ERROR_SOCKET_DISCONNECT) std::cout << "LIBSSH2_ERROR_SOCKET_DISCONNECT" << std::endl;
+        if (res == LIBSSH2_ERROR_PROTO)             std::cout << "LIBSSH2_ERROR_PROTO" << std::endl;
+        if (res == LIBSSH2_ERROR_EAGAIN)            std::cout << "LIBSSH2_ERROR_EAGAIN" << std::endl;
+        */
+
         if (res == 0)
         {
             // Get fingerprint
