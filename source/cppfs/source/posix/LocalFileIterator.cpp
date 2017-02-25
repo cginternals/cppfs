@@ -97,7 +97,12 @@ void LocalFileIterator::readNextEntry()
     while (m_entry && (name == ".." || name == "."))
     {
         m_entry = readdir(m_dir);
-        name = m_entry->d_name;
+
+        if (m_entry) {
+            name = m_entry->d_name;
+        } else {
+            name = "";
+        }
     }
 }
 
