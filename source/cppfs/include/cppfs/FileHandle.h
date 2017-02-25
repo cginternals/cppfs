@@ -255,6 +255,15 @@ public:
 
     /**
     *  @brief
+    *    Compute sha1 hash for file
+    *
+    *  @return
+    *    SHA1 hash, "" on error
+    */
+    std::string sha1() const;
+
+    /**
+    *  @brief
     *    Get handle to the parent directory
     *
     *  @return

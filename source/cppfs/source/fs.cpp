@@ -2,6 +2,15 @@
 #include <cppfs/fs.h>
 
 #include <sstream>
+#include <iomanip>
+
+#if defined(__APPLE__)
+    #define COMMON_DIGEST_FOR_OPENSSL
+    #include <CommonCrypto/CommonDigest.h>
+    #define SHA1 CC_SHA1
+#else
+    #include <openssl/sha.h>
+#endif
 
 #include <cppassist/string/conversion.h>
 
@@ -19,6 +28,27 @@
 
 
 using namespace cppassist;
+
+
+namespace
+{
+
+
+std::string hashToString(const unsigned char * hash)
+{
+    std::stringstream stream;
+    stream << std::hex << std::setfill('0') << std::setw(2);
+
+    for (int i=0; i<20; i++)
+    {
+        stream << static_cast<unsigned int>(hash[i]);
+    }
+
+    return stream.str();
+}
+
+
+}
 
 
 namespace cppfs
@@ -97,6 +127,65 @@ std::string readFile(const std::string & path)
     }
 
     return "";
+}
+
+std::string sha1(const std::string & str)
+{
+    // Initialize hash
+    unsigned char hash[20];
+    SHA_CTX context;
+    SHA1_Init(&context);
+
+    // Update hash
+    SHA1_Update(&context, str.c_str(), str.size());
+
+    // Compute hash
+    SHA1_Final(hash, &context);
+    return hashToString(hash);
+}
+
+std::string sha1(const FileHandle & file)
+{
+    // Check file
+    if (!file.isFile()) {
+        return "";
+    }
+
+    // Open file
+    std::istream * inputStream = file.createInputStream();
+    if (!inputStream) {
+        return "";
+    }
+
+    // Initialize hash
+    unsigned char hash[20];
+    SHA_CTX context;
+    SHA1_Init(&context);
+
+    // Read whole while
+    while (!inputStream->eof())
+    {
+        // Read a maximum of 1024 bytes at once
+        int size = 1024;
+
+        // Read data from file
+        char buf[1024];
+        inputStream->read(buf, size);
+
+        size_t count = inputStream->gcount();
+        if (count > 0)
+        {
+            // Update hash
+            SHA1_Update(&context, buf, count);
+        } else break;
+    }
+
+    // Close file
+    delete inputStream;
+
+    // Compute hash
+    SHA1_Final(hash, &context);
+    return hashToString(hash);
 }
 
 

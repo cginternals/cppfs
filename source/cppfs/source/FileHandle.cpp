@@ -1,6 +1,7 @@
 
 #include <cppfs/FileHandle.h>
 
+#include <cppfs/fs.h>
 #include <cppfs/FilePath.h>
 #include <cppfs/FileIterator.h>
 #include <cppfs/AbstractFileSystem.h>
@@ -130,6 +131,11 @@ unsigned long FileHandle::permissions() const
 void FileHandle::setPermissions(unsigned long permissions)
 {
     if (m_backend) m_backend->setPermissions(permissions);
+}
+
+std::string FileHandle::sha1() const
+{
+    return fs::sha1(*this);
 }
 
 FileHandle FileHandle::parentDirectory() const

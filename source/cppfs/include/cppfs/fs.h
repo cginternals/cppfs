@@ -49,6 +49,30 @@ CPPFS_API FileHandle open(const std::string & path, const LoginCredentials * cre
 */
 CPPFS_API std::string readFile(const std::string & path);
 
+/**
+*  @brief
+*    Compute sha1 hash for string
+*
+*  @param[in] str
+*    String
+*
+*  @return
+*    SHA1 hash
+*/
+CPPFS_API std::string sha1(const std::string & str);
+
+/**
+*  @brief
+*    Compute sha1 hash for file
+*
+*  @param[in] file
+*    File handle
+*
+*  @return
+*    SHA1 hash, "" on error
+*/
+CPPFS_API std::string sha1(const FileHandle & file);
+
 
 } // namespace fs
 
