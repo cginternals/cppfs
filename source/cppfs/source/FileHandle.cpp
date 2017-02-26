@@ -4,6 +4,7 @@
 #include <cppfs/fs.h>
 #include <cppfs/FilePath.h>
 #include <cppfs/FileIterator.h>
+#include <cppfs/Tree.h>
 #include <cppfs/AbstractFileSystem.h>
 #include <cppfs/AbstractFileHandleBackend.h>
 
@@ -71,6 +72,56 @@ bool FileHandle::isFile() const
 bool FileHandle::isDirectory() const
 {
     return m_backend ? m_backend->isDirectory() : false;
+}
+
+Tree * FileHandle::readTree(const std::string & path)
+{
+    // Check if file or directory exists
+    if (!exists()) {
+        return nullptr;
+    }
+
+    // Create tree
+    auto tree = new Tree;
+    tree->setPath(path);
+    tree->setFileName(fileName());
+    tree->setDirectory(isDirectory());
+    tree->setSize(size());
+    tree->setAccessTime(accessTime());
+    tree->setModificationTime(modificationTime());
+    tree->setUserId(userId());
+    tree->setGroupId(groupId());
+    tree->setPermissions(permissions());
+    tree->setSha1(sha1());
+
+    // Is this is directory?
+    if (isDirectory())
+    {
+        // Add children
+        for (auto it = begin(); it != end(); ++it)
+        {
+            // Open file or directory
+            FileHandle fh = open(*it);
+            if (!fh.exists()) continue;
+
+            // Compose name
+            std::string subName = path;
+            if (!subName.empty()) subName += "/";
+            subName += fh.fileName();
+
+            // Read subtree
+            auto * subTree = fh.readTree(subName);
+
+            // Add subtree to list
+            if (subTree)
+            {
+                tree->add(subTree);
+            }
+        }
+    }
+
+    // Return tree
+    return tree;
 }
 
 std::vector<std::string> FileHandle::listFiles() const
@@ -143,7 +194,7 @@ FileHandle FileHandle::parentDirectory() const
     return m_backend ? m_backend->fs()->open(FilePath(m_backend->path()).resolve("..").resolved()) : FileHandle();
 }
 
-FileHandle FileHandle::open(const std::string & path)
+FileHandle FileHandle::open(const std::string & path) const
 {
     return m_backend ? m_backend->fs()->open(FilePath(m_backend->path()).resolve(path).fullPath()) : FileHandle();
 }

@@ -51,6 +51,47 @@ CPPFS_API std::string readFile(const std::string & path);
 
 /**
 *  @brief
+*    Write string to file
+*
+*  @param[in] path
+*    Path to file
+*  @param[in] content
+*    File content
+*
+*  @return
+*    'true' on success, else 'false'
+*/
+CPPFS_API bool writeFile(const std::string & path, const std::string & content);
+
+/**
+*  @brief
+*    Copy directory recursively
+*
+*  @param[in] srcDir
+*    Source directory
+*  @param[in] dstDir
+*    Destination directory
+*
+*  @remarks
+*    Destination directory points to the actual directory that
+*    is to be created, not its parent!
+*
+*    Example:
+*      fs::copyDirectory(fs::open("/projects/project1"), fs::open("/backup/projects/project1"))
+*/
+CPPFS_API void copyDirectory(const FileHandle & srcDir, FileHandle & dstDir);
+
+/**
+*  @brief
+*    Remove directory recursively
+*
+*  @param[in] dir
+*    Directory handle
+*/
+CPPFS_API void removeDirectory(FileHandle & dir);
+
+/**
+*  @brief
 *    Compute sha1 hash for string
 *
 *  @param[in] str

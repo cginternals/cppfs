@@ -18,6 +18,7 @@
 #include <cppfs/LoginCredentials.h>
 #include <cppfs/Url.h>
 #include <cppfs/FileHandle.h>
+#include <cppfs/FileIterator.h>
 #include <cppfs/ssh/SshFileSystem.h>
 
 #ifdef SYSTEM_WINDOWS
@@ -127,6 +128,86 @@ std::string readFile(const std::string & path)
     }
 
     return "";
+}
+
+bool writeFile(const std::string & path, const std::string & content)
+{
+    FileHandle fh = open(path);
+
+    std::ostream * outputStream = fh.createOutputStream();
+    if (!outputStream) return false;
+
+    (*outputStream) << content;
+
+    delete outputStream;
+
+    return true;
+}
+
+void copyDirectory(const FileHandle & srcDir, FileHandle & dstDir)
+{
+    // Check if source directory is valid
+    if (!srcDir.isDirectory())
+    {
+        return;
+    }
+
+    // Check destination directory and try to create it if necessary
+    if (!dstDir.isDirectory())
+    {
+        dstDir.makeDirectory();
+
+        if (!dstDir.isDirectory())
+        {
+            return;
+        }
+    }
+
+    // Copy all entries
+    for (auto it = srcDir.begin(); it != srcDir.end(); ++it)
+    {
+        std::string filename = *it;
+
+        FileHandle src = srcDir.open(filename);
+        FileHandle dst = dstDir.open(filename);
+
+        if (src.isDirectory())
+        {
+            copyDirectory(src, dst);
+        }
+
+        else if (src.isFile())
+        {
+            src.copy(dst);
+        }
+    }
+}
+
+void removeDirectory(FileHandle & dir)
+{
+    // Check directory
+    if (!dir.isDirectory()) {
+        return;
+    }
+
+    // Delete all entries
+    for (auto it = dir.begin(); it != dir.end(); ++it)
+    {
+        FileHandle fh = dir.open(*it);
+
+        if (fh.isDirectory())
+        {
+            removeDirectory(fh);
+        }
+
+        else if (fh.isFile())
+        {
+            fh.remove();
+        }
+    }
+
+    // Remove directory
+    dir.removeDirectory();
 }
 
 std::string sha1(const std::string & str)

@@ -16,6 +16,7 @@ namespace cppfs
 
 class FileIterator;
 class AbstractFileHandleBackend;
+class Tree;
 
 
 /**
@@ -144,6 +145,18 @@ public:
     *    'true' if it is a directory, else 'false'
     */
     bool isDirectory() const;
+
+    /**
+    *  @brief
+    *    Read directory tree
+    *
+    *  @param[in] path
+    *    File path for the root element
+    *
+    *  @return
+    *    File tree, nullptr if this file does not exist
+    */
+    Tree * readTree(const std::string & path = "");
 
     /**
     *  @brief
@@ -281,7 +294,7 @@ public:
     *  @return
     *    File handle
     */
-    FileHandle open(const std::string & path);
+    FileHandle open(const std::string & path) const;
 
     /**
     *  @brief

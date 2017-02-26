@@ -4,6 +4,7 @@
 # 
 
 find_package(cppassist REQUIRED)
+find_package(cppexpose REQUIRED)
 find_package(LibSSH2 REQUIRED)
 find_package(LibCrypto)
 find_package(ZLIB)
@@ -52,6 +53,9 @@ set(headers
     ${include_path}/LoginCredentials.h
     ${include_path}/FilePath.h
     ${include_path}/Url.h
+    ${include_path}/Tree.h
+    ${include_path}/Diff.h
+    ${include_path}/Change.h
 
     ${include_path}/${localfs}/LocalFileSystem.h
     ${include_path}/${localfs}/LocalFileHandle.h
@@ -77,6 +81,9 @@ set(sources
     ${source_path}/LoginCredentials.cpp
     ${source_path}/FilePath.cpp
     ${source_path}/Url.cpp
+    ${source_path}/Tree.cpp
+    ${source_path}/Diff.cpp
+    ${source_path}/Change.cpp
 
     ${source_path}/${localfs}/LocalFileSystem.cpp
     ${source_path}/${localfs}/LocalFileHandle.cpp
@@ -161,11 +168,12 @@ target_include_directories(${target}
 
 target_link_libraries(${target}
     PRIVATE
-    cppassist::cppassist
     ${LIBSSH2_LIBRARY}
 
     PUBLIC
     ${DEFAULT_LIBRARIES}
+    cppassist::cppassist
+    cppexpose::cppexpose
 
     INTERFACE
 )
