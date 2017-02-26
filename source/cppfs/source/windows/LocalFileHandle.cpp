@@ -195,7 +195,7 @@ void LocalFileHandle::setPermissions(unsigned long)
 {
 }
 
-bool LocalFileHandle::makeDirectory()
+bool LocalFileHandle::createDirectory()
 {
     // Check directory
     if (exists()) return false;

@@ -349,7 +349,7 @@ void SshFileHandle::setPermissions(unsigned long permissions)
     updateFileInfo();
 }
 
-bool SshFileHandle::makeDirectory()
+bool SshFileHandle::createDirectory()
 {
     // Check handle
     if (!m_fs->m_session) return false;

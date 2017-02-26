@@ -277,7 +277,7 @@ void LocalFileHandle::setPermissions(unsigned long permissions)
     updateFileInfo();
 }
 
-bool LocalFileHandle::makeDirectory()
+bool LocalFileHandle::createDirectory()
 {
     // Check directory
     if (exists()) return false;

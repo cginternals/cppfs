@@ -199,7 +199,7 @@ FileHandle FileHandle::open(const std::string & path) const
     return m_backend ? m_backend->fs()->open(FilePath(m_backend->path()).resolve(path).fullPath()) : FileHandle();
 }
 
-bool FileHandle::makeDirectory()
+bool FileHandle::createDirectory()
 {
     // Check backend
     if (!m_backend)
@@ -208,7 +208,7 @@ bool FileHandle::makeDirectory()
     }
 
     // Make directory
-    if (!m_backend->makeDirectory())
+    if (!m_backend->createDirectory())
     {
         return false;
     }

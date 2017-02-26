@@ -303,7 +303,7 @@ public:
     *  @return
     *    'true' if successful, else 'false'
     */
-    bool makeDirectory();
+    bool createDirectory();
 
     /**
     *  @brief

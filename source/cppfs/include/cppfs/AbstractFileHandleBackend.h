@@ -203,7 +203,7 @@ public:
     *  @return
     *    'true' if successful, else 'false'
     */
-    virtual bool makeDirectory() = 0;
+    virtual bool createDirectory() = 0;
 
     /**
     *  @brief

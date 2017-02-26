@@ -155,7 +155,7 @@ void copyDirectory(const FileHandle & srcDir, FileHandle & dstDir)
     // Check destination directory and try to create it if necessary
     if (!dstDir.isDirectory())
     {
-        dstDir.makeDirectory();
+        dstDir.createDirectory();
 
         if (!dstDir.isDirectory())
         {

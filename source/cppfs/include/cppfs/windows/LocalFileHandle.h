@@ -57,7 +57,7 @@ public:
     virtual void setGroupId(unsigned int gid) override;
     virtual unsigned long permissions() const override;
     virtual void setPermissions(unsigned long permissions) override;
-    virtual bool makeDirectory() override;
+    virtual bool createDirectory() override;
     virtual bool removeDirectory() override;
     virtual bool copy(AbstractFileHandleBackend * dest) override;
     virtual bool move(AbstractFileHandleBackend * dest) override;
