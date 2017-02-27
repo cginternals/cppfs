@@ -393,6 +393,27 @@ public:
     */
     std::ostream * createOutputStream(std::ios_base::openmode mode = std::ios_base::out);
 
+    /**
+    *  @brief
+    *    Read file to string
+    *
+    *  @return
+    *    File content, "" on error
+    */
+    std::string readFile() const;
+
+    /**
+    *  @brief
+    *    Write string to file
+    *
+    *  @param[in] content
+    *    File content
+    *
+    *  @return
+    *    'true' on success, else 'false'
+    */
+    bool writeFile(const std::string & content);
+
 
 protected:
     /**

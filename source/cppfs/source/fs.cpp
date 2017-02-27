@@ -110,40 +110,6 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
     }
 }
 
-std::string readFile(const std::string & path)
-{
-    FileHandle fh = open(path);
-
-    if (fh.isFile())
-    {
-        std::istream * inputStream = fh.createInputStream();
-        if (!inputStream) return "";
-
-        std::stringstream buffer;
-        buffer << inputStream->rdbuf();
-
-        delete inputStream;
-
-        return buffer.str();
-    }
-
-    return "";
-}
-
-bool writeFile(const std::string & path, const std::string & content)
-{
-    FileHandle fh = open(path);
-
-    std::ostream * outputStream = fh.createOutputStream();
-    if (!outputStream) return false;
-
-    (*outputStream) << content;
-
-    delete outputStream;
-
-    return true;
-}
-
 void copyDirectory(const FileHandle & srcDir, FileHandle & dstDir)
 {
     // Check if source directory is valid

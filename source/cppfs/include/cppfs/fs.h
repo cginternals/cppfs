@@ -39,32 +39,6 @@ CPPFS_API FileHandle open(const std::string & path, const LoginCredentials * cre
 
 /**
 *  @brief
-*    Read entire file to string
-*
-*  @param[in] path
-*    Path to file
-*
-*  @return
-*    File content, "" on error
-*/
-CPPFS_API std::string readFile(const std::string & path);
-
-/**
-*  @brief
-*    Write string to file
-*
-*  @param[in] path
-*    Path to file
-*  @param[in] content
-*    File content
-*
-*  @return
-*    'true' on success, else 'false'
-*/
-CPPFS_API bool writeFile(const std::string & path, const std::string & content);
-
-/**
-*  @brief
 *    Copy directory recursively
 *
 *  @param[in] srcDir

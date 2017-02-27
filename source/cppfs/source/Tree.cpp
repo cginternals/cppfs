@@ -7,6 +7,7 @@
 #include <cppexpose/variant/Variant.h>
 
 #include <cppfs/fs.h>
+#include <cppfs/FileHandle.h>
 #include <cppfs/Diff.h>
 
 
@@ -274,12 +275,14 @@ void Tree::fromVariant(const cppexpose::Variant & obj)
 
 void Tree::save(const std::string & path) const
 {
-    fs::writeFile(path, toVariant().toJSON(JSON::Beautify));
+    FileHandle file = fs::open(path);
+    file.writeFile(toVariant().toJSON(JSON::Beautify));
 }
 
 void Tree::load(const std::string & path)
 {
-    std::string json = fs::readFile(path);
+    FileHandle file = fs::open(path);
+    std::string json = file.readFile();
 
     Variant obj;
     JSON::parse(obj, json);

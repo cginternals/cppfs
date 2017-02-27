@@ -1,6 +1,9 @@
 
 #include <cppfs/FileHandle.h>
 
+#include <iostream>
+#include <sstream>
+
 #include <cppfs/fs.h>
 #include <cppfs/FilePath.h>
 #include <cppfs/FileIterator.h>
@@ -333,6 +336,46 @@ std::ostream * FileHandle::createOutputStream(std::ios_base::openmode mode)
 
     // Return stream
     return m_backend->createOutputStream(mode);
+}
+
+std::string FileHandle::readFile() const
+{
+    // Check if file exists
+    if (isFile())
+    {
+        // Open input stream
+        std::istream * inputStream = createInputStream();
+        if (!inputStream) return "";
+
+        // Read content
+        std::stringstream buffer;
+        buffer << inputStream->rdbuf();
+
+        // Clean up
+        delete inputStream;
+
+        // Return string
+        return buffer.str();
+    }
+
+    // Error, not a valid file
+    return "";
+}
+
+bool FileHandle::writeFile(const std::string & content)
+{
+    // Open output stream
+    std::ostream * outputStream = createOutputStream();
+    if (!outputStream) return false;
+
+    // Write content to file
+    (*outputStream) << content;
+
+    // Clean up
+    delete outputStream;
+
+    // Done
+    return true;
 }
 
 bool FileHandle::genericCopy(FileHandle & dest)
