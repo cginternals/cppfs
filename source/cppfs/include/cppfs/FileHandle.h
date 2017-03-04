@@ -14,8 +14,9 @@ namespace cppfs
 {
 
 
-class FileIterator;
 class AbstractFileHandleBackend;
+class FileIterator;
+class FileVisitor;
 class Tree;
 
 
@@ -40,6 +41,10 @@ class Tree;
 */
 class CPPFS_API FileHandle
 {
+public:
+    using VisitFunc = std::function<void(FileHandle &)>;
+
+
 public:
     /**
     *  @brief
@@ -148,6 +153,57 @@ public:
 
     /**
     *  @brief
+    *    List files in directory
+    *
+    *  @return
+    *    List of files, empty list if this is not a valid directory
+    */
+    std::vector<std::string> listFiles() const;
+
+    /**
+    *  @brief
+    *    Traverse directory tree with a visitor
+    *
+    *  @param[in] visitor
+    *    Visitor that is invoked for each entry in the directory tree
+    */
+    void traverse(FileVisitor & visitor);
+
+    /**
+    *  @brief
+    *    Traverse directory tree with callback functions
+    *
+    *  @param[in] funcFileEntry
+    *    Function that is call on each file entry (files and directories)
+    *  @param[in] funcFile
+    *    Function that is call on each file
+    *  @param[in] funcDirectory
+    *    Function that is call on each directory
+    */
+    void traverse(VisitFunc funcFileEntry, VisitFunc funcFile, VisitFunc funcDirectory);
+
+    /**
+    *  @brief
+    *    Traverse directory tree with callback functions
+    *
+    *  @param[in] funcFile
+    *    Function that is call on each file
+    *  @param[in] funcDirectory
+    *    Function that is call on each directory
+    */
+    void traverse(VisitFunc funcFile, VisitFunc funcDirectory);
+
+    /**
+    *  @brief
+    *    Traverse directory tree with callback functions
+    *
+    *  @param[in] funcFileEntry
+    *    Function that is call on each file entry (files and directories)
+    */
+    void traverse(VisitFunc funcFileEntry);
+
+    /**
+    *  @brief
     *    Read directory tree
     *
     *  @param[in] path
@@ -159,15 +215,6 @@ public:
     *    File tree, nullptr if this file does not exist
     */
     Tree * readTree(const std::string & path = "", bool includeHash = false) const;
-
-    /**
-    *  @brief
-    *    List files in directory
-    *
-    *  @return
-    *    List of files, empty list if this is not a valid directory
-    */
-    std::vector<std::string> listFiles() const;
 
     /**
     *  @brief

@@ -7,6 +7,8 @@
 #include <cppfs/fs.h>
 #include <cppfs/FilePath.h>
 #include <cppfs/FileIterator.h>
+#include <cppfs/FileVisitor.h>
+#include <cppfs/FunctionalFileVisitor.h>
 #include <cppfs/Tree.h>
 #include <cppfs/AbstractFileSystem.h>
 #include <cppfs/AbstractFileHandleBackend.h>
@@ -77,6 +79,55 @@ bool FileHandle::isDirectory() const
     return m_backend ? m_backend->isDirectory() : false;
 }
 
+std::vector<std::string> FileHandle::listFiles() const
+{
+    return m_backend ? m_backend->listFiles() : std::vector<std::string>();
+}
+
+void FileHandle::traverse(FileVisitor & visitor)
+{
+    // Check if file or directory exists
+    if (!exists()) {
+        return;
+    }
+
+    // Invoke visitor
+    visitor.onFileEntry(*this);
+
+    // Is this is directory?
+    if (isDirectory())
+    {
+        // Iterator over child entries
+        for (auto it = begin(); it != end(); ++it)
+        {
+            // Open file or directory
+            FileHandle fh = open(*it);
+            if (!fh.exists()) continue;
+
+            // Handle entry
+            fh.traverse(visitor);
+        }
+    }
+}
+
+void FileHandle::traverse(VisitFunc funcFileEntry, VisitFunc funcFile, VisitFunc funcDirectory)
+{
+    FunctionalFileVisitor visitor(funcFileEntry, funcFile, funcDirectory);
+    traverse(visitor);
+}
+
+void FileHandle::traverse(VisitFunc funcFile, VisitFunc funcDirectory)
+{
+    FunctionalFileVisitor visitor(funcFile, funcDirectory);
+    traverse(visitor);
+}
+
+void FileHandle::traverse(VisitFunc funcFileEntry)
+{
+    FunctionalFileVisitor visitor(funcFileEntry);
+    traverse(visitor);
+}
+
 Tree * FileHandle::readTree(const std::string & path, bool includeHash) const
 {
     // Check if file or directory exists
@@ -127,11 +178,6 @@ Tree * FileHandle::readTree(const std::string & path, bool includeHash) const
 
     // Return tree
     return tree;
-}
-
-std::vector<std::string> FileHandle::listFiles() const
-{
-    return m_backend ? m_backend->listFiles() : std::vector<std::string>();
 }
 
 FileIterator FileHandle::begin() const
