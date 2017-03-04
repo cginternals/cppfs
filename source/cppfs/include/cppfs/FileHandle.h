@@ -152,11 +152,13 @@ public:
     *
     *  @param[in] path
     *    File path for the root element
+    *  @param[in] includeHash
+    *    Compute SHA1 hash of each file? (slow, as each will must be read entirely)
     *
     *  @return
     *    File tree, nullptr if this file does not exist
     */
-    Tree * readTree(const std::string & path = "");
+    Tree * readTree(const std::string & path = "", bool includeHash = false);
 
     /**
     *  @brief
