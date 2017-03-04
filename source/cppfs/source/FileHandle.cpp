@@ -77,7 +77,7 @@ bool FileHandle::isDirectory() const
     return m_backend ? m_backend->isDirectory() : false;
 }
 
-Tree * FileHandle::readTree(const std::string & path, bool includeHash)
+Tree * FileHandle::readTree(const std::string & path, bool includeHash) const
 {
     // Check if file or directory exists
     if (!exists()) {

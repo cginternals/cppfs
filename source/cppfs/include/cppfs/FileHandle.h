@@ -158,7 +158,7 @@ public:
     *  @return
     *    File tree, nullptr if this file does not exist
     */
-    Tree * readTree(const std::string & path = "", bool includeHash = false);
+    Tree * readTree(const std::string & path = "", bool includeHash = false) const;
 
     /**
     *  @brief
