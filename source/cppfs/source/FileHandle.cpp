@@ -115,7 +115,7 @@ Tree * FileHandle::readTree(const std::string & path, bool includeHash) const
             subName += fh.fileName();
 
             // Read subtree
-            auto * subTree = fh.readTree(subName);
+            auto * subTree = fh.readTree(subName, includeHash);
 
             // Add subtree to list
             if (subTree)
