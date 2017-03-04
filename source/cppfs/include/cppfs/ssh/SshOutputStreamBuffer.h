@@ -36,8 +36,15 @@ public:
     *    Opening mode flags
     *  @param[n] bufferSize
     *    Size of the internal buffer
+    *
+    *  @remarks
+    *    Do not set bufferSize to higher values, as libssh2 does not seem to
+    *    support it. Testing revealed any values heigher than 24k to fail
+    *    (files ended up not being written entirely).
+    *
+    *    See https://c-ares.haxx.se/mail/libssh2-devel-archive-2010-02/0170.shtml
     */
-    SshOutputStreamBuffer(std::shared_ptr<SshFileSystem> fs, const std::string & path, std::ios_base::openmode mode, size_t bufferSize = 256);
+    SshOutputStreamBuffer(std::shared_ptr<SshFileSystem> fs, const std::string & path, std::ios_base::openmode mode, size_t bufferSize = 24 * 1024);
 
     /**
     *  @brief

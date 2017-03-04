@@ -388,7 +388,7 @@ bool FileHandle::genericCopy(FileHandle & dest)
 
     // Open files
     std::istream * in  = createInputStream(std::ios::binary);
-    std::ostream * out = dest.createOutputStream(std::ios::binary);
+    std::ostream * out = dest.createOutputStream(std::ios::binary | std::ios::trunc);
     if (!in || !out)
     {
         // Clean up streams

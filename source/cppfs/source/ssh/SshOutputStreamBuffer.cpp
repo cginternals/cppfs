@@ -23,7 +23,7 @@ SshOutputStreamBuffer::SshOutputStreamBuffer(std::shared_ptr<SshFileSystem> fs, 
 : m_fs(fs)
 , m_path(path)
 , m_file(nullptr)
-, m_buffer(std::min(bufferSize, (size_t)1))
+, m_buffer(std::max(bufferSize, (size_t)1))
 {
     // Check handle
     if (!m_fs->m_session) return;
@@ -56,8 +56,11 @@ SshOutputStreamBuffer::~SshOutputStreamBuffer()
     // Close file
     if (m_file)
     {
+        // Flush buffer
         sync();
 
+        // Sync file
+        libssh2_sftp_fsync((LIBSSH2_SFTP_HANDLE *)m_file);
         libssh2_sftp_close((LIBSSH2_SFTP_HANDLE *)m_file);
     }
 }
@@ -71,7 +74,7 @@ std::streambuf::int_type SshOutputStreamBuffer::overflow(std::streambuf::int_typ
     }
 
     // Sync buffer
-    if (sync() != 0)
+    if (sync() != 0 || value == traits_type::eof())
     {
         return traits_type::eof();
     }
@@ -85,7 +88,7 @@ std::streambuf::int_type SshOutputStreamBuffer::overflow(std::streambuf::int_typ
     setp(start + 1, end);
 
     // Done
-    return value;
+    return traits_type::to_int_type(value);
 }
 
 int SshOutputStreamBuffer::sync()
@@ -95,18 +98,24 @@ int SshOutputStreamBuffer::sync()
     if (size > 0)
     {
         // Write to stream
-        libssh2_sftp_write((LIBSSH2_SFTP_HANDLE *)m_file, &m_buffer.front(), size);
+        auto res = libssh2_sftp_write((LIBSSH2_SFTP_HANDLE *)m_file, &m_buffer.front(), size);
+
+        // [TODO] Handle errors
+        /*
+        if (res == LIBSSH2_ERROR_ALLOC)          std::cout << "LIBSSH2_ERROR_ALLOC" << std::endl;
+        if (res == LIBSSH2_ERROR_SOCKET_SEND)    std::cout << "LIBSSH2_ERROR_SOCKET_SEND" << std::endl;
+        if (res == LIBSSH2_ERROR_SOCKET_TIMEOUT) std::cout << "LIBSSH2_ERROR_SOCKET_TIMEOUT" << std::endl;
+        if (res == LIBSSH2_ERROR_SFTP_PROTOCOL)  std::cout << "LIBSSH2_ERROR_ALLOC" << std::endl;
+        */
 
         // Reset write buffer
         char * start = &m_buffer.front();
         char * end   = &m_buffer.front() + m_buffer.size();
         setp(start, end);
-
-        // Done
-        return 0;
     }
 
-    return -1;
+    // Done
+    return 0;
 }
 
 SshOutputStreamBuffer::pos_type SshOutputStreamBuffer::seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode which)
