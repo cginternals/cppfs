@@ -12,10 +12,8 @@ FunctionalFileVisitor::FunctionalFileVisitor()
 {
 }
 
-FunctionalFileVisitor::FunctionalFileVisitor(VisitFunc funcFileEntry, VisitFunc funcFile, VisitFunc funcDirectory)
+FunctionalFileVisitor::FunctionalFileVisitor(VisitFunc funcFileEntry)
 : m_funcFileEntry(funcFileEntry)
-, m_funcFile(funcFile)
-, m_funcDirectory(funcDirectory)
 {
 }
 
@@ -25,47 +23,48 @@ FunctionalFileVisitor::FunctionalFileVisitor(VisitFunc funcFile, VisitFunc funcD
 {
 }
 
-FunctionalFileVisitor::FunctionalFileVisitor(VisitFunc funcFileEntry)
-: m_funcFileEntry(funcFileEntry)
-{
-}
-
 FunctionalFileVisitor::~FunctionalFileVisitor()
 {
 }
 
-void FunctionalFileVisitor::onFileEntry(FileHandle & fh)
+bool FunctionalFileVisitor::onFileEntry(FileHandle & fh)
 {
     if (m_funcFileEntry)
     {
-        m_funcFileEntry(fh);
+        return m_funcFileEntry(fh);
     }
 
-    if (fh.isDirectory())
+    else if (fh.isDirectory())
     {
-        onDirectory(fh);
+        return onDirectory(fh);
     }
 
     else if (fh.isFile())
     {
-        onFile(fh);
+        return onFile(fh);
     }
+
+    return false;
 }
 
-void FunctionalFileVisitor::onFile(FileHandle & fh)
+bool FunctionalFileVisitor::onFile(FileHandle & fh)
 {
     if (m_funcFile)
     {
-        m_funcFile(fh);
+        return m_funcFile(fh);
     }
+
+    return false;
 }
 
-void FunctionalFileVisitor::onDirectory(FileHandle & fh)
+bool FunctionalFileVisitor::onDirectory(FileHandle & fh)
 {
     if (m_funcDirectory)
     {
-        m_funcDirectory(fh);
+        return m_funcDirectory(fh);
     }
+
+    return false;
 }
 
 

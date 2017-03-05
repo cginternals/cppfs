@@ -16,25 +16,27 @@ FileVisitor::~FileVisitor()
 {
 }
 
-void FileVisitor::onFileEntry(FileHandle & fh)
+bool FileVisitor::onFileEntry(FileHandle & fh)
 {
     if (fh.isDirectory())
     {
-        onDirectory(fh);
+        return onDirectory(fh);
     }
 
-    else if (fh.isFile())
+    else
     {
-        onFile(fh);
+        return onFile(fh);
     }
 }
 
-void FileVisitor::onFile(FileHandle &)
+bool FileVisitor::onFile(FileHandle &)
 {
+    return true;
 }
 
-void FileVisitor::onDirectory(FileHandle &)
+bool FileVisitor::onDirectory(FileHandle &)
 {
+    return true;
 }
 
 

@@ -18,7 +18,7 @@ namespace cppfs
 class CPPFS_API FunctionalFileVisitor : public FileVisitor
 {
 public:
-    using VisitFunc = std::function<void(FileHandle &)>;
+    using VisitFunc = std::function<bool(FileHandle &)>;
 
 
 public:
@@ -34,12 +34,8 @@ public:
     *
     *  @param[in] funcFileEntry
     *    Function that is call on each file entry (files and directories)
-    *  @param[in] funcFile
-    *    Function that is call on each file
-    *  @param[in] funcDirectory
-    *    Function that is call on each directory
     */
-    FunctionalFileVisitor(VisitFunc funcFileEntry, VisitFunc funcFile, VisitFunc funcDirectory);
+    FunctionalFileVisitor(VisitFunc funcFileEntry);
 
     /**
     *  @brief
@@ -54,24 +50,15 @@ public:
 
     /**
     *  @brief
-    *    Constructor
-    *
-    *  @param[in] funcFileEntry
-    *    Function that is call on each file entry (files and directories)
-    */
-    FunctionalFileVisitor(VisitFunc funcFileEntry);
-
-    /**
-    *  @brief
     *    Destructor
     */
     virtual ~FunctionalFileVisitor();
 
 
 protected:
-    virtual void onFileEntry(FileHandle & fh) override;
-    virtual void onFile(FileHandle & fh) override;
-    virtual void onDirectory(FileHandle & fh) override;
+    virtual bool onFileEntry(FileHandle & fh) override;
+    virtual bool onFile(FileHandle & fh) override;
+    virtual bool onDirectory(FileHandle & fh) override;
 
 
 protected:

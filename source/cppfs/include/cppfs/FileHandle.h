@@ -42,7 +42,7 @@ class Tree;
 class CPPFS_API FileHandle
 {
 public:
-    using VisitFunc = std::function<void(FileHandle &)>;
+    using VisitFunc = std::function<bool(FileHandle &)>;
 
 
 public:
@@ -162,25 +162,12 @@ public:
 
     /**
     *  @brief
-    *    Traverse directory tree with a visitor
-    *
-    *  @param[in] visitor
-    *    Visitor that is invoked for each entry in the directory tree
-    */
-    void traverse(FileVisitor & visitor);
-
-    /**
-    *  @brief
     *    Traverse directory tree with callback functions
     *
     *  @param[in] funcFileEntry
     *    Function that is call on each file entry (files and directories)
-    *  @param[in] funcFile
-    *    Function that is call on each file
-    *  @param[in] funcDirectory
-    *    Function that is call on each directory
     */
-    void traverse(VisitFunc funcFileEntry, VisitFunc funcFile, VisitFunc funcDirectory);
+    void traverse(VisitFunc funcFileEntry);
 
     /**
     *  @brief
@@ -195,12 +182,12 @@ public:
 
     /**
     *  @brief
-    *    Traverse directory tree with callback functions
+    *    Traverse directory tree with a visitor
     *
-    *  @param[in] funcFileEntry
-    *    Function that is call on each file entry (files and directories)
+    *  @param[in] visitor
+    *    Visitor that is invoked for each entry in the directory tree
     */
-    void traverse(VisitFunc funcFileEntry);
+    void traverse(FileVisitor & visitor);
 
     /**
     *  @brief

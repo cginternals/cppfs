@@ -47,8 +47,11 @@ protected:
     *    The default implementation checks if the file handle
     *    points to a file or a directory and calls onFile()
     *    or onDirectory() respectively.
+    *
+    *  @return
+    *    'true' if subdirectory should be traversed, else 'false'
     */
-    virtual void onFileEntry(FileHandle & fh);
+    virtual bool onFileEntry(FileHandle & fh);
 
     /**
     *  @brief
@@ -56,8 +59,11 @@ protected:
     *
     *  @param[in] fh
     *    Handle to file
+    *
+    *  @return
+    *    Irrelevant for files
     */
-    virtual void onFile(FileHandle & fh);
+    virtual bool onFile(FileHandle & fh);
 
     /**
     *  @brief
@@ -65,8 +71,11 @@ protected:
     *
     *  @param[in] fh
     *    Handle to directory
+    *
+    *  @return
+    *    'true' if subdirectory should be traversed, else 'false'
     */
-    virtual void onDirectory(FileHandle & fh);
+    virtual bool onDirectory(FileHandle & fh);
 };
 
 

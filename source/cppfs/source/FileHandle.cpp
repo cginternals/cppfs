@@ -84,18 +84,31 @@ std::vector<std::string> FileHandle::listFiles() const
     return m_backend ? m_backend->listFiles() : std::vector<std::string>();
 }
 
+void FileHandle::traverse(VisitFunc funcFileEntry)
+{
+    FunctionalFileVisitor visitor(funcFileEntry);
+    traverse(visitor);
+}
+
+void FileHandle::traverse(VisitFunc funcFile, VisitFunc funcDirectory)
+{
+    FunctionalFileVisitor visitor(funcFile, funcDirectory);
+    traverse(visitor);
+}
+
 void FileHandle::traverse(FileVisitor & visitor)
 {
     // Check if file or directory exists
-    if (!exists()) {
+    if (!exists())
+    {
         return;
     }
 
     // Invoke visitor
-    visitor.onFileEntry(*this);
+    bool traverseSubDir = visitor.onFileEntry(*this);
 
     // Is this is directory?
-    if (isDirectory())
+    if (isDirectory() && traverseSubDir)
     {
         // Iterator over child entries
         for (auto it = begin(); it != end(); ++it)
@@ -108,24 +121,6 @@ void FileHandle::traverse(FileVisitor & visitor)
             fh.traverse(visitor);
         }
     }
-}
-
-void FileHandle::traverse(VisitFunc funcFileEntry, VisitFunc funcFile, VisitFunc funcDirectory)
-{
-    FunctionalFileVisitor visitor(funcFileEntry, funcFile, funcDirectory);
-    traverse(visitor);
-}
-
-void FileHandle::traverse(VisitFunc funcFile, VisitFunc funcDirectory)
-{
-    FunctionalFileVisitor visitor(funcFile, funcDirectory);
-    traverse(visitor);
-}
-
-void FileHandle::traverse(VisitFunc funcFileEntry)
-{
-    FunctionalFileVisitor visitor(funcFileEntry);
-    traverse(visitor);
 }
 
 Tree * FileHandle::readTree(const std::string & path, bool includeHash) const
