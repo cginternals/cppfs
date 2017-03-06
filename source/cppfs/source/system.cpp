@@ -12,7 +12,11 @@ namespace system
 
 std::string homeDir()
 {
-    return std::string(getenv("HOME"));
+#if defined(SYSTEM_WINDOWS)
+	return std::string(getenv("HOMEPATH"));
+#else
+	return std::string(getenv("HOME"));
+#endif
 }
 
 std::string configDir(const std::string & application)
