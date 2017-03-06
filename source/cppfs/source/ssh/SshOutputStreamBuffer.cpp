@@ -10,8 +10,8 @@
 #include <cppfs/ssh/SshFileSystem.h>
 
 
-#ifdef min
-	#undef min
+#ifdef max
+	#undef max
 #endif
 
 

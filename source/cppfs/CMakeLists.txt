@@ -9,6 +9,7 @@ find_package(cppexpose REQUIRED)
 find_package(LibSSH2 REQUIRED)
 find_package(LibCrypto)
 find_package(ZLIB)
+find_package(OpenSSL)
 
 
 # 
@@ -155,6 +156,7 @@ target_include_directories(${target}
     ${PROJECT_BINARY_DIR}/source/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
+    ${OPENSSL_INCLUDE_DIR}
     ${LIBSSH2_INCLUDE_DIR}
 
     PUBLIC
@@ -173,6 +175,7 @@ target_include_directories(${target}
 
 target_link_libraries(${target}
     PRIVATE
+    ${OPENSSL_LIBRARIES}
     ${LIBSSH2_LIBRARY}
 
     PUBLIC
