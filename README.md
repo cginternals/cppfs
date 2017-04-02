@@ -315,11 +315,28 @@ dir.removeDirectory();
 
 ### Reading and writing to files
 
-std::istream * createInputStream(std::ios_base::openmode mode = std::ios_base::in) const;
-std::ostream * createOutputStream(std::ios_base::openmode mode = std::ios_base::out);
+To read and write files, standard C++ streams are applied. To open an input stream for a
+file, call *createInputStream*. To create an output stream, call *createOutputStream*.
 
-std::string readFile() const;
-bool writeFile(const std::string & content);
+```C++
+cppfs::FileHandle file = cppfs::fs::open("readme.txt");
+
+std::istream * in = file.createInputStream();
+...
+
+std::ostream * out = file.createOutputStream();
+...
+```
+
+For convience, there are also functions for reading and writing entire files using strings:
+
+```C++
+cppfs::FileHandle file = cppfs::fs::open("readme.txt");
+
+std::string content = file.readFile();
+
+file.writeFile("no more text ...");
+```
 
 
 ### Advanced functions on files
