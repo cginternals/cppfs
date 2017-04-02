@@ -41,7 +41,7 @@ Open a file for reading or writing:
 
 void openFile(const std::string & filename)
 {
-    cppfs::FileHandle f = cppfs::fs::open(filename);
+    FileHandle f = fs::open(filename);
 
     if (in.isFile())
     {
@@ -63,7 +63,7 @@ The class *FilePath* is used to represent paths in the file system.
 It can be constructed from a string and converted back into a string.
 
 ```C++
-cppfs::FilePath path("data/readme.txt");
+FilePath path("data/readme.txt");
 std::string pathOut = path.path();
 ```
 
@@ -74,7 +74,7 @@ native format when displaying paths. To convert a path into the native
 format, call *toNative*.
 
 ```C++
-cppfs::FilePath path("data/readme.txt");
+FilePath path("data/readme.txt");
 std::cout << "File path: " << path.toNative() << std::endl;
 ```
 
@@ -84,7 +84,7 @@ about the actual file or directory the path points to. The following
 functions are useful to get information about a path:
 
 ```C++
-cppfs::FilePath path = ...;
+FilePath path = ...;
 
 // Check if the path is empty ("")
 bool empty = path.isEmpty();
@@ -106,8 +106,8 @@ All of these functions ignore trailing slashes on the path, so they work on
 the object the path points to, not it contents.
 
 ```C++
-cppfs::FilePath path1("C:/path/to/file.txt");
-cppfs::FilePath path2("C:/path/to/directory/");
+FilePath path1("C:/path/to/file.txt");
+FilePath path2("C:/path/to/directory/");
 
 // Get full path
 std::cout << path1.fullPath() << std::endl; // "C:/path/to/file.txt"
@@ -137,14 +137,14 @@ second path is returned. The combination of paths also takes place on
 a pure syntactical level, without checking if any of the paths really exist.
 
 ```C++
-cppfs::FilePath src("C:/projects");
-cppfs::FilePath rel("../documents/test.txt");
-cppfs::FilePath abs("C:/projects2/readme.txt");
+FilePath src("C:/projects");
+FilePath rel("../documents/test.txt");
+FilePath abs("C:/projects2/readme.txt");
 
-cppfs::FilePath path1 = src.resolve(rel);
+FilePath path1 = src.resolve(rel);
 std::cout << path1.fullPath() << std::endl; // "C:/projects/../documents/test.txt"
 
-cppfs::FilePath path2 = src.resolve(abs);
+FilePath path2 = src.resolve(abs);
 std::cout << path2.fullPath() << std::endl; // "C:/projects2/readme.txt"
 ```
 
@@ -155,7 +155,7 @@ and "..", as long as it is possible. Occurences of ".." at the beginning
 of a path will not be removed.
 
 ```C++
-cppfs::FilePath path("C:/projects/../documents/test.txt");
+FilePath path("C:/projects/../documents/test.txt");
 std::cout << path.resolved() << std::endl; // "C:/documents/test.txt"
 ```
 
@@ -172,8 +172,6 @@ or URL. File systems will be closed automatically when they no longer have
 any open file handles.
 
 ```C++
-using namespace cppfs;
-
 // Open local file
 FileHandle file1 = fs::open("data/readme.txt");
 
@@ -190,10 +188,10 @@ FileHandle file2 = fs::open("ssh://example.com/home/user/readme.txt", &login);
 
 At the moment, it is not possible to register new file systems at the global
 level. To use a custom file system, create an instance of it and use the
-*cppfs::AbstractFileSystem* interface to access it.
+*AbstractFileSystem* interface to access it.
 
 ```C++
-class CustomFS : public cppfs::AbstractFileSystem
+class CustomFS : public AbstractFileSystem
 {
     ...
 };
@@ -214,17 +212,17 @@ new object, so it is a cheap operation.
 
 ```C++
 // Open file from local file system
-cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
+FileHandle file = fs::open("data/readme.txt");
 
 // Get a second handle to the same file
-cppfs::FileHandle file2 = file;
+FileHandle file2 = file;
 ```
 
 Once a file handle has been obtained, it can be used to query basic information
 about the file system object is points to.
 
 ```C++
-cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
+FileHandle file = fs::open("data/readme.txt");
 
 // Check type
      if (file.isFile())         std::cout << "file" << std::endl;
@@ -248,11 +246,11 @@ unsigned long perm  = file.permissions();
 File permissions can also be modified:
 
 ```C++
-cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
+FileHandle file = fs::open("data/readme.txt");
 
 file.setUserId(1000);
 file.setGroupId(1000);
-file.setPermissions(cppfs::FilePermissions::UserRead | cppfs::FilePermissions::GroupRead);
+file.setPermissions(FilePermissions::UserRead | FilePermissions::GroupRead);
 ```
 
 The file information is retrieved only when needed, i.e., on the first call
@@ -263,7 +261,7 @@ handle to the same file, the file handle cannot know about the change. Therefore
 it must be updated manually:
 
 ```C++
-cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
+FileHandle file = fs::open("data/readme.txt");
 
 // If the file has been modified outside the application ...
 file.updateFileInfo();
@@ -281,8 +279,8 @@ to be inside that directory (for example, a file will be copied into
 the given directory).
 
 ```C++
-cppfs::FileHandle dir  = cppfs::fs::open("data");
-cppfs::FileHandle file = cppfs::fs::open("readme.txt");
+FileHandle dir  = fs::open("data");
+FileHandle file = fs::open("readme.txt");
 
 // Create directory if it does not yet exist
 if (!dir.isDirectory()) dir.createDirectory();
@@ -319,7 +317,7 @@ To read and write files, standard C++ streams are applied. To open an input stre
 file, call *createInputStream*. To create an output stream, call *createOutputStream*.
 
 ```C++
-cppfs::FileHandle file = cppfs::fs::open("readme.txt");
+FileHandle file = fs::open("readme.txt");
 
 std::istream * in = file.createInputStream();
 ...
@@ -331,7 +329,7 @@ std::ostream * out = file.createOutputStream();
 For convience, there are also functions for reading and writing entire files using strings:
 
 ```C++
-cppfs::FileHandle file = cppfs::fs::open("readme.txt");
+FileHandle file = fs::open("readme.txt");
 
 std::string content = file.readFile();
 
@@ -345,7 +343,7 @@ Advanced file operation include the generation of hashes and base64 encoding of 
 They can be called directly on a file handle:
 
 ```C++
-cppfs::FileHandle file = cppfs::fs::open("readme.txt");
+FileHandle file = fs::open("readme.txt");
 
 // Get SHA1 hash of a file
 std::string hash = file.sha1();
@@ -365,7 +363,7 @@ To check if a file handle points to a directory, the function
 *isDirectory* can be used.
 
 ```C++
-cppfs::FileHandle dir = cppfs::fs::open("data");
+FileHandle dir = fs::open("data");
 if (dir.isDirectory())
 {
     ...
