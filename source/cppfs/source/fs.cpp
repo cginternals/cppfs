@@ -3,6 +3,9 @@
 
 #include <sstream>
 #include <iomanip>
+#include <iterator>
+
+#include <basen/basen.hpp>
 
 #if defined(__APPLE__)
     #define COMMON_DIGEST_FOR_OPENSSL
@@ -233,6 +236,42 @@ std::string sha1(const FileHandle & file)
     // Compute hash
     SHA1_Final(hash, &context);
     return hashToString(hash);
+}
+
+std::string base64(const std::string & str)
+{
+    // Encode base64
+    std::string encoded;
+    bn::encode_b64(str.begin(), str.end(), back_inserter(encoded));
+
+    // Return encoded string
+    return encoded;
+}
+
+std::string base64(const FileHandle & file)
+{
+    // Check file
+    if (!file.isFile()) {
+        return "";
+    }
+
+    // Open file
+    std::istream * inputStream = file.createInputStream();
+    if (!inputStream) {
+        return "";
+    }
+
+    // Create stream iterator
+    std::noskipws(*inputStream);
+    std::istream_iterator<char> it(*inputStream);
+    std::istream_iterator<char> end;
+
+    // Encode base64
+    std::string encoded;
+    bn::encode_b64(it, end, back_inserter(encoded));
+
+    // Return encoded string
+    return encoded;
 }
 
 

@@ -154,6 +154,7 @@ set_target_properties(${target}
 target_include_directories(${target}
     PRIVATE
     ${PROJECT_BINARY_DIR}/source/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${OPENSSL_INCLUDE_DIR}

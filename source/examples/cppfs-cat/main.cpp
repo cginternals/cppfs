@@ -36,6 +36,9 @@ int main(int argc, char * argv[])
     CommandLineOption opConfig("--config", "-c", "file", "Load configuration from file", CommandLineOption::Optional);
     action.add(&opConfig);
 
+    CommandLineSwitch swBase64("--base64", "", "Encode file in base64", CommandLineSwitch::Optional);
+    action.add(&swBase64);
+
     CommandLineParameter paramPath("path", CommandLineParameter::NonOptional);
     action.add(&paramPath);
 
@@ -64,23 +67,12 @@ int main(int argc, char * argv[])
     FileHandle file = fs::open(path, &login);
     if (file.isFile())
     {
-        // Open input stream
-        std::istream * inputStream = file.createInputStream();
-        if (inputStream)
-        {
-            // Read entire file
-            std::stringstream buffer;
-            buffer << inputStream->rdbuf();
+        // Output file content
+        std::string content = swBase64.activated() ? file.base64() : file.readFile();
+        std::cout << content << std::endl;
 
-            // Output content
-            std::cout << buffer.str() << std::endl;
-
-            // Destroy input stream
-            delete inputStream;
-
-            // Done
-            return 0;
-        }
+        // Done
+        return 0;
     }
 
     // Error

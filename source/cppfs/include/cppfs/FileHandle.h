@@ -323,6 +323,15 @@ public:
 
     /**
     *  @brief
+    *    Get base64 encoded file content
+    *
+    *  @return
+    *    Base64 encoded file, "" on error
+    */
+    std::string base64() const;
+
+    /**
+    *  @brief
     *    Get handle to the parent directory
     *
     *  @return

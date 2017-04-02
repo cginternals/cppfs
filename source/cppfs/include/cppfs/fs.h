@@ -88,6 +88,30 @@ CPPFS_API std::string sha1(const std::string & str);
 */
 CPPFS_API std::string sha1(const FileHandle & file);
 
+/**
+*  @brief
+*    Get base64 encoding for string
+*
+*  @param[in] str
+*    String
+*
+*  @return
+*    Base64 encoded string
+*/
+CPPFS_API std::string base64(const std::string & str);
+
+/**
+*  @brief
+*    Get base64 encoding for file
+*
+*  @param[in] file
+*    File handle
+*
+*  @return
+*    Base64 encoded file, "" on error
+*/
+CPPFS_API std::string base64(const FileHandle & file);
+
 
 } // namespace fs
 

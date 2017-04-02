@@ -240,6 +240,11 @@ std::string FileHandle::sha1() const
     return fs::sha1(*this);
 }
 
+std::string FileHandle::base64() const
+{
+    return fs::base64(*this);
+}
+
 FileHandle FileHandle::parentDirectory() const
 {
     return m_backend ? m_backend->fs()->open(FilePath(m_backend->path()).resolve("..").resolved()) : FileHandle();
