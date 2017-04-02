@@ -62,18 +62,18 @@ void openFile(const std::string & filename)
 The class *FilePath* is used to represent paths in the file system.
 It can be constructed from a string and converted back into a string.
 
-```
+```C++
 cppfs::FilePath path("data/readme.txt");
 std::string pathOut = path.path();
 ```
 
-Paths are stored in a unified format using only forward slash ('/')
+Paths are stored in a unified format using only forward slashes ('/')
 as a separator. The unified format is compatible to all systems,
 but as a convenience for the user, it should be converted to the
-native format when displaying paths to the user. To convert a path
-into the native format, call *toNative*.
+native format when displaying paths. To convert a path into the native
+format, call *toNative*.
 
-```
+```C++
 cppfs::FilePath path("data/readme.txt");
 std::cout << "File path: " << path.toNative() << std::endl;
 ```
@@ -83,7 +83,7 @@ It does however work purely on the string, it cannot provide information
 about the actual file or directory the path points to. The following
 functions are useful to get information about a path:
 
-```
+```C++
 cppfs::FilePath path = ...;
 
 // Check if the path is empty ("")
@@ -105,7 +105,7 @@ such as the filename, extension, or path to the containing directory.
 All of these functions ignore trailing slashes on the path, so they work on
 the object the path points to, not it contents.
 
-```
+```C++
 cppfs::FilePath path1("C:/path/to/file.txt");
 cppfs::FilePath path2("C:/path/to/directory/");
 
@@ -136,7 +136,7 @@ second path must be relative to combine the two paths, otherwise only the
 second path is returned. The combination of paths also takes place on
 a pure syntactical level, without checking if any of the paths really exist.
 
-```
+```C++
 cppfs::FilePath src("C:/projects");
 cppfs::FilePath rel("../documents/test.txt");
 cppfs::FilePath abs("C:/projects2/readme.txt");
@@ -154,13 +154,39 @@ function *resolved* can be called. It will remove all occurences of "."
 and "..", as long as it is possible. Occurences of ".." at the beginning
 of a path will not be removed.
 
-```
+```C++
 cppfs::FilePath path("C:/projects/../documents/test.txt");
 std::cout << path.resolved() << std::endl; // "C:/documents/test.txt"
 ```
 
 
-### Filesystems
+### Accessing file systems
+
+To open files, the global function *fs::open* can be used. The type of file
+system that is accessed will be determined automatically by the given path
+or URL. File systems will be closed automatically when they no longer have
+any open file handles. At the moment, it is not possible to register new file
+systems at this global level. To use a custom file system, you have to create
+an own instance of it and use the *cppfs::AbstractFileSystem* interface to
+access it.
+
+```C++
+using namespace cppfs;
+
+// Open local file
+FileHandle f1 = fs::open("data/readme.txt");
+
+// Open file on SSH server
+LoginCredentials login;
+login.setValue("username",   "username");
+login.setValue("password",   "password");
+login.setValue("publicKey",  "/path/to/key.pub"); // Default: "$home/.ssh/id_rsa.pub"
+login.setValue("privateKey", "/path/to/key");     // Default: "$home/.ssh/id_rsa"
+login.setValue("port",       "999");              // Default: 22
+
+FileHandle f2 = fs::open("ssh://example.com/home/user/readme.txt", &login);
+```
+
 
 ### File handles
 
