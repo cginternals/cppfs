@@ -341,9 +341,21 @@ file.writeFile("no more text ...");
 
 ### Advanced functions on files
 
-std::string sha1() const;
-std::string base64() const;
-bool writeFileBase64(const std::string & base64);
+Advanced file operation include the generation of hashes and base64 encoding of files.
+They can be called directly on a file handle:
+
+```C++
+cppfs::FileHandle file = cppfs::fs::open("readme.txt");
+
+// Get SHA1 hash of a file
+std::string hash = file.sha1();
+
+// Get base64 encoding of a file
+std::string base64 = file.base64();
+
+// Write file from base64 encoding
+file.writeFileBase64(base64);
+```
 
 
 ### Accessing and traversing directories
