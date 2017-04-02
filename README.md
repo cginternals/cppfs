@@ -162,7 +162,11 @@ std::cout << path.resolved() << std::endl; // "C:/documents/test.txt"
 
 ### Accessing the file system
 
-To open files, the global function *fs::open* can be used. The type of file
+The main class for accessing file and directories in cppfs is *FileHandle*.
+It can be used to get information about file system objects, to manipulate
+them (e.g., copy, rename, or delete), as well as to read and write files.
+
+To obtain a file handle, the global function *fs::open* can be used. The type of file
 system that is accessed will be determined automatically by the given path
 or URL. File systems will be closed automatically when they no longer have
 any open file handles.
@@ -199,16 +203,13 @@ FileHandle file = fs.open("data/readme.txt");
 ```
 
 
-### File handles
+### Getting file information
 
-The main class to access file and directories in cppfs is *FileHandle*.
-It can be used to get information about file system objects, to manipulate
-them (e.g., copy, rename, or delete), as well as to read and write files.
-
-To open a file handle, use the filesystem interface as described before.
-File handles can also be copied, creating a second handle that points to
-the same file system object but does not inherit the state of the former
-handle. Actually, this operation only copies the path of the handle to the
+A file handle can be used to access information about the file
+system object it points to. A file handle can also be copied,
+creating a second handle that points to the same file system
+object but does not inherit the state of the former handle.
+This operation only copies the path of the handle to the
 new object, so it is a cheap operation.
 
 ```C++
@@ -244,8 +245,18 @@ unsigned int  gid   = file.groupId();
 unsigned long perm  = file.permissions();
 ```
 
+File permissions can also be modified:
+
+```C++
+cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
+
+file.setUserId(1000);
+file.setGroupId(1000);
+file.setPermissions(cppfs::FilePermissions::UserRead | cppfs::FilePermissions::GroupRead);
+```
+
 The file information is retrieved only when needed, i.e., on the first call
-of one of the above functions, and cached in memory. When an operation on
+of one of the above functions, and then cached in memory. When an operation on
 the handle modifies the file information, it is updated automatically.
 However, if a file is modified outside of the application or using a different
 handle to the same file, the file handle cannot know about the change. Therefore,
@@ -258,29 +269,73 @@ cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
 file.updateFileInfo();
 ```
 
-File permissions can be modified:
+
+### Accessing and traversing directories
+
+A *FileHandle* is used to access files as well as directories.
+To check if a file handle points to a directory, the function
+*isDirectory* can be used.
 
 ```C++
-cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
-
-file.setUserId(1000);
-file.setGroupId(1000);
-file.setPermissions(cppfs::FilePermissions::UserRead | cppfs::FilePermissions::GroupRead);
+cppfs::FileHandle dir = cppfs::fs::open("data");
+if (dir.isDirectory())
+{
+    ...
+}
 ```
 
-std::vector<std::string> listFiles() const;
+To list all files in a directory, call *listFiles*:
 
-FileIterator begin() const;
-FileIterator end() const;
+```C++
+std::vector<std::string> files = dir.listFiles();
+```
 
-void traverse(VisitFunc funcFileEntry);
-void traverse(VisitFunc funcFile, VisitFunc funcDirectory);
-void traverse(FileVisitor & visitor);
+For better control, the C++ iterator interface can be used:
 
-Tree * readTree(const std::string & path = "", bool includeHash = false) const;
+```C++
+for (FileIterator it = dir.begin(); it != dir.end(); ++it)
+{
+    std::string path = *it;
+}
+```
+
+For automatically traversing a directory tree, the *traverse*
+function can be called. It can be passed  either
+- a callback function for each file entry
+- a callback function for each file and one for each directory
+- a visitor object
+
+```C++
+// Traverse all file entries
+dir.traverse([](FileHandle & fh) -> bool {
+    std::cout << fh.path() << std::endl;
+    return true; // continue
+});
+
+// Traverse all files and directories
+dir.traverse([](FileHandle & fh) -> bool {
+    std::cout << fh.path() << std::endl;
+    return true; // continue
+}, [](FileHandle & dir) -> bool {
+    std::cout << dir.path() << std::endl;
+    return true; // continue
+});
+```
+
+Once ...
 
 FileHandle parentDirectory() const;
 FileHandle open(const std::string & path) const;
+
+
+### File trees
+
+Tree * readTree(const std::string & path = "", bool includeHash = false) const;
+Diff
+Change
+
+
+### File operations
 
 bool createDirectory();
 bool removeDirectory();
@@ -291,15 +346,18 @@ bool createSymbolicLink(FileHandle & dest);
 bool rename(const std::string & filename);
 bool remove();
 
+
+### Reading and writing into files
+
 std::istream * createInputStream(std::ios_base::openmode mode = std::ios_base::in) const;
 std::ostream * createOutputStream(std::ios_base::openmode mode = std::ios_base::out);
 
 std::string readFile() const;
 bool writeFile(const std::string & content);
 
+
+### Advanced functions
+
 std::string sha1() const;
 std::string base64() const;
 bool writeFileBase64(const std::string & base64);
-
-
-### Advanced functions
