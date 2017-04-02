@@ -31,7 +31,25 @@ Please follow our [CMake project setup guide](https://github.com/cginternals/cma
 to setup and build *cppfs*.
 
 
-## Basic Example
+## Basic Examples
+
+Opening files and checking for existence and type:
+
+```C++
+#include <cppfs/fs.h>
+#include <cppfs/FileHandle.h>
+
+using namespace cppfs;
+
+void openFile(const std::string & filename)
+{
+    FileHandle fh = fs::open(filename);
+
+         if (fh.isFile())      { // File ... }
+    else if (fh.isDirectory()) { // Directory ... }
+    else if (!fh.exists())     { // Not there ... }
+}
+```
 
 Open a file for reading or writing:
 
@@ -39,17 +57,41 @@ Open a file for reading or writing:
 #include <cppfs/fs.h>
 #include <cppfs/FileHandle.h>
 
+using namespace cppfs;
+
 void openFile(const std::string & filename)
 {
-    FileHandle f = fs::open(filename);
+    FileHandle fh = fs::open(filename);
 
-    if (in.isFile())
+    if (fh.isFile())
     {
-        std::istream * in = f.createInputStream();
+        std::istream * in = fh.createInputStream();
         ...
 
-        std::istream * out = f.createOutputStream();
+        std::istream * out = fh.createOutputStream();
         ...
+    }
+}
+```
+
+Listing directory entries:
+
+```C++
+#include <cppfs/fs.h>
+#include <cppfs/FileHandle.h>
+
+using namespace cppfs;
+
+void lstDir(const std::string & path)
+{
+    FileHandle dir = fs::open(path);
+
+    if (dir.isDirectory())
+    {
+        for (FileIterator it = dir.begin(); it != dir.end(); ++it)
+        {
+            std::string path = *it;
+        }
     }
 }
 ```
@@ -408,7 +450,7 @@ dir.traverse([](FileHandle & fh) -> bool {
 });
 ```
 
-When a handle to directory has been obtained, it can also
+When a handle to a directory has been obtained, it can
 be used to open file handles relative to that directory:
 
 ```C++
