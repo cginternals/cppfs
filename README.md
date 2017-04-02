@@ -244,7 +244,21 @@ unsigned int  gid   = file.groupId();
 unsigned long perm  = file.permissions();
 ```
 
-The file permissions can be modified:
+The file information is retrieved only when needed, i.e., on the first call
+of one of the above functions, and cached in memory. When an operation on
+the handle modifies the file information, it is updated automatically.
+However, if a file is modified outside of the application or using a different
+handle to the same file, the file handle cannot know about the change. Therefore,
+it must be updated manually:
+
+```C++
+cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
+
+// If the file has been modified outside the application ...
+file.updateFileInfo();
+```
+
+File permissions can be modified:
 
 ```C++
 cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
@@ -254,15 +268,16 @@ file.setGroupId(1000);
 file.setPermissions(cppfs::FilePermissions::UserRead | cppfs::FilePermissions::GroupRead);
 ```
 
-void updateFileInfo();
-
 std::vector<std::string> listFiles() const;
+
+FileIterator begin() const;
+FileIterator end() const;
+
 void traverse(VisitFunc funcFileEntry);
 void traverse(VisitFunc funcFile, VisitFunc funcDirectory);
 void traverse(FileVisitor & visitor);
+
 Tree * readTree(const std::string & path = "", bool includeHash = false) const;
-FileIterator begin() const;
-FileIterator end() const;
 
 FileHandle parentDirectory() const;
 FileHandle open(const std::string & path) const;
