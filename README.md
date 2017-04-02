@@ -476,6 +476,6 @@ for (Change change : diff->changes())
 }
 
 delete diff;
-delete dst;
-delete src;
+delete srcTree;
+delete dstTree;
 ```
