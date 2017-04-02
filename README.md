@@ -31,6 +31,32 @@ Please follow our [CMake project setup guide](https://github.com/cginternals/cma
 to setup and build *cppfs*.
 
 
+## Basic Example
+
+Open a file for reading or writing:
+
+```C++
+#include <cppfs/fs.h>
+#include <cppfs/FileHandle.h>
+
+using namespace cppfs;
+
+void openFile(const std::string & filename)
+{
+    FileHandle f = fs::open(filename);
+
+    if (in.isFile())
+    {
+        std::istream * in = f.createInputStream();
+        ...
+
+        std::istream * out = f.createOutputStream();
+        ...
+    }
+}
+```
+
+
 ## Features
 
 
