@@ -272,17 +272,48 @@ file.updateFileInfo();
 
 ### File operations
 
-bool createDirectory();
-bool removeDirectory();
-bool copy(FileHandle & dest);
-bool move(FileHandle & dest);
-bool createLink(FileHandle & dest);
-bool createSymbolicLink(FileHandle & dest);
-bool rename(const std::string & filename);
-bool remove();
+Using the *FileHandle*, basic file operations can be performed.
+For binary operations, such as copy or move, the second file handle
+is considered to be the target of the operation. Depending on the
+operation, the target does not need to already exist. If the target
+points to a directory rather than a file, the target will be considered
+to be inside that directory (for example, a file will be copied into
+the given directory).
+
+```C++
+cppfs::FileHandle dir  = cppfs::fs::open("data");
+cppfs::FileHandle file = cppfs::fs::open("readme.txt");
+
+// Create directory if it does not yet exist
+if (!dir.isDirectory()) dir.createDirectory();
+
+// Copy file into directory
+file.copy(dir);
+
+// Copy file to another file
+file.copy(dir.open("readme2.txt"));
+
+// Move file into directory
+file.move(dir);
+
+// Create hard link
+file.createLink(dir.open("readme2.txt"));
+
+// Create symbolic link
+file.createSymbolicLink(dir.open("readme2.txt"));
+
+// Rename file
+file.rename(dir.open("readme.md"));
+
+// Delete file
+file.remove();
+
+// Delete directory
+dir.removeDirectory();
+```
 
 
-### Reading and writing into files
+### Reading and writing to files
 
 std::istream * createInputStream(std::ios_base::openmode mode = std::ios_base::in) const;
 std::ostream * createOutputStream(std::ios_base::openmode mode = std::ios_base::out);
@@ -291,7 +322,7 @@ std::string readFile() const;
 bool writeFile(const std::string & content);
 
 
-### Advanced functions
+### Advanced functions on files
 
 std::string sha1() const;
 std::string base64() const;
@@ -367,7 +398,7 @@ FileHandle file2 = dir.open("../readme.txt");
 
 ### File trees and diffs
 
-For higher level operations on directory tree, the classes *Tree*, *Diff*,
+For higher level operations on directory trees, the classes *Tree*, *Diff*,
 and *Change* can be used. A *Tree* contains the information about all files
 and directories in a tree data structure. It can be obtained from a
 directory handle by calling *readTree*.
