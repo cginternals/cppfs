@@ -192,7 +192,7 @@ level. To use a custom file system, create an instance of it and use the
 class CustomFS : public cppfs::AbstractFileSystem
 {
     ...
-}
+};
 
 CustomFS fs;
 FileHandle file = fs.open("data/readme.txt");
@@ -200,6 +200,91 @@ FileHandle file = fs.open("data/readme.txt");
 
 
 ### File handles
+
+The main class to access file and directories in cppfs is *FileHandle*.
+It can be used to get information about file system objects, to manipulate
+them (e.g., copy, rename, or delete), as well as to read and write files.
+
+To open a file handle, use the filesystem interface as described before.
+File handles can also be copied, creating a second handle that points to
+the same file system object but does not inherit the state of the former
+handle. Actually, this operation only copies the path of the handle to the
+new object, so it is a cheap operation.
+
+```C++
+// Open file from local file system
+cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
+
+// Get a second handle to the same file
+cppfs::FileHandle file2 = file;
+```
+
+Once a file handle has been obtained, it can be used to query basic information
+about the file system object is points to.
+
+```C++
+cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
+
+// Check type
+     if (file.isFile())         std::cout << "file" << std::endl;
+else if (file.isDirectory())    std::cout << "directory" << std::endl;
+else if (file.isSymbolicLink()) std::cout << "symlink" << std::endl;
+else if (!file.exists())        std::cout << "file does not exist" << std::endl;
+
+// Get filename and path
+std::string path = file.path();
+std::string filename = file.fileName();
+
+// Get file information
+unsigned int  size  = file.size();
+unsigned int  atime = file.accessTime();
+unsigned int  mtime = file.modificationTime();
+unsigned int  uid   = file.userId();
+unsigned int  gid   = file.groupId();
+unsigned long perm  = file.permissions();
+```
+
+The file permissions can be modified:
+
+```C++
+cppfs::FileHandle file = cppfs::fs::open("data/readme.txt");
+
+file.setUserId(1000);
+file.setGroupId(1000);
+file.setPermissions(cppfs::FilePermissions::UserRead | cppfs::FilePermissions::GroupRead);
+```
+
+void updateFileInfo();
+
+std::vector<std::string> listFiles() const;
+void traverse(VisitFunc funcFileEntry);
+void traverse(VisitFunc funcFile, VisitFunc funcDirectory);
+void traverse(FileVisitor & visitor);
+Tree * readTree(const std::string & path = "", bool includeHash = false) const;
+FileIterator begin() const;
+FileIterator end() const;
+
+FileHandle parentDirectory() const;
+FileHandle open(const std::string & path) const;
+
+bool createDirectory();
+bool removeDirectory();
+bool copy(FileHandle & dest);
+bool move(FileHandle & dest);
+bool createLink(FileHandle & dest);
+bool createSymbolicLink(FileHandle & dest);
+bool rename(const std::string & filename);
+bool remove();
+
+std::istream * createInputStream(std::ios_base::openmode mode = std::ios_base::in) const;
+std::ostream * createOutputStream(std::ios_base::openmode mode = std::ios_base::out);
+
+std::string readFile() const;
+bool writeFile(const std::string & content);
+
+std::string sha1() const;
+std::string base64() const;
+bool writeFileBase64(const std::string & base64);
 
 
 ### Advanced functions
