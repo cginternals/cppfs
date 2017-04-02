@@ -57,7 +57,6 @@ void openFile(const std::string & filename)
 
 ## Features
 
-
 ### Paths and URLs
 
 The class *FilePath* is used to represent paths in the file system.
@@ -72,11 +71,92 @@ Paths are stored in a unified format using only forward slash ('/')
 as a separator. The unified format is compatible to all systems,
 but as a convenience for the user, it should be converted to the
 native format when displaying paths to the user. To convert a path
-into native format, call *toNative*.
+into the native format, call *toNative*.
 
 ```
 cppfs::FilePath path("data/readme.txt");
 std::cout << "File path: " << path.toNative() << std::endl;
+```
+
+A *FilePath* can be used to obtain syntactical information about a path.
+It does however work purely on the string, it cannot provide information
+about the actual file or directory the path points to. The following
+functions are useful to get information about a path:
+
+```
+cppfs::FilePath path = ...;
+
+// Check if the path is empty ("")
+bool empty = path.isEmpty();
+
+// Check if the path is an absolute path (e.g., "/test.txt", or "C:/test.txt")
+bool abs = path.isAbsolute();
+
+// Check if the path is a relative path (e.g., "data/test.txt")
+bool rel = path.isRelative();
+
+// Check if path points to a file/directory (e.g., "/path/to/dir")
+// or its content (e.g., "/path/to/dir/").
+bool listContent = path.pointsToContent();
+```
+
+*FilePath* offers functions to obtain the individual components of a file path,
+such as the filename, extension, or path to the containing directory.
+All of these functions ignore trailing slashes on the path, so they work on
+the object the path points to, not it contents.
+
+```
+cppfs::FilePath path1("C:/path/to/file.txt");
+cppfs::FilePath path2("C:/path/to/directory/");
+
+// Get full path
+std::cout << path1.fullPath() << std::endl; // "C:/path/to/file.txt"
+std::cout << path2.fullPath() << std::endl; // "C:/path/to/directory"
+
+// Get filename components
+std::cout << path1.fileName()  << std::endl; // "file.txt"
+std::cout << path2.fileName()  << std::endl; // "directory"
+std::cout << path1.baseName()  << std::endl; // "file"
+std::cout << path2.baseName()  << std::endl; // "directory"
+std::cout << path1.extension() << std::endl; // ".txt"
+std::cout << path2.extension() << std::endl; // ""
+
+// Get path to containing directory
+std::cout << path1.directoryPath() << std::endl; // "C:/path/to/"
+std::cout << path2.directoryPath() << std::endl; // "C:/path/to/"
+
+// Get drive letter
+std::cout << path1.driveLetter() << std::endl; // "C:"
+std::cout << path2.driveLetter() << std::endl; // "C:"
+```
+
+Paths often need to be combined in order to determine the actual location
+of a file. To combine two paths, the function *resolve* can be used. The
+second path must be relative to combine the two paths, otherwise only the
+second path is returned. The combination of paths also takes place on
+a pure syntactical level, without checking if any of the paths really exist.
+
+```
+cppfs::FilePath src("C:/projects");
+cppfs::FilePath rel("../documents/test.txt");
+cppfs::FilePath abs("C:/projects2/readme.txt");
+
+cppfs::FilePath path1 = src.resolve(rel);
+std::cout << path1.fullPath() << std::endl; // "C:/projects/../documents/test.txt"
+
+cppfs::FilePath path2 = src.resolve(abs);
+std::cout << path2.fullPath() << std::endl; // "C:/projects2/readme.txt"
+```
+
+When combining relative paths, the resulting strings may contain a lot
+of ".." and "." components. To resolve these on a syntactical level, the
+function *resolved* can be called. It will remove all occurences of "."
+and "..", as long as it is possible. Occurences of ".." at the beginning
+of a path will not be removed.
+
+```
+cppfs::FilePath path("C:/projects/../documents/test.txt");
+std::cout << path.resolved() << std::endl; // "C:/documents/test.txt"
 ```
 
 
