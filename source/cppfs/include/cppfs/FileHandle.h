@@ -493,6 +493,18 @@ public:
     */
     bool writeFile(const std::string & content);
 
+    /**
+    *  @brief
+    *    Write file content from base64 encoded string
+    *
+    *  @param[in] base64
+    *    File content in base64 encoding
+    *
+    *  @return
+    *    'true' on success, else 'false'
+    */
+    bool writeFileBase64(const std::string & base64);
+
 
 protected:
     /**

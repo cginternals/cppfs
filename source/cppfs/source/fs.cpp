@@ -241,11 +241,11 @@ std::string sha1(const FileHandle & file)
 std::string base64(const std::string & str)
 {
     // Encode base64
-    std::string encoded;
-    bn::encode_b64(str.begin(), str.end(), back_inserter(encoded));
+    std::string base64;
+    bn::encode_b64(str.begin(), str.end(), back_inserter(base64));
 
     // Return encoded string
-    return encoded;
+    return base64;
 }
 
 std::string base64(const FileHandle & file)
@@ -267,11 +267,21 @@ std::string base64(const FileHandle & file)
     std::istream_iterator<char> end;
 
     // Encode base64
-    std::string encoded;
-    bn::encode_b64(it, end, back_inserter(encoded));
+    std::string base64;
+    bn::encode_b64(it, end, back_inserter(base64));
 
     // Return encoded string
-    return encoded;
+    return base64;
+}
+
+std::string fromBase64(const std::string & base64)
+{
+    // Decode base64
+    std::string str;
+    bn::decode_b64(base64.begin(), base64.end(), back_inserter(str));
+
+    // Return decoded string
+    return str;
 }
 
 

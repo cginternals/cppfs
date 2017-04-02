@@ -112,6 +112,18 @@ CPPFS_API std::string base64(const std::string & str);
 */
 CPPFS_API std::string base64(const FileHandle & file);
 
+/**
+*  @brief
+*    Get decoded string from base64 encoding
+*
+*  @param[in] base64
+*    Base64 encoded string
+*
+*  @return
+*    Decoded string
+*/
+CPPFS_API std::string fromBase64(const std::string & base64);
+
 
 } // namespace fs
 

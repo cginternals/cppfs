@@ -479,6 +479,22 @@ bool FileHandle::writeFile(const std::string & content)
     return true;
 }
 
+bool FileHandle::writeFileBase64(const std::string & base64)
+{
+    // Open output stream
+    std::ostream * outputStream = createOutputStream();
+    if (!outputStream) return false;
+
+    // Write content to file
+    (*outputStream) << fs::fromBase64(base64);
+
+    // Clean up
+    delete outputStream;
+
+    // Done
+    return true;
+}
+
 bool FileHandle::genericCopy(FileHandle & dest)
 {
     // Check backend
