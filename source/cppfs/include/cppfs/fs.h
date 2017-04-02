@@ -39,33 +39,6 @@ CPPFS_API FileHandle open(const std::string & path, const LoginCredentials * cre
 
 /**
 *  @brief
-*    Copy directory recursively
-*
-*  @param[in] srcDir
-*    Source directory
-*  @param[in] dstDir
-*    Destination directory
-*
-*  @remarks
-*    Destination directory points to the actual directory that
-*    is to be created, not its parent!
-*
-*    Example:
-*      fs::copyDirectory(fs::open("/projects/project1"), fs::open("/backup/projects/project1"))
-*/
-CPPFS_API void copyDirectory(const FileHandle & srcDir, FileHandle & dstDir);
-
-/**
-*  @brief
-*    Remove directory recursively
-*
-*  @param[in] dir
-*    Directory handle
-*/
-CPPFS_API void removeDirectory(FileHandle & dir);
-
-/**
-*  @brief
 *    Compute sha1 hash for string
 *
 *  @param[in] str
@@ -75,18 +48,6 @@ CPPFS_API void removeDirectory(FileHandle & dir);
 *    SHA1 hash
 */
 CPPFS_API std::string sha1(const std::string & str);
-
-/**
-*  @brief
-*    Compute sha1 hash for file
-*
-*  @param[in] file
-*    File handle
-*
-*  @return
-*    SHA1 hash, "" on error
-*/
-CPPFS_API std::string sha1(const FileHandle & file);
 
 /**
 *  @brief
@@ -102,18 +63,6 @@ CPPFS_API std::string base64(const std::string & str);
 
 /**
 *  @brief
-*    Get base64 encoding for file
-*
-*  @param[in] file
-*    File handle
-*
-*  @return
-*    Base64 encoded file, "" on error
-*/
-CPPFS_API std::string base64(const FileHandle & file);
-
-/**
-*  @brief
 *    Get decoded string from base64 encoding
 *
 *  @param[in] base64
@@ -123,6 +72,18 @@ CPPFS_API std::string base64(const FileHandle & file);
 *    Decoded string
 */
 CPPFS_API std::string fromBase64(const std::string & base64);
+
+/**
+*  @brief
+*    Convert hash buffer into string
+*
+*  @param[in] hash
+*    Hash buffer
+*
+*  @return
+*    Hash string
+*/
+CPPFS_API std::string hashToString(const unsigned char * hash);
 
 
 } // namespace fs

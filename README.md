@@ -461,7 +461,7 @@ for (Change change : diff->changes())
     if (change.operation() == Change::CopyDir) {
         FileHandle src = srcDir.open(change.path());
         FileHandle dst = dstDir.open(change.path());
-        fs::copyDirectory(src, dst);
+        src.copyDirectoryRec(dst);
     }
 
     if (change.operation() == Change::RemoveFile) {
@@ -471,7 +471,7 @@ for (Change change : diff->changes())
 
     if (change.operation() == Change::RemoveDir) {
         FileHandle dst = dstDir.open(change.path());
-        fs::removeDirectory(dst);
+        dst.removeDirectoryRec();
     }
 }
 

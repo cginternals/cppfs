@@ -3,6 +3,17 @@
 
 #include <iostream>
 #include <sstream>
+#include <iterator>
+
+#if defined(__APPLE__)
+    #define COMMON_DIGEST_FOR_OPENSSL
+    #include <CommonCrypto/CommonDigest.h>
+    #define SHA1 CC_SHA1
+#else
+    #include <openssl/sha.h>
+#endif
+
+#include <basen/basen.hpp>
 
 #include <cppfs/fs.h>
 #include <cppfs/FilePath.h>
@@ -237,12 +248,72 @@ void FileHandle::setPermissions(unsigned long permissions)
 
 std::string FileHandle::sha1() const
 {
-    return fs::sha1(*this);
+    // Check file
+    if (!isFile()) {
+        return "";
+    }
+
+    // Open file
+    std::istream * inputStream = createInputStream();
+    if (!inputStream) {
+        return "";
+    }
+
+    // Initialize hash
+    unsigned char hash[20];
+    SHA_CTX context;
+    SHA1_Init(&context);
+
+    // Read whole while
+    while (!inputStream->eof())
+    {
+        // Read a maximum of 1024 bytes at once
+        int size = 1024;
+
+        // Read data from file
+        char buf[1024];
+        inputStream->read(buf, size);
+
+        size_t count = inputStream->gcount();
+        if (count > 0)
+        {
+            // Update hash
+            SHA1_Update(&context, buf, count);
+        } else break;
+    }
+
+    // Close file
+    delete inputStream;
+
+    // Compute hash
+    SHA1_Final(hash, &context);
+    return fs::hashToString(hash);
 }
 
 std::string FileHandle::base64() const
 {
-    return fs::base64(*this);
+    // Check file
+    if (!isFile()) {
+        return "";
+    }
+
+    // Open file
+    std::istream * inputStream = createInputStream();
+    if (!inputStream) {
+        return "";
+    }
+
+    // Create stream iterator
+    std::noskipws(*inputStream);
+    std::istream_iterator<char> it(*inputStream);
+    std::istream_iterator<char> end;
+
+    // Encode base64
+    std::string base64;
+    bn::encode_b64(it, end, back_inserter(base64));
+
+    // Return encoded string
+    return base64;
 }
 
 FileHandle FileHandle::parentDirectory() const
@@ -289,6 +360,72 @@ bool FileHandle::removeDirectory()
 
     // Done
     return true;
+}
+
+void FileHandle::copyDirectoryRec(FileHandle & dstDir)
+{
+    // Check if source directory is valid
+    if (!isDirectory())
+    {
+        return;
+    }
+
+    // Check destination directory and try to create it if necessary
+    if (!dstDir.isDirectory())
+    {
+        dstDir.createDirectory();
+
+        if (!dstDir.isDirectory())
+        {
+            return;
+        }
+    }
+
+    // Copy all entries
+    for (auto it = begin(); it != end(); ++it)
+    {
+        std::string filename = *it;
+
+        FileHandle src = this->open(filename);
+        FileHandle dst = dstDir.open(filename);
+
+        if (src.isDirectory())
+        {
+            src.copyDirectoryRec(dst);
+        }
+
+        else if (src.isFile())
+        {
+            src.copy(dst);
+        }
+    }
+}
+
+void FileHandle::removeDirectoryRec()
+{
+    // Check directory
+    if (!isDirectory()) {
+        return;
+    }
+
+    // Delete all entries
+    for (auto it = begin(); it != end(); ++it)
+    {
+        FileHandle fh = open(*it);
+
+        if (fh.isDirectory())
+        {
+            fh.removeDirectoryRec();
+        }
+
+        else if (fh.isFile())
+        {
+            fh.remove();
+        }
+    }
+
+    // Remove directory
+    removeDirectory();
 }
 
 bool FileHandle::copy(FileHandle & dest)

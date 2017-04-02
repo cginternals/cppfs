@@ -34,27 +34,6 @@
 using namespace cppassist;
 
 
-namespace
-{
-
-
-std::string hashToString(const unsigned char * hash)
-{
-    std::stringstream stream;
-    stream << std::hex << std::setfill('0') << std::setw(2);
-
-    for (int i=0; i<20; i++)
-    {
-        stream << static_cast<unsigned int>(hash[i]);
-    }
-
-    return stream.str();
-}
-
-
-}
-
-
 namespace cppfs
 {
 namespace fs
@@ -113,72 +92,6 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
     }
 }
 
-void copyDirectory(const FileHandle & srcDir, FileHandle & dstDir)
-{
-    // Check if source directory is valid
-    if (!srcDir.isDirectory())
-    {
-        return;
-    }
-
-    // Check destination directory and try to create it if necessary
-    if (!dstDir.isDirectory())
-    {
-        dstDir.createDirectory();
-
-        if (!dstDir.isDirectory())
-        {
-            return;
-        }
-    }
-
-    // Copy all entries
-    for (auto it = srcDir.begin(); it != srcDir.end(); ++it)
-    {
-        std::string filename = *it;
-
-        FileHandle src = srcDir.open(filename);
-        FileHandle dst = dstDir.open(filename);
-
-        if (src.isDirectory())
-        {
-            copyDirectory(src, dst);
-        }
-
-        else if (src.isFile())
-        {
-            src.copy(dst);
-        }
-    }
-}
-
-void removeDirectory(FileHandle & dir)
-{
-    // Check directory
-    if (!dir.isDirectory()) {
-        return;
-    }
-
-    // Delete all entries
-    for (auto it = dir.begin(); it != dir.end(); ++it)
-    {
-        FileHandle fh = dir.open(*it);
-
-        if (fh.isDirectory())
-        {
-            removeDirectory(fh);
-        }
-
-        else if (fh.isFile())
-        {
-            fh.remove();
-        }
-    }
-
-    // Remove directory
-    dir.removeDirectory();
-}
-
 std::string sha1(const std::string & str)
 {
     // Initialize hash
@@ -188,50 +101,6 @@ std::string sha1(const std::string & str)
 
     // Update hash
     SHA1_Update(&context, str.c_str(), str.size());
-
-    // Compute hash
-    SHA1_Final(hash, &context);
-    return hashToString(hash);
-}
-
-std::string sha1(const FileHandle & file)
-{
-    // Check file
-    if (!file.isFile()) {
-        return "";
-    }
-
-    // Open file
-    std::istream * inputStream = file.createInputStream();
-    if (!inputStream) {
-        return "";
-    }
-
-    // Initialize hash
-    unsigned char hash[20];
-    SHA_CTX context;
-    SHA1_Init(&context);
-
-    // Read whole while
-    while (!inputStream->eof())
-    {
-        // Read a maximum of 1024 bytes at once
-        int size = 1024;
-
-        // Read data from file
-        char buf[1024];
-        inputStream->read(buf, size);
-
-        size_t count = inputStream->gcount();
-        if (count > 0)
-        {
-            // Update hash
-            SHA1_Update(&context, buf, count);
-        } else break;
-    }
-
-    // Close file
-    delete inputStream;
 
     // Compute hash
     SHA1_Final(hash, &context);
@@ -248,32 +117,6 @@ std::string base64(const std::string & str)
     return base64;
 }
 
-std::string base64(const FileHandle & file)
-{
-    // Check file
-    if (!file.isFile()) {
-        return "";
-    }
-
-    // Open file
-    std::istream * inputStream = file.createInputStream();
-    if (!inputStream) {
-        return "";
-    }
-
-    // Create stream iterator
-    std::noskipws(*inputStream);
-    std::istream_iterator<char> it(*inputStream);
-    std::istream_iterator<char> end;
-
-    // Encode base64
-    std::string base64;
-    bn::encode_b64(it, end, back_inserter(base64));
-
-    // Return encoded string
-    return base64;
-}
-
 std::string fromBase64(const std::string & base64)
 {
     // Decode base64
@@ -282,6 +125,19 @@ std::string fromBase64(const std::string & base64)
 
     // Return decoded string
     return str;
+}
+
+std::string hashToString(const unsigned char * hash)
+{
+    std::stringstream stream;
+    stream << std::hex << std::setfill('0') << std::setw(2);
+
+    for (int i=0; i<20; i++)
+    {
+        stream << static_cast<unsigned int>(hash[i]);
+    }
+
+    return stream.str();
 }
 
 

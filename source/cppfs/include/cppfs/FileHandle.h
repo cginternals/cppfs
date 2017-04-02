@@ -366,8 +366,35 @@ public:
     *
     *  @return
     *    'true' if successful, else 'false'
+    *
+    *  @remarks
+    *    Only works if the directory exists and is empty.
+    *    To remove an entire directory tree, see removeDirectoryRec.
     */
     bool removeDirectory();
+
+    /**
+    *  @brief
+    *    Copy directory recursively
+    *
+    *  @param[in] dstDir
+    *    Destination directory
+    *
+    *  @remarks
+    *    Destination directory points to the actual directory that
+    *    is to be created, not its parent!
+    *
+    *    Example:
+    *      FileHandle dir = fs::open("/projects/project1");
+    *      dir.copyDirectory(fs::open("/backup/projects/project1"))
+    */
+    void copyDirectoryRec(FileHandle & dstDir);
+
+    /**
+    *  @brief
+    *    Remove directory recursively
+    */
+    void removeDirectoryRec();
 
     /**
     *  @brief
