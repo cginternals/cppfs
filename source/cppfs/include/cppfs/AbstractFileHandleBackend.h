@@ -249,6 +249,30 @@ public:
 
     /**
     *  @brief
+    *    Create hard link
+    *
+    *  @param[in] dest
+    *    Destination file or directory (must NOT be nullptr, and MUST be of the same type as this file handle)
+    *
+    *  @return
+    *    'true' if successful, else 'false'
+    */
+    virtual bool createLink(AbstractFileHandleBackend * dest) = 0;
+
+    /**
+    *  @brief
+    *    Create symbolic link
+    *
+    *  @param[in] dest
+    *    Destination file or directory (must NOT be nullptr, and MUST be of the same type as this file handle)
+    *
+    *  @return
+    *    'true' if successful, else 'false'
+    */
+    virtual bool createSymbolicLink(AbstractFileHandleBackend * dest) = 0;
+
+    /**
+    *  @brief
     *    Rename file or directory
     *
     *  @param[in] filename

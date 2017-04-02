@@ -508,6 +508,44 @@ bool SshFileHandle::move(AbstractFileHandleBackend * dest)
     return true;
 }
 
+bool SshFileHandle::createLink(AbstractFileHandleBackend *)
+{
+    // Sorry, not possible with ssh/sftp
+    return false;
+}
+
+bool SshFileHandle::createSymbolicLink(AbstractFileHandleBackend * dest)
+{
+    // Check handle
+    if (!m_fs->m_session) return false;
+
+    // Initialize SFTP sub-protocol
+    m_fs->initSftp();
+    if (!m_fs->m_sftpSession) return false;
+
+    // Check source file
+    if (!exists()) return false;
+
+    // Get source and target filenames
+    std::string src = m_path;
+    std::string dst = dest->path();
+
+    if (dest->isDirectory())
+    {
+        std::string filename = FilePath(m_path).fileName();
+        dst = FilePath(dest->path()).resolve(filename).fullPath();
+    }
+
+    // Create symbolic link
+    if (libssh2_sftp_symlink((LIBSSH2_SFTP *)m_fs->m_sftpSession, src.c_str(), const_cast<char *>(dst.c_str())) != 0)
+    {
+        return false;
+    }
+
+    // Done
+    return true;
+}
+
 bool SshFileHandle::rename(const std::string & filename)
 {
     // Check handle

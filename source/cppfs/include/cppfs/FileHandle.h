@@ -386,6 +386,30 @@ public:
 
     /**
     *  @brief
+    *    Create hard link
+    *
+    *  @param[in] dest
+    *    Destination file or directory
+    *
+    *  @return
+    *    'true' if successful, else 'false'
+    */
+    bool createLink(FileHandle & dest);
+
+    /**
+    *  @brief
+    *    Create symbolic link
+    *
+    *  @param[in] dest
+    *    Destination file or directory
+    *
+    *  @return
+    *    'true' if successful, else 'false'
+    */
+    bool createSymbolicLink(FileHandle & dest);
+
+    /**
+    *  @brief
     *    Rename file or directory
     *
     *  @param[in] filename

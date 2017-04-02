@@ -362,7 +362,6 @@ bool LocalFileHandle::copy(AbstractFileHandleBackend * dest)
     out << in.rdbuf();
 
     // Done
-    updateFileInfo();
     return true;
 }
 
@@ -390,6 +389,56 @@ bool LocalFileHandle::move(AbstractFileHandleBackend * dest)
     // Update path
     m_path = dst;
     updateFileInfo();
+
+    // Done
+    return true;
+}
+
+bool LocalFileHandle::createLink(AbstractFileHandleBackend * dest)
+{
+    // Check source file
+    if (!exists()) return false;
+
+    // Get source and target filenames
+    std::string src = m_path;
+    std::string dst = dest->path();
+
+    if (dest->isDirectory())
+    {
+        std::string filename = FilePath(m_path).fileName();
+        dst = FilePath(dest->path()).resolve(filename).fullPath();
+    }
+
+    // Create link
+    if (::link(src.c_str(), dst.c_str()) != 0)
+    {
+        return false;
+    }
+
+    // Done
+    return true;
+}
+
+bool LocalFileHandle::createSymbolicLink(AbstractFileHandleBackend * dest)
+{
+    // Check source file
+    if (!exists()) return false;
+
+    // Get source and target filenames
+    std::string src = m_path;
+    std::string dst = dest->path();
+
+    if (dest->isDirectory())
+    {
+        std::string filename = FilePath(m_path).fileName();
+        dst = FilePath(dest->path()).resolve(filename).fullPath();
+    }
+
+    // Create symbolic link
+    if (::symlink(src.c_str(), dst.c_str()) != 0)
+    {
+        return false;
+    }
 
     // Done
     return true;

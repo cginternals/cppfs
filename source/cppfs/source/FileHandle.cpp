@@ -297,7 +297,9 @@ bool FileHandle::copy(FileHandle & dest)
     // If both handles are from the same file system, use internal method
     if (m_backend->fs() == dest.m_backend->fs())
     {
-        return m_backend->copy(dest.m_backend.get());
+        bool result = m_backend->copy(dest.m_backend.get());
+        dest.updateFileInfo();
+        return result;
     }
 
     // Otherwise, use generic (slow) method
@@ -317,12 +319,58 @@ bool FileHandle::move(FileHandle & dest)
     // If both handles are from the same file system, use internal method
     if (m_backend->fs() == dest.m_backend->fs())
     {
-        return m_backend->move(dest.m_backend.get());
+        bool result = m_backend->move(dest.m_backend.get());
+        dest.updateFileInfo();
+        return result;
     }
 
     // Otherwise, use generic (slow) method
     else {
         return genericMove(dest);
+    }
+}
+
+bool FileHandle::createLink(FileHandle & dest)
+{
+    // Check backend
+    if (!m_backend)
+    {
+        return false;
+    }
+
+    // If both handles are from the same file system, use internal method
+    if (m_backend->fs() == dest.m_backend->fs())
+    {
+        bool result = m_backend->createLink(dest.m_backend.get());
+        dest.updateFileInfo();
+        return result;
+    }
+
+    // Otherwise, this is not possible
+    else {
+        return false;
+    }
+}
+
+bool FileHandle::createSymbolicLink(FileHandle & dest)
+{
+    // Check backend
+    if (!m_backend)
+    {
+        return false;
+    }
+
+    // If both handles are from the same file system, use internal method
+    if (m_backend->fs() == dest.m_backend->fs())
+    {
+        bool result = m_backend->createSymbolicLink(dest.m_backend.get());
+        dest.updateFileInfo();
+        return result;
+    }
+
+    // Otherwise, this is not possible
+    else {
+        return false;
     }
 }
 

@@ -62,6 +62,8 @@ public:
     virtual bool removeDirectory() override;
     virtual bool copy(AbstractFileHandleBackend * dest) override;
     virtual bool move(AbstractFileHandleBackend * dest) override;
+    virtual bool createLink(AbstractFileHandleBackend * dest) override;
+    virtual bool createSymbolicLink(AbstractFileHandleBackend * dest) override;
     virtual bool rename(const std::string & filename) override;
     virtual bool remove() override;
     virtual std::istream * createInputStream(std::ios_base::openmode mode) const override;
