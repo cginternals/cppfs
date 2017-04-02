@@ -270,6 +270,34 @@ file.updateFileInfo();
 ```
 
 
+### File operations
+
+bool createDirectory();
+bool removeDirectory();
+bool copy(FileHandle & dest);
+bool move(FileHandle & dest);
+bool createLink(FileHandle & dest);
+bool createSymbolicLink(FileHandle & dest);
+bool rename(const std::string & filename);
+bool remove();
+
+
+### Reading and writing into files
+
+std::istream * createInputStream(std::ios_base::openmode mode = std::ios_base::in) const;
+std::ostream * createOutputStream(std::ios_base::openmode mode = std::ios_base::out);
+
+std::string readFile() const;
+bool writeFile(const std::string & content);
+
+
+### Advanced functions
+
+std::string sha1() const;
+std::string base64() const;
+bool writeFileBase64(const std::string & base64);
+
+
 ### Accessing and traversing directories
 
 A *FileHandle* is used to access files as well as directories.
@@ -322,42 +350,74 @@ dir.traverse([](FileHandle & fh) -> bool {
 });
 ```
 
-Once ...
+When a handle to directory has been obtained, it can also
+be used to open file handles relative to that directory:
 
-FileHandle parentDirectory() const;
-FileHandle open(const std::string & path) const;
+```C++
+// Open parent directory
+FileHandle parentDir = dir.parentDirectory();
 
+// Open file in directory
+FileHandle file1 = dir.open("readme.txt");
 
-### File trees
-
-Tree * readTree(const std::string & path = "", bool includeHash = false) const;
-Diff
-Change
-
-
-### File operations
-
-bool createDirectory();
-bool removeDirectory();
-bool copy(FileHandle & dest);
-bool move(FileHandle & dest);
-bool createLink(FileHandle & dest);
-bool createSymbolicLink(FileHandle & dest);
-bool rename(const std::string & filename);
-bool remove();
+// Open file relative to directory
+FileHandle file2 = dir.open("../readme.txt");
+```
 
 
-### Reading and writing into files
+### File trees and diffs
 
-std::istream * createInputStream(std::ios_base::openmode mode = std::ios_base::in) const;
-std::ostream * createOutputStream(std::ios_base::openmode mode = std::ios_base::out);
+For higher level operations on directory tree, the classes *Tree*, *Diff*,
+and *Change* can be used. A *Tree* contains the information about all files
+and directories in a tree data structure. It can be obtained from a
+directory handle by calling *readTree*.
 
-std::string readFile() const;
-bool writeFile(const std::string & content);
+```C++
+// Read directory tree from current directory
+Tree * tree = dir.readTree();
 
+// Read directory tree from current directory, giving it a virtual root
+Tree * tree = dir.readTree("/root");
+```
 
-### Advanced functions
+Given two directory trees, the differences between them can be calculated,
+resulting in a diff object. A diff contains a number of file system operations
+that need to be performed in order to transform from the source tree to
+the destination tree. This can be utilized to implement basic file syncing:
 
-std::string sha1() const;
-std::string base64() const;
-bool writeFileBase64(const std::string & base64);
+```C++
+// Sync directories
+Tree * srcTree = srcDir.readTree();
+Tree * dstTree = dstDir.readTree();
+
+Diff * diff = dstTree->createDiff(*srcTree);
+
+for (Change change : diff->changes())
+{
+    if (change.operation() == Change::CopyFile) {
+        FileHandle src = srcDir.open(change.path());
+        FileHandle dst = dstDir.open(change.path());
+        src.copy(dst);
+    }
+
+    if (change.operation() == Change::CopyDir) {
+        FileHandle src = srcDir.open(change.path());
+        FileHandle dst = dstDir.open(change.path());
+        fs::copyDirectory(src, dst);
+    }
+
+    if (change.operation() == Change::RemoveFile) {
+        FileHandle dst = dstDir.open(change.path());
+        dst.remove();
+    }
+
+    if (change.operation() == Change::RemoveDir) {
+        FileHandle dst = dstDir.open(change.path());
+        fs::removeDirectory(dst);
+    }
+}
+
+delete diff;
+delete dst;
+delete src;
+```
