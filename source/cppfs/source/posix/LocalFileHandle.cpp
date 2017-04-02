@@ -21,6 +21,7 @@ LocalFileHandle::LocalFileHandle(std::shared_ptr<LocalFileSystem> fs, const std:
 : m_fs(fs)
 , m_path(path)
 , m_fileInfo(nullptr)
+, m_linkInfo(nullptr)
 {
 }
 
@@ -29,6 +30,11 @@ LocalFileHandle::~LocalFileHandle()
     if (m_fileInfo)
     {
         delete (struct stat *)m_fileInfo;
+    }
+
+    if (m_linkInfo)
+    {
+        delete (struct stat *)m_linkInfo;
     }
 }
 
@@ -49,6 +55,13 @@ void LocalFileHandle::updateFileInfo()
     {
         delete (struct stat *)m_fileInfo;
         m_fileInfo = nullptr;
+    }
+
+    // Reset link information
+    if (m_linkInfo)
+    {
+        delete (struct stat *)m_linkInfo;
+        m_linkInfo = nullptr;
     }
 }
 
@@ -83,6 +96,18 @@ bool LocalFileHandle::isDirectory() const
     if (m_fileInfo)
     {
         return S_ISDIR( ((struct stat *)m_fileInfo)->st_mode );
+    }
+
+    return false;
+}
+
+bool LocalFileHandle::isSymbolicLink() const
+{
+    readLinkInfo();
+
+    if (m_linkInfo)
+    {
+        return S_ISLNK( ((struct stat *)m_linkInfo)->st_mode );
     }
 
     return false;
@@ -432,6 +457,23 @@ void LocalFileHandle::readFileInfo() const
         // Error!
         delete (struct stat *)m_fileInfo;
         m_fileInfo = nullptr;
+    }
+}
+
+void LocalFileHandle::readLinkInfo() const
+{
+    // Check if file info has already been read
+    if (m_linkInfo) return;
+
+    // Create file information structure
+    m_linkInfo = (void *)new struct stat;
+
+    // Get file info
+    if (lstat(m_path.c_str(), (struct stat *)m_linkInfo) != 0)
+    {
+        // Error!
+        delete (struct stat *)m_linkInfo;
+        m_linkInfo = nullptr;
     }
 }
 

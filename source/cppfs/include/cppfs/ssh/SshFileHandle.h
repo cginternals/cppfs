@@ -46,6 +46,7 @@ public:
     virtual bool exists() const override;
     virtual bool isFile() const override;
     virtual bool isDirectory() const override;
+    virtual bool isSymbolicLink() const override;
     virtual std::vector<std::string> listFiles() const override;
     virtual AbstractFileIteratorBackend * begin() const override;
     virtual unsigned int size() const override;
@@ -69,12 +70,14 @@ public:
 
 protected:
     void readFileInfo() const;
+    void readLinkInfo() const;
 
 
 protected:
     std::shared_ptr<SshFileSystem> m_fs;       ///< File system that created this handle
     std::string                    m_path;     ///< Path to file or directory
-    mutable void                 * m_fileInfo; ///< Information about the current file (created on demand)
+    mutable void                 * m_fileInfo; ///< Information about the current file (resolves links, created on demand)
+    mutable void                 * m_linkInfo; ///< Information about the current file (does not resolve links, created on demand)
 };
 
 

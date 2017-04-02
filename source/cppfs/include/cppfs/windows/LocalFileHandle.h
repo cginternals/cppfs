@@ -46,6 +46,7 @@ public:
     virtual bool exists() const override;
     virtual bool isFile() const override;
     virtual bool isDirectory() const override;
+    virtual bool isSymbolicLink() const override;
     virtual std::vector<std::string> listFiles() const override;
     virtual AbstractFileIteratorBackend * begin() const override;
     virtual unsigned int size() const override;

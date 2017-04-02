@@ -68,7 +68,7 @@ bool LocalFileHandle::isFile() const
 
     if (m_fileInfo)
     {
-		return (((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+        return (((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
     }
 
     return false;
@@ -80,7 +80,19 @@ bool LocalFileHandle::isDirectory() const
 
     if (m_fileInfo)
     {
-		return (((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+        return (((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    }
+
+    return false;
+}
+
+bool LocalFileHandle::isSymbolicLink() const
+{
+    readFileInfo();
+
+    if (m_fileInfo)
+    {
+        return (((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
     }
 
     return false;
@@ -90,20 +102,20 @@ std::vector<std::string> LocalFileHandle::listFiles() const
 {
     std::vector<std::string> entries;
 
-	// Open directory
-	WIN32_FIND_DATA findData;
-	std::string query = FilePath(m_path).fullPath() + "/*";
-	HANDLE findHandle = FindFirstFileA(query.c_str(), &findData);
+    // Open directory
+    WIN32_FIND_DATA findData;
+    std::string query = FilePath(m_path).fullPath() + "/*";
+    HANDLE findHandle = FindFirstFileA(query.c_str(), &findData);
 
-	if (findHandle == INVALID_HANDLE_VALUE)
+    if (findHandle == INVALID_HANDLE_VALUE)
     {
         return entries;
     }
 
-	// Read directory entries
-	do
+    // Read directory entries
+    do
     {
-		// Get name
+        // Get name
         std::string name = findData.cFileName;
 
         // Ignore . and ..
@@ -111,7 +123,7 @@ std::vector<std::string> LocalFileHandle::listFiles() const
         {
             entries.push_back(name);
         }
-	} while (FindNextFile(findHandle, &findData));
+    } while (FindNextFile(findHandle, &findData));
 
     // Close directory
     FindClose(findHandle);
@@ -131,11 +143,11 @@ unsigned int LocalFileHandle::size() const
 
     if (m_fileInfo)
     {
-		// [TODO] Use 64bit numbers
-		auto fileSizeH  = ((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->nFileSizeHigh;
-		auto fileSizeL = ((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->nFileSizeLow;
-		return static_cast<unsigned int>(static_cast<__int64>(fileSizeH) << 32 | fileSizeL);
-	}
+        // [TODO] Use 64bit numbers
+        auto fileSizeH  = ((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->nFileSizeHigh;
+        auto fileSizeL = ((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->nFileSizeLow;
+        return static_cast<unsigned int>(static_cast<__int64>(fileSizeH) << 32 | fileSizeL);
+    }
 
     return 0;
 }
@@ -146,10 +158,10 @@ unsigned int LocalFileHandle::accessTime() const
 
     if (m_fileInfo)
     {
-		// [TODO] Use 64bit numbers
-		auto time = ((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->ftLastAccessTime;
-		return static_cast<unsigned int>(static_cast<__int64>(time.dwHighDateTime) << 32 | time.dwLowDateTime);
-	}
+        // [TODO] Use 64bit numbers
+        auto time = ((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->ftLastAccessTime;
+        return static_cast<unsigned int>(static_cast<__int64>(time.dwHighDateTime) << 32 | time.dwLowDateTime);
+    }
 
     return 0;
 }
@@ -158,12 +170,12 @@ unsigned int LocalFileHandle::modificationTime() const
 {
     readFileInfo();
 
-	if (m_fileInfo)
-	{
-		// [TODO] Use 64bit numbers
-		auto time = ((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->ftLastWriteTime;
-		return static_cast<unsigned int>(static_cast<__int64>(time.dwHighDateTime) << 32 | time.dwLowDateTime);
-	}
+    if (m_fileInfo)
+    {
+        // [TODO] Use 64bit numbers
+        auto time = ((WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo)->ftLastWriteTime;
+        return static_cast<unsigned int>(static_cast<__int64>(time.dwHighDateTime) << 32 | time.dwLowDateTime);
+    }
 
     return 0;
 }
@@ -201,7 +213,7 @@ bool LocalFileHandle::createDirectory()
     if (exists()) return false;
 
     // Create directory
-	if (!CreateDirectoryA(m_path.c_str(), nullptr))
+    if (!CreateDirectoryA(m_path.c_str(), nullptr))
     {
         return false;
     }
@@ -217,10 +229,10 @@ bool LocalFileHandle::removeDirectory()
     if (!isDirectory()) return false;
 
     // Remove directory
-	if (!RemoveDirectoryA(m_path.c_str()))
-	{
-		return false;
-	}
+    if (!RemoveDirectoryA(m_path.c_str()))
+    {
+        return false;
+    }
 
     // Done
     updateFileInfo();
@@ -242,11 +254,11 @@ bool LocalFileHandle::copy(AbstractFileHandleBackend * dest)
         dst = FilePath(dest->path()).resolve(filename).fullPath();
     }
 
-	// Copy file
-	if (!CopyFileA(src.c_str(), dst.c_str(), FALSE))
-	{
-		// Error!
-		return false;
+    // Copy file
+    if (!CopyFileA(src.c_str(), dst.c_str(), FALSE))
+    {
+        // Error!
+        return false;
     }
 
     // Done
@@ -270,11 +282,11 @@ bool LocalFileHandle::move(AbstractFileHandleBackend * dest)
     }
 
     // Move file
-	if (!MoveFileA(src.c_str(), dst.c_str()))
-	{
-		// Error!
-		return false;
-	}
+    if (!MoveFileA(src.c_str(), dst.c_str()))
+    {
+        // Error!
+        return false;
+    }
 
     // Update path
     m_path = dst;
@@ -293,11 +305,11 @@ bool LocalFileHandle::rename(const std::string & filename)
     std::string path = FilePath(FilePath(m_path).directoryPath()).resolve(filename).fullPath();
 
     // Rename
-	if (!MoveFileA(m_path.c_str(), path.c_str()))
-	{
-		// Error!
-		return false;
-	}
+    if (!MoveFileA(m_path.c_str(), path.c_str()))
+    {
+        // Error!
+        return false;
+    }
 
     // Update path
     m_path = path;
@@ -313,8 +325,8 @@ bool LocalFileHandle::remove()
     if (!isFile()) return false;
 
     // Delete file
-	if (!DeleteFileA(m_path.c_str()))
-	{
+    if (!DeleteFileA(m_path.c_str()))
+    {
         return false;
     }
 
@@ -339,13 +351,13 @@ void LocalFileHandle::readFileInfo() const
     if (m_fileInfo) return;
 
     // Create file information structure
-	m_fileInfo = (void *)new WIN32_FILE_ATTRIBUTE_DATA;
+    m_fileInfo = (void *)new WIN32_FILE_ATTRIBUTE_DATA;
 
-	// Get file info
-	if (!GetFileAttributesExA(m_path.c_str(), GetFileExInfoStandard, (WIN32_FILE_ATTRIBUTE_DATA*)m_fileInfo))
+    // Get file info
+    if (!GetFileAttributesExA(m_path.c_str(), GetFileExInfoStandard, (WIN32_FILE_ATTRIBUTE_DATA*)m_fileInfo))
     {
         // Error!
-		delete (WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo;
+        delete (WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo;
         m_fileInfo = nullptr;
     }
 }

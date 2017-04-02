@@ -69,7 +69,16 @@ int main(int argc, char * argv[])
         // List files
         for (auto it = dir.begin(); it != dir.end(); ++it)
         {
-            std::cout << "- " << *it << std::endl;
+            std::cout << "- " << *it;
+
+            FileHandle f = dir.open(*it);
+            if (f.isDirectory()) {
+                std::cout << " (DIR)";
+            } else if (f.isSymbolicLink()) {
+                std::cout << " (LNK)";                
+            }
+
+            std::cout << std::endl;
         }
     }
 

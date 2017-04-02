@@ -22,6 +22,7 @@ SshFileHandle::SshFileHandle(std::shared_ptr<SshFileSystem> fs, const std::strin
 : m_fs(fs)
 , m_path(path)
 , m_fileInfo(nullptr)
+, m_linkInfo(nullptr)
 {
 }
 
@@ -30,6 +31,11 @@ SshFileHandle::~SshFileHandle()
     if (m_fileInfo)
     {
         delete (LIBSSH2_SFTP_ATTRIBUTES *)m_fileInfo;
+    }
+
+    if (m_linkInfo)
+    {
+        delete (LIBSSH2_SFTP_ATTRIBUTES *)m_linkInfo;
     }
 }
 
@@ -50,6 +56,13 @@ void SshFileHandle::updateFileInfo()
     {
         delete (LIBSSH2_SFTP_ATTRIBUTES *)m_fileInfo;
         m_fileInfo = nullptr;
+    }
+
+    // Reset link information
+    if (m_linkInfo)
+    {
+        delete (LIBSSH2_SFTP_ATTRIBUTES *)m_linkInfo;
+        m_linkInfo = nullptr;
     }
 }
 
@@ -102,6 +115,25 @@ bool SshFileHandle::isDirectory() const
     {
         // Check if it is a directory
         if (((LIBSSH2_SFTP_ATTRIBUTES *)m_fileInfo)->permissions & LIBSSH2_SFTP_S_IFDIR)
+        {
+            return true;
+        }
+    }
+
+    // File or directory does not exist
+    return false;
+}
+
+bool SshFileHandle::isSymbolicLink() const
+{
+    // Get file info
+    readLinkInfo();
+
+    // Check if file or directory exists
+    if (m_linkInfo)
+    {
+        // Check if it is a directory
+        if (((LIBSSH2_SFTP_ATTRIBUTES *)m_linkInfo)->permissions & LIBSSH2_SFTP_S_IFLNK)
         {
             return true;
         }
@@ -578,6 +610,30 @@ void SshFileHandle::readFileInfo() const
         // Error!
         delete (LIBSSH2_SFTP_ATTRIBUTES *)m_fileInfo;
         m_fileInfo = nullptr;
+    }
+}
+
+void SshFileHandle::readLinkInfo() const
+{
+    // Check if file info has already been read
+    if (m_linkInfo) return;
+
+    // Check handle
+    if (!m_fs->m_session) return;
+
+    // Initialize SFTP sub-protocol
+    m_fs->initSftp();
+    if (!m_fs->m_sftpSession) return;
+
+    // Create file information structure
+    m_linkInfo = (void *)new LIBSSH2_SFTP_ATTRIBUTES;
+
+    // Get file info
+    if (libssh2_sftp_stat_ex((LIBSSH2_SFTP *)m_fs->m_sftpSession, m_path.c_str(), m_path.length(), LIBSSH2_SFTP_LSTAT, (LIBSSH2_SFTP_ATTRIBUTES *)m_fileInfo) != 0)
+    {
+        // Error!
+        delete (LIBSSH2_SFTP_ATTRIBUTES *)m_linkInfo;
+        m_linkInfo = nullptr;
     }
 }
 

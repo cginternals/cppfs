@@ -79,6 +79,11 @@ bool FileHandle::isDirectory() const
     return m_backend ? m_backend->isDirectory() : false;
 }
 
+bool FileHandle::isSymbolicLink() const
+{
+    return m_backend ? m_backend->isSymbolicLink() : false;
+}
+
 std::vector<std::string> FileHandle::listFiles() const
 {
     return m_backend ? m_backend->listFiles() : std::vector<std::string>();

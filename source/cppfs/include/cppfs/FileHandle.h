@@ -154,6 +154,15 @@ public:
 
     /**
     *  @brief
+    *    Check if item is a symbolic link
+    *
+    *  @return
+    *    'true' if it is a symbolic link, else 'false'
+    */
+    bool isSymbolicLink() const;
+
+    /**
+    *  @brief
     *    List files in directory
     *
     *  @return
