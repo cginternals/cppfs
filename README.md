@@ -102,7 +102,7 @@ bool listContent = path.pointsToContent();
 
 *FilePath* offers functions to obtain the individual components of a file path,
 such as the filename, extension, or path to the containing directory.
-All of these functions ignore trailing slashes on the path, so they work on
+All of these functions ignore trailing slashes on the path, so they operate on
 the object the path points to, not it contents.
 
 ```C++
@@ -162,14 +162,14 @@ std::cout << path.resolved() << std::endl; // "C:/documents/test.txt"
 
 ### Accessing the file system
 
-The main class for accessing file and directories in cppfs is *FileHandle*.
+The main class for accessing files and directories in cppfs is *FileHandle*.
 It can be used to get information about file system objects, to manipulate
 them (e.g., copy, rename, or delete), as well as to read and write files.
 
-To obtain a file handle, the global function *fs::open* can be used. The type of file
-system that is accessed will be determined automatically by the given path
-or URL. File systems will be closed automatically when they no longer have
-any open file handles.
+To obtain a file handle, the global function *fs::open* can be called. The
+type of file system that is accessed will be determined automatically by the
+given path or URL. File systems will be closed automatically when there are
+no longer any open file handles left.
 
 ```C++
 // Open local file
@@ -291,22 +291,22 @@ file.copy(dir);
 // Copy file to another file
 file.copy(dir.open("readme2.txt"));
 
+// Rename file
+file.rename("readme3.txt");
+
 // Move file into directory
 file.move(dir);
 
 // Create hard link
-file.createLink(dir.open("readme2.txt"));
+file.createLink(dir.open("readme4.txt"));
 
 // Create symbolic link
-file.createSymbolicLink(dir.open("readme2.txt"));
-
-// Rename file
-file.rename(dir.open("readme.md"));
+file.createSymbolicLink(dir.open("readme5.txt"));
 
 // Delete file
 file.remove();
 
-// Delete directory
+// Delete directory (only if empty)
 dir.removeDirectory();
 ```
 
