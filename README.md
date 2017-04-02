@@ -13,20 +13,6 @@ The following backends are currently implemented:
 - SSH (libssh2)
 
 
-## Resources
-
-* [Project Health](#project-health)
-
-###### Installation and Development
-* [Install Instructions](#install-instructions)
-* [Build form Source](#build-instructions)
-* [Tips for Linking](#tips-for-linking)
-* [Basic Example](#basic-example)
-
-###### Feature Documentation and Code Snippets
-* [Foo Bar](#foo-bar)
-
-
 ## Project Health
 
 | Service | System | Compiler | Status |
@@ -39,107 +25,13 @@ The following backends are currently implemented:
 Please note that our macOS build node is currently broken (physically). However, *cppfs* is maintained for macOS as well and there are many people using it on macOS on a regular basis.
 
 
-## Install Instructions
-
-*cpplocate* is available for different platforms using different distribution channels. 
-
-ToDo
-
-###### Windows
-
-ToDo
-
-###### Ubuntu
-
-ToDo
-
-###### Arch Linux
-
-ToDo
-
-###### macOS
-
-ToDo
-
-
-###### Debian-based Systems
-
-There is currently no precompiled package maintained. Please download the source code and commence [building from source](#build-instructions).
-
-
 ## Build Instructions
 
-##### Prerequisites and Dependencies
-
-The only mandatory run-time dependencies of *cpplocate* are the STL of the used compiler. 
-Building *cpplocate* utilizes:
-* [CMake](https://cmake.org/) 3.0 or higher for building *cpplocate* from source (mandatory for any build from source)
-* [git](https://git-scm.com/) for version control (optional)
-* [Doxygen](http://www.stack.nl/~dimitri/doxygen/) 1.8 or higher for generating the documentation on your system (optional)
-  * [graphviz](http://www.graphviz.org/) for generating diagrams (optional)
-
-##### Compile Instructions
-
-For compilation, a C++11 compliant compiler, e.g., GCC 4.8, Clang 3.3, MSVC 2013 **Update 3**, is required.
-
-First, download the source code [as archive](https://github.com/cginternals/cpplocate/releases) or via git:
-```shell
-> git clone https://github.com/cginternals/cpplocate.git
-> cd cpplocate
-```
-Then, depending on the version of *cpplocate* you want to build, choose the appropriate tag or branch, e.g., for the 1.0.0 release:
-```shell
-> git fetch --tags
-> git checkout v1.0.0
-```
-The actual compilation can be done using CMake and your favorite compiler and IDE.
-
-For building *cpplocate* CMake via command line can be used (should work on all systems):
-
-First create a build directory (we do not recommend in-source builds):
-```shell
-> mkdir build
-> cd build
-```
-
-Configure *cpplocate* with your prefered or default generator, e.g., for Visual Studio 2015 in x64 use
-(note: some IDEs have integrated support for CMake projects, e.g., Qt Creator, and allow you to skip the manual project configuration):
-```shell
-> cmake .. -G "Visual Studio 14 2015 Win64"
-```
-
-In order to compile the project, either use you favorite Editor/IDE with the created project or use CMake as follows:
-```shell
-> cmake --build .
-```
-
-
-
-## Tips for Linking
-
-We suggest using the build system of *cpplocate* for a smooth integration: [CMake](https://cmake.org/)
-For it, *cpplocate* provides a find configuration script that should be installed into your system or at least be accessible by CMake. 
-In the projects CMakeLists.txt, add one of the following lines:
-```
-find_package(cpplocate QUIET)    # if you want to check for existance
-find_package(cpplocate REQUIRED) # if it is really required in your project
-```
-
-There is no need for explicit linking (e.g., ```target_link_libraries(${target} ... PUBLIC cpplocate::cpplocate)```) anymore. 
-The find configuration script takes care of that.
-
-
-
-
-## Basic Example
-
-ToDo
-
+Please follow our [CMake project setup guide](https://github.com/cginternals/cmake-init/wiki/Setup-Guide)
+to setup and build *cppfs*.
 
 
 ## Features
-
-### Foo Bar
 
 
 ## Get absolute path to the current executable
