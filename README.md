@@ -160,21 +160,18 @@ std::cout << path.resolved() << std::endl; // "C:/documents/test.txt"
 ```
 
 
-### Accessing file systems
+### Accessing the system
 
 To open files, the global function *fs::open* can be used. The type of file
 system that is accessed will be determined automatically by the given path
 or URL. File systems will be closed automatically when they no longer have
-any open file handles. At the moment, it is not possible to register new file
-systems at this global level. To use a custom file system, you have to create
-an own instance of it and use the *cppfs::AbstractFileSystem* interface to
-access it.
+any open file handles.
 
 ```C++
 using namespace cppfs;
 
 // Open local file
-FileHandle f1 = fs::open("data/readme.txt");
+FileHandle file1 = fs::open("data/readme.txt");
 
 // Open file on SSH server
 LoginCredentials login;
@@ -184,10 +181,25 @@ login.setValue("publicKey",  "/path/to/key.pub"); // Default: "$home/.ssh/id_rsa
 login.setValue("privateKey", "/path/to/key");     // Default: "$home/.ssh/id_rsa"
 login.setValue("port",       "999");              // Default: 22
 
-FileHandle f2 = fs::open("ssh://example.com/home/user/readme.txt", &login);
+FileHandle file2 = fs::open("ssh://example.com/home/user/readme.txt", &login);
+```
+
+At the moment, it is not possible to register new file systems at the global
+level. To use a custom file system, you have to create an instance of it and
+use the *cppfs::AbstractFileSystem* interface to access it.
+
+```C++
+class CustomFS : public cppfs::AbstractFileSystem
+{
+    ...
+}
+
+CustomFS fs;
+FileHandle file = fs.open("data/readme.txt");
 ```
 
 
 ### File handles
+
 
 ### Advanced functions
