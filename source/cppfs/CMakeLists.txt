@@ -60,6 +60,7 @@ set(headers
     ${include_path}/Tree.h
     ${include_path}/Diff.h
     ${include_path}/Change.h
+    ${include_path}/units.h
 
     ${include_path}/${localfs}/LocalFileSystem.h
     ${include_path}/${localfs}/LocalFileHandle.h

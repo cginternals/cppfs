@@ -12,7 +12,7 @@
 
 
 #ifdef max
-	#undef max
+    #undef max
 #endif
 
 

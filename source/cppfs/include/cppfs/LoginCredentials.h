@@ -77,7 +77,7 @@ public:
     *  @return
     *    Reference to this value
     */
-    LoginCredentials & operator=(const LoginCredentials && loginCredentials);
+    LoginCredentials & operator=(LoginCredentials && loginCredentials);
 
     /**
     *  @brief
@@ -125,7 +125,7 @@ public:
     *  @return
     *    Value for key, "" if key does not exist
     */
-    std::string value(const std::string & key) const;
+    const std::string & value(const std::string & key) const;
 
     /**
     *  @brief
@@ -137,6 +137,17 @@ public:
     *    Value for key
     */
     void setValue(const std::string & key, const std::string & value);
+
+    /**
+    *  @brief
+    *    Set value for key
+    *
+    *  @param[in] key
+    *    Key
+    *  @param[in] value
+    *    Value for key
+    */
+    void setValue(const std::string & key, std::string && value);
 
 
 protected:

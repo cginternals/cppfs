@@ -31,17 +31,32 @@ void Diff::add(const Change & change)
     m_changes.push_back(change);
 }
 
+void Diff::add(Change && change)
+{
+    m_changes.push_back(change);
+}
+
 void Diff::add(Change::Operation operation, const std::string & path)
 {
-    m_changes.push_back(Change(operation, path));
+    m_changes.emplace_back(operation, path);
+}
+
+void Diff::add(Change::Operation operation, std::string && path)
+{
+    m_changes.emplace_back(operation, path);
+}
+
+void Diff::print(std::ostream & stream)
+{
+    for (size_t i = 0; i < m_changes.size(); i++)
+    {
+        stream << m_changes[i].toString() << std::endl;
+    }
 }
 
 void Diff::print()
 {
-    for (size_t i = 0; i < m_changes.size(); i++)
-    {
-        std::cout << m_changes[i].toString() << std::endl;
-    }
+    print(std::cout);
 }
 
 

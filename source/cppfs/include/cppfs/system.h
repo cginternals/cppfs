@@ -25,8 +25,12 @@ namespace system
 *
 *  @return
 *    Home directory (native path)
+*
+*  @remarks
+*    It is assumed that the home directory doesn't change
+*    for the process lifetime.
 */
-CPPFS_API std::string homeDir();
+CPPFS_API const std::string & homeDir();
 
 /**
 *  @brief
@@ -37,6 +41,10 @@ CPPFS_API std::string homeDir();
 *
 *  @return
 *    Config directory (native path)
+*
+*  @remarks
+*    It is assumed that the config directory doesn't change
+*    for the process lifetime.
 */
 CPPFS_API std::string configDir(const std::string & application);
 

@@ -42,7 +42,7 @@ public:
     *  @param[in] url
     *    Url to move
     */
-    Url(const Url && url);
+    Url(Url && url);
 
     /**
     *  @brief
@@ -60,7 +60,7 @@ public:
     *  @param[in] url
     *    Url
     */
-    Url(const std::string && url);
+    Url(std::string && url);
 
     /**
     *  @brief
@@ -99,7 +99,7 @@ public:
     *  @return
     *    Reference to this value
     */
-    Url & operator=(const Url && url);
+    Url & operator=(Url && url);
 
     /**
     *  @brief
@@ -117,7 +117,7 @@ public:
     *  @return
     *    Protocol part (including "://")
     */
-    std::string protocol() const;
+    const std::string & protocol() const;
 
     /**
     *  @brief
@@ -126,7 +126,7 @@ public:
     *  @return
     *    Location (everything after the protocol part)
     */
-    std::string location() const;
+    const std::string & location() const;
 
     /**
     *  @brief
@@ -135,7 +135,7 @@ public:
     *  @return
     *    Address (including username, password, and hostname)
     */
-    std::string address() const;
+    const std::string & address() const;
 
     /**
     *  @brief
@@ -144,7 +144,7 @@ public:
     *  @return
     *    Path (everything after the address)
     */
-    std::string path() const;
+    const std::string & path() const;
 
     /**
     *  @brief
@@ -153,7 +153,7 @@ public:
     *  @return
     *    Login part (username and password)
     */
-    std::string login() const;
+    const std::string & login() const;
 
     /**
     *  @brief
@@ -162,7 +162,7 @@ public:
     *  @return
     *    Host name
     */
-    std::string host() const;
+    const std::string & host() const;
 
     /**
     *  @brief
@@ -171,7 +171,7 @@ public:
     *  @return
     *    User name
     */
-    std::string username() const;
+    const std::string & username() const;
 
     /**
     *  @brief
@@ -180,7 +180,7 @@ public:
     *  @return
     *    Password
     */
-    std::string password() const;
+    const std::string & password() const;
 
 
 protected:

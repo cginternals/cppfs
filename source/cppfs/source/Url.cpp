@@ -36,17 +36,17 @@ Url::Url(const Url & url)
 {
 }
 
-Url::Url(const Url && url)
-: m_url(url.m_url)
-, m_analyzed(url.m_analyzed)
-, m_protocol(url.m_protocol)
-, m_location(url.m_location)
-, m_address(url.m_address)
-, m_path(url.m_path)
-, m_login(url.m_login)
-, m_host(url.m_host)
-, m_username(url.m_username)
-, m_password(url.m_password)
+Url::Url(Url && url)
+: m_url(std::move(url.m_url))
+, m_analyzed(std::move(url.m_analyzed))
+, m_protocol(std::move(url.m_protocol))
+, m_location(std::move(url.m_location))
+, m_address(std::move(url.m_address))
+, m_path(std::move(url.m_path))
+, m_login(std::move(url.m_login))
+, m_host(std::move(url.m_host))
+, m_username(std::move(url.m_username))
+, m_password(std::move(url.m_password))
 {
 }
 
@@ -64,8 +64,8 @@ Url::Url(const std::string & url)
 {
 }
 
-Url::Url(const std::string && url)
-: m_url(url)
+Url::Url(std::string && url)
+: m_url(std::move(url))
 , m_analyzed(false)
 , m_protocol("")
 , m_location("")
@@ -112,7 +112,7 @@ Url & Url::operator=(const Url & url)
     return *this;
 }
 
-Url & Url::operator=(const Url && url)
+Url & Url::operator=(Url && url)
 {
     m_url      = std::move(url.m_url);
     m_analyzed = std::move(url.m_analyzed);
@@ -133,49 +133,49 @@ const std::string & Url::toString() const
     return m_url;
 }
 
-std::string Url::protocol() const
+const std::string & Url::protocol() const
 {
     analyze();
     return m_protocol;
 }
 
-std::string Url::location() const
+const std::string & Url::location() const
 {
     analyze();
     return m_location;
 }
 
-std::string Url::address() const
+const std::string & Url::address() const
 {
     analyze();
     return m_address;
 }
 
-std::string Url::path() const
+const std::string & Url::path() const
 {
     analyze();
     return m_path;
 }
 
-std::string Url::login() const
+const std::string & Url::login() const
 {
     analyze();
     return m_login;
 }
 
-std::string Url::host() const
+const std::string & Url::host() const
 {
     analyze();
     return m_host;
 }
 
-std::string Url::username() const
+const std::string & Url::username() const
 {
     analyze();
     return m_username;
 }
 
-std::string Url::password() const
+const std::string & Url::password() const
 {
     analyze();
     return m_password;

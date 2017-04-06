@@ -135,6 +135,33 @@ void FilePath::setPath(const std::string & path)
     }
 }
 
+void FilePath::setPath(std::string && path)
+{
+    // Set new path
+    m_path = std::move(path);
+
+    // Reset state
+    m_pointsToContent = false;
+    m_details         = false;
+    m_fullPath        = "";
+    m_filename        = "";
+    m_basename        = "";
+    m_extension       = "";
+    m_directoryPath   = "";
+    m_driveLetter     = "";
+    m_absolute        = false;
+
+    // Convert path into unified form
+    std::replace(m_path.begin(), m_path.end(), '\\', '/');
+
+    // Check if path ends with a delimiter
+    auto pos = m_path.find_last_of('/');
+    if (pos == m_path.size()-1)
+    {
+        m_pointsToContent = true;
+    }
+}
+
 std::string FilePath::toNative() const
 {
     auto path = m_path;
@@ -156,42 +183,42 @@ bool FilePath::pointsToContent() const
     return m_pointsToContent;
 }
 
-std::string FilePath::fullPath() const
+const std::string & FilePath::fullPath() const
 {
     analyze();
 
     return m_fullPath;
 }
 
-std::string FilePath::fileName() const
+const std::string & FilePath::fileName() const
 {
     analyze();
 
     return m_filename;
 }
 
-std::string FilePath::baseName() const
+const std::string & FilePath::baseName() const
 {
     analyze();
 
     return m_basename;
 }
 
-std::string FilePath::extension() const
+const std::string & FilePath::extension() const
 {
     analyze();
 
     return m_extension;
 }
 
-std::string FilePath::directoryPath() const
+const std::string & FilePath::directoryPath() const
 {
     analyze();
 
     return m_directoryPath;
 }
 
-std::string FilePath::driveLetter() const
+const std::string & FilePath::driveLetter() const
 {
     analyze();
 
@@ -257,7 +284,7 @@ std::string FilePath::resolved() const
     for (size_t i = 0; i < numParts; i++)
     {
         // Get sub-path
-        std::string path = parts[i];
+        const std::string & path = parts[i];
 
         // Check if it is the beginning of an absolute path
         if (i == 0 && (path.empty() || (path.length() == 2 && path[1] == ':'))) {
@@ -341,7 +368,7 @@ void FilePath::analyze() const
     for (size_t i = 0; i < numParts; i++)
     {
         // Get sub-path
-        std::string path = parts[i];
+        const std::string & path = parts[i];
 
         // If this is the first path and it is absolute, ensure '/' at the end
         if (i == 0 && (path.empty() || (path.length() == 2 && path[1] == ':')))
@@ -405,14 +432,7 @@ void FilePath::analyze() const
     // Determine drive letter
     pos = m_fullPath.find_first_of(':');
 
-    if (pos == 1)
-    {
-        m_driveLetter = m_path.substr(0, pos+1);
-    }
-    else
-    {
-        m_driveLetter = "";
-    }
+    m_driveLetter = pos == 1 ? m_path.substr(0, pos+1) : "";
 
     // Set state
     m_details = true;

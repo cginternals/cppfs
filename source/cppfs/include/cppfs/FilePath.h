@@ -138,6 +138,15 @@ public:
 
     /**
     *  @brief
+    *    Set path
+    *
+    *  @param[in] path
+    *    File path
+    */
+    void setPath(std::string && path);
+
+    /**
+    *  @brief
     *    Get native path as string
     *
     *  @return
@@ -189,7 +198,7 @@ public:
     *    If you want trailing separators to remain in the string, use path().
     *    Calling this function triggers a full analysis of the path (costly operation).
     */
-    std::string fullPath() const;
+    const std::string & fullPath() const;
 
     /**
     *  @brief
@@ -203,7 +212,7 @@ public:
     *    "/path/to/something.ex/".
     *    Calling this function triggers a full analysis of the path (costly operation).
     */
-    std::string fileName() const;
+    const std::string & fileName() const;
 
     /**
     *  @brief
@@ -217,7 +226,7 @@ public:
     *    "/path/to/something.ex/".
     *    Calling this function triggers a full analysis of the path (costly operation).
     */
-    std::string baseName() const;
+    const std::string & baseName() const;
 
     /**
     *  @brief
@@ -232,7 +241,7 @@ public:
     *    string is returned.
     *    Calling this function triggers a full analysis of the path (costly operation).
     */
-    std::string extension() const;
+    const std::string & extension() const;
 
     /**
     *  @brief
@@ -246,7 +255,7 @@ public:
     *    "/path/to/directory" and "/path/to/directory/".
     *    Calling this function triggers a full analysis of the path (costly operation).
     */
-    std::string directoryPath() const;
+    const std::string & directoryPath() const;
 
     /**
     *  @brief
@@ -259,7 +268,7 @@ public:
     *    If there is no drive letter (Linux, Mac), an empty string is returned.
     *    Calling this function triggers a full analysis of the path (costly operation).
     */
-    std::string driveLetter() const;
+    const std::string & driveLetter() const;
 
     /**
     *  @brief

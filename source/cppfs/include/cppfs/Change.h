@@ -52,12 +52,32 @@ public:
 
     /**
     *  @brief
+    *    Constructor
+    *
+    *  @param[in] operation
+    *    Operation type
+    *  @param[in] path
+    *    Path on which the operation takes place
+    */
+    Change(Operation operation, std::string && path);
+
+    /**
+    *  @brief
     *    Copy constructor
     *
     *  @param[in] change
     *    Other change
     */
     Change(const Change & change);
+
+    /**
+    *  @brief
+    *    Move constructor
+    *
+    *  @param[in] change
+    *    Other change
+    */
+    Change(Change && change);
 
     /**
     *  @brief
@@ -73,6 +93,15 @@ public:
     *    Other change
     */
     Change & operator=(const Change & change);
+
+    /**
+    *  @brief
+    *    Move operator
+    *
+    *  @param[in] change
+    *    Other change
+    */
+    Change & operator=(Change && change);
 
     /**
     *  @brief
@@ -99,7 +128,7 @@ public:
     *  @return
     *    Path on which the operation takes place
     */
-    std::string path() const;
+    const std::string & path() const;
 
 
 protected:

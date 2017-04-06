@@ -36,6 +36,17 @@ public:
 
     /**
     *  @brief
+    *    Constructor
+    *
+    *  @param[in] fs
+    *    File system that created this iterator
+    *  @param[in] path
+    *    Path to file or directory
+    */
+    LocalFileIterator(std::shared_ptr<LocalFileSystem> fs, std::string && path);
+
+    /**
+    *  @brief
     *    Destructor
     */
     virtual ~LocalFileIterator();

@@ -34,6 +34,17 @@ public:
 
     /**
     *  @brief
+    *    Constructor
+    *
+    *  @param[in] fs
+    *    File system that created this handle
+    *  @param[in] path
+    *    Path to file or directory
+    */
+    LocalFileHandle(std::shared_ptr<LocalFileSystem> fs, std::string && path);
+
+    /**
+    *  @brief
     *    Destructor
     */
     virtual ~LocalFileHandle();

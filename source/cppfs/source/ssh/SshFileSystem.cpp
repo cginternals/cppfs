@@ -42,12 +42,31 @@ SshFileSystem::SshFileSystem(const std::string & host, int port, const std::stri
     connect();
 }
 
+SshFileSystem::SshFileSystem(std::string && host, int port, std::string && username, std::string && password, std::string && publicKey, std::string && privateKey)
+: m_host(std::move(host))
+, m_port(std::move(port))
+, m_username(std::move(username))
+, m_password(std::move(password))
+, m_publicKey(std::move(publicKey))
+, m_privateKey(std::move(privateKey))
+, m_socket(0)
+, m_session(nullptr)
+, m_sftpSession(nullptr)
+{
+    connect();
+}
+
 SshFileSystem::~SshFileSystem()
 {
     disconnect();
 }
 
 FileHandle SshFileSystem::open(const std::string & path)
+{
+    return open(std::string(path));
+}
+
+FileHandle SshFileSystem::open(std::string && path)
 {
     return FileHandle(new SshFileHandle(shared_from_this(), path));
 }
