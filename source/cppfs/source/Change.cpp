@@ -18,9 +18,21 @@ Change::Change(Operation operation, const std::string & path)
 {
 }
 
+Change::Change(Operation operation, std::string && path)
+: m_operation(operation)
+, m_path(std::move(path))
+{
+}
+
 Change::Change(const Change & change)
 : m_operation(change.m_operation)
 , m_path(change.m_path)
+{
+}
+
+Change::Change(Change && change)
+: m_operation(std::move(change.m_operation))
+, m_path(std::move(change.m_path))
 {
 }
 
@@ -32,6 +44,14 @@ Change & Change::operator=(const Change & change)
 {
     m_operation = change.m_operation;
     m_path      = change.m_path;
+
+    return *this;
+}
+
+Change & Change::operator=(Change && change)
+{
+    m_operation = std::move(change.m_operation);
+    m_path      = std::move(change.m_path);
 
     return *this;
 }
@@ -53,7 +73,7 @@ Change::Operation Change::operation() const
     return m_operation;
 }
 
-std::string Change::path() const
+const std::string & Change::path() const
 {
     return m_path;
 }

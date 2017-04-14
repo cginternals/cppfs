@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <iterator>
+#include <array>
 
 #if defined(__APPLE__)
     #define COMMON_DIGEST_FOR_OPENSSL
@@ -56,6 +57,13 @@ FileHandle::~FileHandle()
 FileHandle & FileHandle::operator=(const FileHandle & fileHandle)
 {
     m_backend.reset(fileHandle.m_backend ? fileHandle.m_backend->clone() : nullptr);
+
+    return *this;
+}
+
+FileHandle & FileHandle::operator=(FileHandle && fileHandle)
+{
+    m_backend = std::move(fileHandle.m_backend);
 
     return *this;
 }
@@ -142,7 +150,8 @@ void FileHandle::traverse(FileVisitor & visitor)
 Tree * FileHandle::readTree(const std::string & path, bool includeHash) const
 {
     // Check if file or directory exists
-    if (!exists()) {
+    if (!exists())
+    {
         return nullptr;
     }
 
@@ -157,7 +166,9 @@ Tree * FileHandle::readTree(const std::string & path, bool includeHash) const
     tree->setUserId(userId());
     tree->setGroupId(groupId());
     tree->setPermissions(permissions());
-    if (includeHash) {
+
+    if (includeHash)
+    {
         tree->setSha1(sha1());
     }
 
@@ -249,13 +260,15 @@ void FileHandle::setPermissions(unsigned long permissions)
 std::string FileHandle::sha1() const
 {
     // Check file
-    if (!isFile()) {
+    if (!isFile())
+    {
         return "";
     }
 
     // Open file
     std::istream * inputStream = createInputStream();
-    if (!inputStream) {
+    if (!inputStream)
+    {
         return "";
     }
 
@@ -268,17 +281,15 @@ std::string FileHandle::sha1() const
     while (!inputStream->eof())
     {
         // Read a maximum of 1024 bytes at once
-        int size = 1024;
-
         // Read data from file
-        char buf[1024];
-        inputStream->read(buf, size);
+        std::array<char, 1024> buf;
+        inputStream->read(buf.data(), buf.size());
 
         size_t count = inputStream->gcount();
         if (count > 0)
         {
             // Update hash
-            SHA1_Update(&context, buf, count);
+            SHA1_Update(&context, buf.data(), count);
         } else break;
     }
 
@@ -293,13 +304,16 @@ std::string FileHandle::sha1() const
 std::string FileHandle::base64() const
 {
     // Check file
-    if (!isFile()) {
+    if (!isFile())
+    {
         return "";
     }
 
     // Open file
     std::istream * inputStream = createInputStream();
-    if (!inputStream) {
+
+    if (!inputStream)
+    {
         return "";
     }
 
@@ -445,7 +459,8 @@ bool FileHandle::copy(FileHandle & dest)
     }
 
     // Otherwise, use generic (slow) method
-    else {
+    else
+    {
         return genericCopy(dest);
     }
 }
@@ -467,7 +482,8 @@ bool FileHandle::move(FileHandle & dest)
     }
 
     // Otherwise, use generic (slow) method
-    else {
+    else
+    {
         return genericMove(dest);
     }
 }
@@ -489,7 +505,8 @@ bool FileHandle::createLink(FileHandle & dest)
     }
 
     // Otherwise, this is not possible
-    else {
+    else
+    {
         return false;
     }
 }
@@ -511,7 +528,8 @@ bool FileHandle::createSymbolicLink(FileHandle & dest)
     }
 
     // Otherwise, this is not possible
-    else {
+    else
+    {
         return false;
     }
 }
@@ -643,11 +661,12 @@ bool FileHandle::genericCopy(FileHandle & dest)
     // Open files
     std::istream * in  = createInputStream(std::ios::binary);
     std::ostream * out = dest.createOutputStream(std::ios::binary | std::ios::trunc);
+
     if (!in || !out)
     {
         // Clean up streams
-        if (in)  delete in;
-        if (out) delete out;
+        delete in;
+        delete out;
 
         // Error!
         return false;

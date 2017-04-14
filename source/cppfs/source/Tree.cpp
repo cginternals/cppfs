@@ -44,7 +44,7 @@ void Tree::clear()
     m_children.clear();
 }
 
-std::string Tree::path() const
+const std::string & Tree::path() const
 {
     return m_path;
 }
@@ -54,12 +54,22 @@ void Tree::setPath(const std::string & path)
     m_path = path;
 }
 
-std::string Tree::fileName() const
+void Tree::setPath(std::string && path)
+{
+    m_path = std::move(path);
+}
+
+const std::string & Tree::fileName() const
 {
     return m_filename;
 }
 
 void Tree::setFileName(const std::string & filename)
+{
+    m_filename = filename;
+}
+
+void Tree::setFileName(std::string && filename)
 {
     m_filename = filename;
 }
@@ -139,7 +149,7 @@ void Tree::setPermissions(unsigned int permissions)
     m_permissions = permissions;
 }
 
-std::string Tree::sha1() const
+const std::string & Tree::sha1() const
 {
     return m_sha1;
 }
@@ -149,11 +159,17 @@ void Tree::setSha1(const std::string & hash)
     m_sha1 = hash;
 }
 
+void Tree::setSha1(std::string && hash)
+{
+    m_sha1 = std::move(hash);
+}
+
 std::vector<std::string> Tree::listFiles() const
 {
     std::vector<std::string> children;
 
-    if (!m_directory) {
+    if (!m_directory)
+    {
         return children;
     }
 
@@ -178,7 +194,8 @@ std::vector<Tree *> & Tree::children()
 void Tree::add(Tree * tree)
 {
     // Check parameters
-    if (!tree) {
+    if (!tree)
+    {
         return;
     }
 
@@ -189,12 +206,13 @@ void Tree::add(Tree * tree)
 void Tree::remove(Tree * tree)
 {
     // Check parameters
-    if (!tree) {
+    if (!tree)
+    {
         return;
     }
 
     // Find item in list
-    auto it = std::find(m_children.begin(), m_children.end(), tree);
+    const auto it = std::find(m_children.begin(), m_children.end(), tree);
     if (it != m_children.end())
     {
         // Remove from list
@@ -239,7 +257,8 @@ void Tree::fromVariant(const cppexpose::Variant & obj)
     clear();
 
     // Check object
-    if (!obj.isVariantMap()) {
+    if (!obj.isVariantMap())
+    {
         return;
     }
 
@@ -257,7 +276,7 @@ void Tree::fromVariant(const cppexpose::Variant & obj)
     m_sha1             = map.at("sha1").toString();
 
     // Read children
-    auto it = map.find("children");
+    const auto it = map.find("children");
     if (it != map.end())
     {
         const cppexpose::Variant & children = (*it).second;
@@ -320,7 +339,7 @@ void Tree::createDiff(const Tree * currentState, const Tree * targetState, Diff 
     auto currentFiles = currentState->listFiles();
 
     // Delete files which are in the current state but not in the target state
-    for (auto * file : currentState->children())
+    for (const auto * file : currentState->children())
     {
         // Check if file is in the target state
         if (std::find(targetFiles.begin(), targetFiles.end(), file->fileName()) == targetFiles.end())
@@ -341,10 +360,10 @@ void Tree::createDiff(const Tree * currentState, const Tree * targetState, Diff 
     }
 
     // Copy files which are new or changed
-    for (auto * targetFile : targetState->children())
+    for (const auto * targetFile : targetState->children())
     {
         // Get file in the current state
-        auto it = std::find(currentFiles.begin(), currentFiles.end(), targetFile->fileName());
+        const auto it = std::find(currentFiles.begin(), currentFiles.end(), targetFile->fileName());
         Tree * currentFile = (it != currentFiles.end()) ? currentState->children()[std::distance(currentFiles.begin(), it)] : nullptr;
 
         // Directory

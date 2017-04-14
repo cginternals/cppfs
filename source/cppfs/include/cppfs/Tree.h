@@ -59,7 +59,7 @@ public:
     *    empty (""), the path of the first-order child elements
     *    will equal their filenames, etc.
     */
-    std::string path() const;
+    const std::string & path() const;
 
     /**
     *  @brief
@@ -72,12 +72,21 @@ public:
 
     /**
     *  @brief
+    *    Set path
+    *
+    *  @param[in] path
+    *    Path to file or directory
+    */
+    void setPath(std::string && path);
+
+    /**
+    *  @brief
     *    Get filename
     *
     *  @return
     *    Filename
     */
-    std::string fileName() const;
+    const std::string & fileName() const;
 
     /**
     *  @brief
@@ -87,6 +96,15 @@ public:
     *    Filename
     */
     void setFileName(const std::string & filename);
+
+    /**
+    *  @brief
+    *    Set filename
+    *
+    *  @param[in] filename
+    *    Filename
+    */
+    void setFileName(std::string && filename);
 
     /**
     *  @brief
@@ -230,7 +248,7 @@ public:
     *  @return
     *    SHA1 hash
     */
-    std::string sha1() const;
+    const std::string & sha1() const;
 
     /**
     *  @brief
@@ -240,6 +258,15 @@ public:
     *    SHA1 hash
     */
     void setSha1(const std::string & hash);
+
+    /**
+    *  @brief
+    *    Set sha1 hash
+    *
+    *  @param[in] hash
+    *    SHA1 hash
+    */
+    void setSha1(std::string && hash);
 
     /**
     *  @brief

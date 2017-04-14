@@ -41,6 +41,15 @@ public:
     *    Path to file or directory
     */
     virtual FileHandle open(const std::string & path) = 0;
+
+    /**
+    *  @brief
+    *    Open file or directory in file system
+    *
+    *  @param[in] path
+    *    Path to file or directory
+    */
+    virtual FileHandle open(std::string && path) = 0;
 };
 
 

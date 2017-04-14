@@ -53,12 +53,39 @@ public:
 
     /**
     *  @brief
+    *    Constructor
+    *
+    *  @param[in] host
+    *    Host name
+    *  @param[in] port
+    *    Port
+    *  @param[in] username
+    *    User name
+    *  @param[in] password
+    *    Password
+    *  @param[in] publicKey
+    *    Path to public key file
+    *  @param[in] privateKey
+    *    Path to private key file
+    */
+    SshFileSystem(
+        std::string && host,
+        int port,
+        std::string && username,
+        std::string && password,
+        std::string && publicKey,
+        std::string && privateKey
+    );
+
+    /**
+    *  @brief
     *    Destructor
     */
     virtual ~SshFileSystem();
 
     // Virtual AbstractFileSystem functions
     virtual FileHandle open(const std::string & path) override;
+    virtual FileHandle open(std::string && path) override;
 
 
 protected:

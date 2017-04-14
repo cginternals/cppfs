@@ -8,6 +8,7 @@
 #include <streambuf>
 
 #include <cppfs/cppfs_api.h>
+#include <cppfs/units.h>
 
 
 namespace cppfs
@@ -39,7 +40,7 @@ public:
     *  @param[n] putbackSize
     *    Size of the putback area
     */
-    SshInputStreamBuffer(std::shared_ptr<SshFileSystem> fs, const std::string & path, std::ios_base::openmode mode, size_t bufferSize = 32 * 1024, size_t putBackSize = 128);
+    SshInputStreamBuffer(std::shared_ptr<SshFileSystem> fs, const std::string & path, std::ios_base::openmode mode, size_t bufferSize = 32_kB, size_t putBackSize = 128_B);
 
     /**
     *  @brief
@@ -55,7 +56,7 @@ public:
 
 protected:
     std::shared_ptr<SshFileSystem>   m_fs;          ///< File system that created this iterator
-    std::string                      m_path;        ///< Path to file or directory
+    const std::string                m_path;        ///< Path to file or directory
     void                           * m_file;        ///< SFTP file handle
     const size_t                     m_putbackSize; ///< Size of the putback area
     std::vector<char>                m_buffer;      ///< Read buffer

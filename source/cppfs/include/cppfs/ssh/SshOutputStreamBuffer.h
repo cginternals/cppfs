@@ -8,6 +8,7 @@
 #include <streambuf>
 
 #include <cppfs/cppfs_api.h>
+#include <cppfs/units.h>
 
 
 namespace cppfs
@@ -44,7 +45,7 @@ public:
     *
     *    See https://c-ares.haxx.se/mail/libssh2-devel-archive-2010-02/0170.shtml
     */
-    SshOutputStreamBuffer(std::shared_ptr<SshFileSystem> fs, const std::string & path, std::ios_base::openmode mode, size_t bufferSize = 24 * 1024);
+    SshOutputStreamBuffer(std::shared_ptr<SshFileSystem> fs, const std::string & path, std::ios_base::openmode mode, size_t bufferSize = 24_kB);
 
     /**
     *  @brief
@@ -60,10 +61,10 @@ public:
 
 
 protected:
-    std::shared_ptr<SshFileSystem>   m_fs;     ///< File system that created this iterator
-    std::string                      m_path;   ///< Path to file or directory
-    void                           * m_file;   ///< SFTP file handle
-    std::vector<char>                m_buffer; ///< Write buffer
+    std::shared_ptr<SshFileSystem>         m_fs;     ///< File system that created this iterator
+    const std::string                      m_path;   ///< Path to file or directory
+    void                                 * m_file;   ///< SFTP file handle
+    std::vector<std::streambuf::char_type> m_buffer; ///< Write buffer
 };
 
 

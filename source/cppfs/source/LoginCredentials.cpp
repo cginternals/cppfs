@@ -9,6 +9,16 @@
 #include <cppfs/FileHandle.h>
 
 
+namespace
+{
+
+
+const std::string emptyValue = "";
+
+
+} // namespace
+
+
 namespace cppfs
 {
 
@@ -23,7 +33,7 @@ LoginCredentials::LoginCredentials(const LoginCredentials & loginCredentials)
 }
 
 LoginCredentials::LoginCredentials(const LoginCredentials && loginCredentials)
-: m_values(loginCredentials.m_values)
+    : m_values(std::move(loginCredentials.m_values))
 {
 }
 
@@ -38,9 +48,9 @@ LoginCredentials & LoginCredentials::operator=(const LoginCredentials & loginCre
     return *this;
 }
 
-LoginCredentials & LoginCredentials::operator=(const LoginCredentials && loginCredentials)
+LoginCredentials & LoginCredentials::operator=(LoginCredentials && loginCredentials)
 {
-    m_values = loginCredentials.m_values;
+    m_values = std::move(loginCredentials.m_values);
 
     return *this;
 }
@@ -72,6 +82,7 @@ bool LoginCredentials::load(const std::string & path)
 
     // Close
     delete in;
+
     return true;
 }
 
@@ -87,8 +98,8 @@ bool LoginCredentials::save(const std::string & path) const
     // Get all keys and values
     for (auto it : m_values)
     {
-        std::string key   = it.first;
-        std::string value = it.second;
+        const std::string & key   = it.first;
+        const std::string & value = it.second;
 
         if (!key.empty() && !value.empty())
         {
@@ -98,6 +109,7 @@ bool LoginCredentials::save(const std::string & path) const
 
     // Close
     delete out;
+
     return true;
 }
 
@@ -106,21 +118,26 @@ bool LoginCredentials::isSet(const std::string & key) const
     return (m_values.find(key) != m_values.end());
 }
 
-std::string LoginCredentials::value(const std::string & key) const
+const std::string & LoginCredentials::value(const std::string & key) const
 {
-    auto it = m_values.find(key);
+    const auto it = m_values.find(key);
 
     if (it != m_values.end())
     {
         return it->second;
     }
 
-    return "";
+    return emptyValue;
 }
 
 void LoginCredentials::setValue(const std::string & key, const std::string & value)
 {
     m_values[key] = value;
+}
+
+void LoginCredentials::setValue(const std::string & key, std::string && value)
+{
+    m_values[key] = std::move(value);
 }
 
 

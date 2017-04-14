@@ -3,10 +3,10 @@
 
 
 #include <memory>
+#include <ios>
 #include <functional>
 #include <vector>
 #include <string>
-#include <iostream>
 
 #include <cppfs/cppfs_api.h>
 
@@ -94,6 +94,15 @@ public:
     *    Source handle
     */
     FileHandle & operator=(const FileHandle & fileHandle);
+
+    /**
+    *  @brief
+    *    Move operator
+    *
+    *  @param[in] fileHandle
+    *    Source handle
+    */
+    FileHandle & operator=(FileHandle && fileHandle);
 
     /**
     *  @brief

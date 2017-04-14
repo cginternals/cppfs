@@ -98,7 +98,7 @@ int SshOutputStreamBuffer::sync()
     if (size > 0)
     {
         // Write to stream
-        auto res = libssh2_sftp_write((LIBSSH2_SFTP_HANDLE *)m_file, &m_buffer.front(), size);
+        /*auto res = */libssh2_sftp_write((LIBSSH2_SFTP_HANDLE *)m_file, &m_buffer.front(), size);
 
         // [TODO] Handle errors
         /*
