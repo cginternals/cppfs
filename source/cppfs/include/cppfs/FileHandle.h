@@ -60,7 +60,7 @@ public:
     *  @param[in] backend
     *    Concrete file handle backend
     */
-    FileHandle(AbstractFileHandleBackend * backend);
+    FileHandle(std::unique_ptr<AbstractFileHandleBackend> && backend);
 
     /**
     *  @brief
@@ -220,7 +220,7 @@ public:
     *  @return
     *    File tree, nullptr if this file does not exist
     */
-    Tree * readTree(const std::string & path = "", bool includeHash = false) const;
+    std::unique_ptr<Tree> readTree(const std::string & path = "", bool includeHash = false) const;
 
     /**
     *  @brief
@@ -491,7 +491,7 @@ public:
     *  @remarks
     *    The created stream object has to be destroyed be the caller.
     */
-    std::istream * createInputStream(std::ios_base::openmode mode = std::ios_base::in) const;
+    std::unique_ptr<std::istream> createInputStream(std::ios_base::openmode mode = std::ios_base::in) const;
 
     /**
     *  @brief
@@ -506,7 +506,7 @@ public:
     *  @remarks
     *    The created stream object has to be destroyed be the caller.
     */
-    std::ostream * createOutputStream(std::ios_base::openmode mode = std::ios_base::out);
+    std::unique_ptr<std::ostream> createOutputStream(std::ios_base::openmode mode = std::ios_base::out);
 
     /**
     *  @brief
@@ -569,7 +569,7 @@ protected:
 
 
 protected:
-    std::unique_ptr<AbstractFileHandleBackend> m_backend; ///< Backend implementation (never null)
+    std::unique_ptr<AbstractFileHandleBackend> m_backend; ///< Backend implementation (can be null)
 };
 
 

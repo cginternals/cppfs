@@ -2,6 +2,7 @@
 #pragma once
 
 
+#include <memory>
 #include <vector>
 #include <string>
 #include <istream>
@@ -44,7 +45,7 @@ public:
     *  @return
     *    File handle
     */
-    virtual AbstractFileHandleBackend * clone() const = 0;
+    virtual std::unique_ptr<AbstractFileHandleBackend> clone() const = 0;
 
     /**
     *  @brief
@@ -122,7 +123,7 @@ public:
     *  @return
     *    Iterator backend, must NOT be null
     */
-    virtual AbstractFileIteratorBackend * begin() const = 0;
+    virtual std::unique_ptr<AbstractFileIteratorBackend> begin() const = 0;
 
     /**
     *  @brief
@@ -228,48 +229,48 @@ public:
     *    Copy file
     *
     *  @param[in] dest
-    *    Destination file or directory (must NOT be nullptr, and MUST be of the same type as this file handle)
+    *    Destination file or directory (must be of the same type as this file handle)
     *
     *  @return
     *    'true' if successful, else 'false'
     */
-    virtual bool copy(AbstractFileHandleBackend * dest) = 0;
+    virtual bool copy(AbstractFileHandleBackend & dest) = 0;
 
     /**
     *  @brief
     *    Move file
     *
     *  @param[in] dest
-    *    Destination file or directory (must NOT be nullptr, and MUST be of the same type as this file handle)
+    *    Destination file or directory (must be of the same type as this file handle)
     *
     *  @return
     *    'true' if successful, else 'false'
     */
-    virtual bool move(AbstractFileHandleBackend * dest) = 0;
+    virtual bool move(AbstractFileHandleBackend & dest) = 0;
 
     /**
     *  @brief
     *    Create hard link
     *
     *  @param[in] dest
-    *    Destination file or directory (must NOT be nullptr, and MUST be of the same type as this file handle)
+    *    Destination file or directory (must be of the same type as this file handle)
     *
     *  @return
     *    'true' if successful, else 'false'
     */
-    virtual bool createLink(AbstractFileHandleBackend * dest) = 0;
+    virtual bool createLink(AbstractFileHandleBackend & dest) = 0;
 
     /**
     *  @brief
     *    Create symbolic link
     *
     *  @param[in] dest
-    *    Destination file or directory (must NOT be nullptr, and MUST be of the same type as this file handle)
+    *    Destination file or directory (must be of the same type as this file handle)
     *
     *  @return
     *    'true' if successful, else 'false'
     */
-    virtual bool createSymbolicLink(AbstractFileHandleBackend * dest) = 0;
+    virtual bool createSymbolicLink(AbstractFileHandleBackend & dest) = 0;
 
     /**
     *  @brief
@@ -309,7 +310,7 @@ public:
     *  @remarks
     *    The created stream object has to be destroyed be the caller.
     */
-    virtual std::istream * createInputStream(std::ios_base::openmode mode) const = 0;
+    virtual std::unique_ptr<std::istream> createInputStream(std::ios_base::openmode mode) const = 0;
 
     /**
     *  @brief
@@ -324,7 +325,7 @@ public:
     *  @remarks
     *    The created stream object has to be destroyed be the caller.
     */
-    virtual std::ostream * createOutputStream(std::ios_base::openmode mode) = 0;
+    virtual std::unique_ptr<std::ostream> createOutputStream(std::ios_base::openmode mode) = 0;
 };
 
 

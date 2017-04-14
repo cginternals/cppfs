@@ -63,7 +63,6 @@ int main(int argc, char * argv[])
 
     // Open directory
     FileHandle dir = fs::open(path, &login);
-
     if (dir.isDirectory())
     {
         // List files
@@ -81,7 +80,6 @@ int main(int argc, char * argv[])
             std::cout << std::endl;
         }
     }
-
     else
     {
         std::cout << "'" << path << "' is not a valid directory." << std::endl;

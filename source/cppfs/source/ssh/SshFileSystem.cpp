@@ -68,7 +68,11 @@ FileHandle SshFileSystem::open(const std::string & path)
 
 FileHandle SshFileSystem::open(std::string && path)
 {
-    return FileHandle(new SshFileHandle(shared_from_this(), path));
+    return FileHandle(
+        std::unique_ptr<AbstractFileHandleBackend>(
+            new SshFileHandle(shared_from_this(), path)
+        )
+    );
 }
 
 void SshFileSystem::connect()

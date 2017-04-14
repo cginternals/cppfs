@@ -43,9 +43,9 @@ LocalFileHandle::~LocalFileHandle()
     }
 }
 
-AbstractFileHandleBackend * LocalFileHandle::clone() const
+std::unique_ptr<AbstractFileHandleBackend> LocalFileHandle::clone() const
 {
-    return new LocalFileHandle(m_fs, m_path);
+    return std::unique_ptr<AbstractFileHandleBackend>(new LocalFileHandle(m_fs, m_path));
 }
 
 AbstractFileSystem * LocalFileHandle::fs() const
@@ -153,9 +153,9 @@ std::vector<std::string> LocalFileHandle::listFiles() const
     return entries;
 }
 
-AbstractFileIteratorBackend * LocalFileHandle::begin() const
+std::unique_ptr<AbstractFileIteratorBackend> LocalFileHandle::begin() const
 {
-    return new LocalFileIterator(m_fs, m_path);
+    return std::unique_ptr<AbstractFileIteratorBackend>(new LocalFileIterator(m_fs, m_path));
 }
 
 unsigned int LocalFileHandle::size() const
@@ -339,19 +339,19 @@ bool LocalFileHandle::removeDirectory()
     return true;
 }
 
-bool LocalFileHandle::copy(AbstractFileHandleBackend * dest)
+bool LocalFileHandle::copy(AbstractFileHandleBackend & dest)
 {
     // Check source file
     if (!isFile()) return false;
 
     // Get source and target filenames
     std::string src = m_path;
-    std::string dst = dest->path();
+    std::string dst = dest.path();
 
-    if (dest->isDirectory())
+    if (dest.isDirectory())
     {
         std::string filename = FilePath(m_path).fileName();
-        dst = FilePath(dest->path()).resolve(filename).fullPath();
+        dst = FilePath(dest.path()).resolve(filename).fullPath();
     }
 
     // Open files
@@ -370,19 +370,19 @@ bool LocalFileHandle::copy(AbstractFileHandleBackend * dest)
     return true;
 }
 
-bool LocalFileHandle::move(AbstractFileHandleBackend * dest)
+bool LocalFileHandle::move(AbstractFileHandleBackend & dest)
 {
     // Check source file
     if (!exists()) return false;
 
     // Get source and target filenames
     std::string src = m_path;
-    std::string dst = dest->path();
+    std::string dst = dest.path();
 
-    if (dest->isDirectory())
+    if (dest.isDirectory())
     {
         std::string filename = FilePath(m_path).fileName();
-        dst = FilePath(dest->path()).resolve(filename).fullPath();
+        dst = FilePath(dest.path()).resolve(filename).fullPath();
     }
 
     // Move file
@@ -399,19 +399,19 @@ bool LocalFileHandle::move(AbstractFileHandleBackend * dest)
     return true;
 }
 
-bool LocalFileHandle::createLink(AbstractFileHandleBackend * dest)
+bool LocalFileHandle::createLink(AbstractFileHandleBackend & dest)
 {
     // Check source file
     if (!exists()) return false;
 
     // Get source and target filenames
     std::string src = m_path;
-    std::string dst = dest->path();
+    std::string dst = dest.path();
 
-    if (dest->isDirectory())
+    if (dest.isDirectory())
     {
         std::string filename = FilePath(m_path).fileName();
-        dst = FilePath(dest->path()).resolve(filename).fullPath();
+        dst = FilePath(dest.path()).resolve(filename).fullPath();
     }
 
     // Create link
@@ -424,19 +424,19 @@ bool LocalFileHandle::createLink(AbstractFileHandleBackend * dest)
     return true;
 }
 
-bool LocalFileHandle::createSymbolicLink(AbstractFileHandleBackend * dest)
+bool LocalFileHandle::createSymbolicLink(AbstractFileHandleBackend & dest)
 {
     // Check source file
     if (!exists()) return false;
 
     // Get source and target filenames
     std::string src = m_path;
-    std::string dst = dest->path();
+    std::string dst = dest.path();
 
-    if (dest->isDirectory())
+    if (dest.isDirectory())
     {
         std::string filename = FilePath(m_path).fileName();
-        dst = FilePath(dest->path()).resolve(filename).fullPath();
+        dst = FilePath(dest.path()).resolve(filename).fullPath();
     }
 
     // Create symbolic link
@@ -487,14 +487,14 @@ bool LocalFileHandle::remove()
     return true;
 }
 
-std::istream * LocalFileHandle::createInputStream(std::ios_base::openmode mode) const
+std::unique_ptr<std::istream> LocalFileHandle::createInputStream(std::ios_base::openmode mode) const
 {
-    return new std::ifstream(m_path, mode);
+    return std::unique_ptr<std::istream>(new std::ifstream(m_path, mode));
 }
 
-std::ostream * LocalFileHandle::createOutputStream(std::ios_base::openmode mode)
+std::unique_ptr<std::ostream> LocalFileHandle::createOutputStream(std::ios_base::openmode mode)
 {
-    return new std::ofstream(m_path, mode);
+    return std::unique_ptr<std::ostream>(new std::ofstream(m_path, mode));
 }
 
 void LocalFileHandle::readFileInfo() const

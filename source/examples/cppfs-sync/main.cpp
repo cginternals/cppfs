@@ -92,12 +92,14 @@ int main(int argc, char * argv[])
         }
     }
 
-    // Sync directories
-    Tree * srcTree = srcDir.readTree();
-    Tree * dstTree = dstDir.readTree();
+    // Get both directory trees
+    auto srcTree = srcDir.readTree();
+    auto dstTree = dstDir.readTree();
 
-    Diff * diff = dstTree->createDiff(*srcTree);
+    // Compute differences
+    auto diff = dstTree->createDiff(*srcTree.get());
 
+    // Apply changes to destination
     for (Change change : diff->changes())
     {
         if (change.operation() == Change::CopyFile) {
@@ -122,10 +124,6 @@ int main(int argc, char * argv[])
             dst.removeDirectoryRec();
         }
     }
-
-    delete diff;
-    delete srcTree;
-    delete dstTree;
 
     // Done
     return 0;

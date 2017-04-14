@@ -19,7 +19,11 @@ LocalFileSystem::~LocalFileSystem()
 
 FileHandle LocalFileSystem::open(const std::string & path)
 {
-    return FileHandle(new LocalFileHandle(shared_from_this(), path));
+    return FileHandle(
+        std::unique_ptr<AbstractFileHandleBackend>(
+            new LocalFileHandle(shared_from_this(), path)
+        )
+    );
 }
 
 

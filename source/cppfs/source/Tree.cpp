@@ -36,11 +36,6 @@ Tree::~Tree()
 
 void Tree::clear()
 {
-    for (auto * child : m_children)
-    {
-        delete child;
-    }
-
     m_children.clear();
 }
 
@@ -173,7 +168,7 @@ std::vector<std::string> Tree::listFiles() const
         return children;
     }
 
-    for (auto * tree : m_children)
+    for (auto & tree : m_children)
     {
         children.push_back(tree->fileName());
     }
@@ -181,17 +176,17 @@ std::vector<std::string> Tree::listFiles() const
     return children;
 }
 
-const std::vector<Tree *> & Tree::children() const
+const std::vector< std::unique_ptr<Tree> > & Tree::children() const
 {
     return m_children;
 }
 
-std::vector<Tree *> & Tree::children()
+std::vector< std::unique_ptr<Tree> > & Tree::children()
 {
     return m_children;
 }
 
-void Tree::add(Tree * tree)
+void Tree::add(std::unique_ptr<Tree> && tree)
 {
     // Check parameters
     if (!tree)
@@ -200,27 +195,7 @@ void Tree::add(Tree * tree)
     }
 
     // Add tree to list
-    m_children.push_back(tree);
-}
-
-void Tree::remove(Tree * tree)
-{
-    // Check parameters
-    if (!tree)
-    {
-        return;
-    }
-
-    // Find item in list
-    const auto it = std::find(m_children.begin(), m_children.end(), tree);
-    if (it != m_children.end())
-    {
-        // Remove from list
-        m_children.erase(it);
-
-        // Delete child tree
-        delete tree;
-    }
+    m_children.push_back(std::move(tree));
 }
 
 Variant Tree::toVariant() const
@@ -243,7 +218,7 @@ Variant Tree::toVariant() const
 
     VariantArray & array = *map["children"].asArray();
 
-    for (auto * tree : m_children)
+    for (auto & tree : m_children)
     {
         array.push_back(tree->toVariant());
     }
@@ -284,10 +259,10 @@ void Tree::fromVariant(const cppexpose::Variant & obj)
 
         for (auto & childObj : array)
         {
-            Tree * tree = new Tree;
+            std::unique_ptr<Tree> tree(new Tree);
             tree->fromVariant(childObj);
 
-            add(tree);
+            add(std::move(tree));
         }
     }
 }
@@ -309,13 +284,13 @@ void Tree::load(const std::string & path)
     fromVariant(obj);
 }
 
-Diff * Tree::createDiff(const Tree & target) const
+std::unique_ptr<Diff> Tree::createDiff(const Tree & target) const
 {
     auto diff = new Diff;
 
     createDiff(this, &target, *diff);
 
-    return diff;
+    return std::unique_ptr<Diff>(diff);
 }
 
 void Tree::createDiff(const Tree * currentState, const Tree * targetState, Diff & diff)
@@ -339,7 +314,7 @@ void Tree::createDiff(const Tree * currentState, const Tree * targetState, Diff 
     auto currentFiles = currentState->listFiles();
 
     // Delete files which are in the current state but not in the target state
-    for (const auto * file : currentState->children())
+    for (const auto & file : currentState->children())
     {
         // Check if file is in the target state
         if (std::find(targetFiles.begin(), targetFiles.end(), file->fileName()) == targetFiles.end())
@@ -360,17 +335,17 @@ void Tree::createDiff(const Tree * currentState, const Tree * targetState, Diff 
     }
 
     // Copy files which are new or changed
-    for (const auto * targetFile : targetState->children())
+    for (const auto & targetFile : targetState->children())
     {
         // Get file in the current state
         const auto it = std::find(currentFiles.begin(), currentFiles.end(), targetFile->fileName());
-        Tree * currentFile = (it != currentFiles.end()) ? currentState->children()[std::distance(currentFiles.begin(), it)] : nullptr;
+        Tree * currentFile = (it != currentFiles.end()) ? currentState->children()[std::distance(currentFiles.begin(), it)].get() : nullptr;
 
         // Directory
         if (targetFile->isDirectory())
         {
             // Sync directories recursively
-            createDiff(currentFile, targetFile, diff);
+            createDiff(currentFile, targetFile.get(), diff);
         }
 
         // File

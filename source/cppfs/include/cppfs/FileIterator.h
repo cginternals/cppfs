@@ -35,7 +35,7 @@ public:
     *  @param[in] backend
     *    Concrete file handle backend
     */
-    FileIterator(AbstractFileIteratorBackend * backend);
+    FileIterator(std::unique_ptr<AbstractFileIteratorBackend> && backend);
 
     /**
     *  @brief
