@@ -33,7 +33,7 @@ LoginCredentials::LoginCredentials(const LoginCredentials & loginCredentials)
 }
 
 LoginCredentials::LoginCredentials(const LoginCredentials && loginCredentials)
-    : m_values(std::move(loginCredentials.m_values))
+: m_values(std::move(loginCredentials.m_values))
 {
 }
 

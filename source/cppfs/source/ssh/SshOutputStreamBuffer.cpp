@@ -98,15 +98,30 @@ int SshOutputStreamBuffer::sync()
     if (size > 0)
     {
         // Write to stream
-        /*auto res = */libssh2_sftp_write((LIBSSH2_SFTP_HANDLE *)m_file, &m_buffer.front(), size);
+        auto res = libssh2_sftp_write((LIBSSH2_SFTP_HANDLE *)m_file, &m_buffer.front(), size);
 
-        // [TODO] Handle errors
-        /*
-        if (res == LIBSSH2_ERROR_ALLOC)          std::cout << "LIBSSH2_ERROR_ALLOC" << std::endl;
-        if (res == LIBSSH2_ERROR_SOCKET_SEND)    std::cout << "LIBSSH2_ERROR_SOCKET_SEND" << std::endl;
-        if (res == LIBSSH2_ERROR_SOCKET_TIMEOUT) std::cout << "LIBSSH2_ERROR_SOCKET_TIMEOUT" << std::endl;
-        if (res == LIBSSH2_ERROR_SFTP_PROTOCOL)  std::cout << "LIBSSH2_ERROR_ALLOC" << std::endl;
-        */
+        // Check for errors
+        switch (res)
+        {
+            case LIBSSH2_ERROR_ALLOC:
+                std::cout << "SSH error: LIBSSH2_ERROR_ALLOC" << std::endl;
+                break;
+
+            case LIBSSH2_ERROR_SOCKET_SEND:
+                std::cout << "SSH error: LIBSSH2_ERROR_SOCKET_SEND" << std::endl;
+                break;
+
+            case LIBSSH2_ERROR_SOCKET_TIMEOUT:
+                std::cout << "SSH error: LIBSSH2_ERROR_SOCKET_TIMEOUT" << std::endl;
+                break;
+
+            case LIBSSH2_ERROR_SFTP_PROTOCOL:
+                std::cout << "SSH error: LIBSSH2_ERROR_SFTP_PROTOCOL" << std::endl;
+                break;
+
+            default:
+                break;
+        }
 
         // Reset write buffer
         char * start = &m_buffer.front();
