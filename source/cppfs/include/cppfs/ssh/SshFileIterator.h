@@ -41,7 +41,7 @@ public:
     virtual ~SshFileIterator();
 
     // Virtual AbstractFileIteratorBackend functions
-    virtual AbstractFileIteratorBackend * clone() const override;
+    virtual std::unique_ptr<AbstractFileIteratorBackend> clone() const override;
     virtual AbstractFileSystem * fs() const override;
     virtual bool valid() const override;
     virtual std::string path() const override;

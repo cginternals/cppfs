@@ -80,9 +80,7 @@ bool LoginCredentials::load(const std::string & path)
         }
     }
 
-    // Close
-    delete in;
-
+    // Done
     return true;
 }
 
@@ -107,9 +105,7 @@ bool LoginCredentials::save(const std::string & path) const
         }
     }
 
-    // Close
-    delete out;
-
+    // Done
     return true;
 }
 

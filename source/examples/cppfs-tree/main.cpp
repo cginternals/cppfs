@@ -7,11 +7,13 @@
 #include <cppassist/cmdline/CommandLineOption.h>
 #include <cppassist/cmdline/CommandLineParameter.h>
 
+#include <cppexpose/variant/Variant.h>
+
 #include <cppfs/cppfs-version.h>
 #include <cppfs/fs.h>
 #include <cppfs/LoginCredentials.h>
 #include <cppfs/FileHandle.h>
-#include <cppfs/FileIterator.h>
+#include <cppfs/Tree.h>
 
 
 using namespace cppassist;
@@ -22,12 +24,12 @@ int main(int argc, char * argv[])
 {
     // Declare program
     CommandLineProgram program(
-        "cppfs-ls",
-        "cppfs-ls " CPPFS_VERSION,
-        "List all files in a directory."
+        "cppfs-tree",
+        "cppfs-tree " CPPFS_VERSION,
+        "Print directory tree."
     );
 
-    CommandLineAction action("list", "List files in directory");
+    CommandLineAction action("tree", "Print directory tree");
     program.add(&action);
 
     CommandLineSwitch swHelp("--help", "-h", "Print help text", CommandLineSwitch::Optional);
@@ -63,27 +65,19 @@ int main(int argc, char * argv[])
 
     // Open directory
     FileHandle dir = fs::open(path, &login);
-    if (dir.isDirectory())
+    if (!dir.isDirectory())
     {
-        // List files
-        for (auto it = dir.begin(); it != dir.end(); ++it)
-        {
-            std::cout << "- " << *it;
-
-            FileHandle f = dir.open(*it);
-            if (f.isDirectory()) {
-                std::cout << " (DIR)";
-            } else if (f.isSymbolicLink()) {
-                std::cout << " (LNK)";                
-            }
-
-            std::cout << std::endl;
-        }
+        // Error
+        std::cout << "Could not open directory '" << path << "'." << std::endl;
+        return 1;
     }
-    else
-    {
-        std::cout << "'" << path << "' is not a valid directory." << std::endl;
-    }
+
+    // Get directory tree
+    auto tree = dir.readTree();
+
+    // Print tree
+    std::string json = tree->toVariant().toJSON(cppexpose::JSON::Beautify);
+    std::cout << json << std::endl;
 
     // Done
     return 0;

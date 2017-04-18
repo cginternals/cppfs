@@ -38,7 +38,7 @@ LocalFileIterator::~LocalFileIterator()
     }
 }
 
-AbstractFileIteratorBackend * LocalFileIterator::clone() const
+std::unique_ptr<AbstractFileIteratorBackend> LocalFileIterator::clone() const
 {
     auto * twin = new LocalFileIterator(m_fs, m_path);
 
@@ -47,7 +47,7 @@ AbstractFileIteratorBackend * LocalFileIterator::clone() const
         twin->readNextEntry();
     }
 
-    return twin;
+    return std::unique_ptr<AbstractFileIteratorBackend>(twin);
 }
 
 AbstractFileSystem * LocalFileIterator::fs() const

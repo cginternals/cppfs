@@ -39,7 +39,7 @@ public:
     virtual ~SshFileHandle();
 
     // Virtual AbstractFileHandleBackend functions
-    virtual AbstractFileHandleBackend * clone() const override;
+    virtual std::unique_ptr<AbstractFileHandleBackend> clone() const override;
     virtual AbstractFileSystem * fs() const override;
     virtual void updateFileInfo() override;
     virtual std::string path() const override;
@@ -48,7 +48,7 @@ public:
     virtual bool isDirectory() const override;
     virtual bool isSymbolicLink() const override;
     virtual std::vector<std::string> listFiles() const override;
-    virtual AbstractFileIteratorBackend * begin() const override;
+    virtual std::unique_ptr<AbstractFileIteratorBackend> begin() const override;
     virtual unsigned int size() const override;
     virtual unsigned int accessTime() const override;
     virtual unsigned int modificationTime() const override;
@@ -60,14 +60,14 @@ public:
     virtual void setPermissions(unsigned long permissions) override;
     virtual bool createDirectory() override;
     virtual bool removeDirectory() override;
-    virtual bool copy(AbstractFileHandleBackend * dest) override;
-    virtual bool move(AbstractFileHandleBackend * dest) override;
-    virtual bool createLink(AbstractFileHandleBackend * dest) override;
-    virtual bool createSymbolicLink(AbstractFileHandleBackend * dest) override;
+    virtual bool copy(AbstractFileHandleBackend & dest) override;
+    virtual bool move(AbstractFileHandleBackend & dest) override;
+    virtual bool createLink(AbstractFileHandleBackend & dest) override;
+    virtual bool createSymbolicLink(AbstractFileHandleBackend & dest) override;
     virtual bool rename(const std::string & filename) override;
     virtual bool remove() override;
-    virtual std::istream * createInputStream(std::ios_base::openmode mode) const override;
-    virtual std::ostream * createOutputStream(std::ios_base::openmode mode) override;
+    virtual std::unique_ptr<std::istream> createInputStream(std::ios_base::openmode mode) const override;
+    virtual std::unique_ptr<std::ostream> createOutputStream(std::ios_base::openmode mode) override;
 
 
 protected:

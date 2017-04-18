@@ -2,6 +2,7 @@
 #pragma once
 
 
+#include <memory>
 #include <vector>
 #include <string>
 
@@ -284,7 +285,7 @@ public:
     *  @return
     *    List of children
     */
-    const std::vector<Tree *> & children() const;
+    const std::vector< std::unique_ptr<Tree> > & children() const;
 
     /**
     *  @brief
@@ -293,7 +294,7 @@ public:
     *  @return
     *    List of children
     */
-    std::vector<Tree *> & children();
+    std::vector< std::unique_ptr<Tree> > & children();
 
     /**
     *  @brief
@@ -305,19 +306,7 @@ public:
     *  @remarks
     *    The tree takes ownership over the child tree
     */
-    void add(Tree * tree);
-
-    /**
-    *  @brief
-    *    Remove child
-    *
-    *  @param[in] tree
-    *    Child tree (must NOT be null!)
-    *
-    *  @remarks
-    *    Will also destroy the child tree
-    */
-    void remove(Tree * tree);
+    void add(std::unique_ptr<Tree> && tree);
 
     /**
     *  @brief
@@ -370,7 +359,7 @@ public:
     *    that are needed to get from this state to the target state.
     *    The returned diff must be deleted by the caller.
     */
-    Diff * createDiff(const Tree & target) const;
+    std::unique_ptr<Diff> createDiff(const Tree & target) const;
 
 
 protected:
@@ -389,7 +378,7 @@ protected:
     unsigned long m_permissions;      ///< File permissions
     std::string   m_sha1;             ///< SHA1 hash
 
-    std::vector<Tree *> m_children;   ///< List of children
+    std::vector< std::unique_ptr<Tree> > m_children; ///< List of children
 };
 
 

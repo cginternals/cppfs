@@ -2,6 +2,7 @@
 #pragma once
 
 
+#include <memory>
 #include <string>
 
 #include <cppfs/cppfs_api.h>
@@ -40,7 +41,7 @@ public:
     *  @return
     *    File iterator
     */
-    virtual AbstractFileIteratorBackend * clone() const = 0;
+    virtual std::unique_ptr<AbstractFileIteratorBackend> clone() const = 0;
 
     /**
     *  @brief

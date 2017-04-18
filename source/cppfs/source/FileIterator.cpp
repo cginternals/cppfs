@@ -12,13 +12,13 @@ FileIterator::FileIterator()
 {
 }
 
-FileIterator::FileIterator(AbstractFileIteratorBackend * backend)
-: m_backend(backend)
+FileIterator::FileIterator(std::unique_ptr<AbstractFileIteratorBackend> && backend)
+: m_backend(std::move(backend))
 {
 }
 
 FileIterator::FileIterator(const FileIterator & fileIterator)
-: m_backend(fileIterator.m_backend ? fileIterator.m_backend->clone() : nullptr)
+: m_backend(fileIterator.m_backend ? std::move(fileIterator.m_backend->clone()) : nullptr)
 {
 }
 
@@ -33,7 +33,14 @@ FileIterator::~FileIterator()
 
 FileIterator & FileIterator::operator=(const FileIterator & fileIterator)
 {
-    m_backend.reset(fileIterator.m_backend ? fileIterator.m_backend->clone() : nullptr);
+    if (fileIterator.m_backend)
+    {
+        m_backend = fileIterator.m_backend->clone();
+    }
+    else
+    {
+        m_backend.reset(nullptr);
+    }
 
     return *this;
 }

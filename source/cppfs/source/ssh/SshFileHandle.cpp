@@ -39,9 +39,9 @@ SshFileHandle::~SshFileHandle()
     }
 }
 
-AbstractFileHandleBackend * SshFileHandle::clone() const
+std::unique_ptr<AbstractFileHandleBackend> SshFileHandle::clone() const
 {
-    return new SshFileHandle(m_fs, m_path);
+    return std::unique_ptr<AbstractFileHandleBackend>(new SshFileHandle(m_fs, m_path));
 }
 
 AbstractFileSystem * SshFileHandle::fs() const
@@ -180,9 +180,9 @@ std::vector<std::string> SshFileHandle::listFiles() const
     return entries;
 }
 
-AbstractFileIteratorBackend * SshFileHandle::begin() const
+std::unique_ptr<AbstractFileIteratorBackend> SshFileHandle::begin() const
 {
-    return new SshFileIterator(m_fs, m_path);
+    return std::unique_ptr<AbstractFileIteratorBackend>(new SshFileIterator(m_fs, m_path));
 }
 
 unsigned int SshFileHandle::size() const
@@ -427,7 +427,7 @@ bool SshFileHandle::removeDirectory()
     return true;
 }
 
-bool SshFileHandle::copy(AbstractFileHandleBackend * dest)
+bool SshFileHandle::copy(AbstractFileHandleBackend & dest)
 {
     // This copies a file by executing "cp <src> <dst>" on the remote machine
     // assuming a UNIX system that supports this command. This is of course
@@ -442,12 +442,12 @@ bool SshFileHandle::copy(AbstractFileHandleBackend * dest)
 
     // Get source and target filenames
     std::string src = m_path;
-    std::string dst = dest->path();
+    std::string dst = dest.path();
 
-    if (dest->isDirectory())
+    if (dest.isDirectory())
     {
         std::string filename = FilePath(m_path).fileName();
-        dst = FilePath(dest->path()).resolve(filename).fullPath();
+        dst = FilePath(dest.path()).resolve(filename).fullPath();
     }
 
     // Open channel
@@ -472,7 +472,7 @@ bool SshFileHandle::copy(AbstractFileHandleBackend * dest)
     return true;
 }
 
-bool SshFileHandle::move(AbstractFileHandleBackend * dest)
+bool SshFileHandle::move(AbstractFileHandleBackend & dest)
 {
     // Check handle
     if (!m_fs->m_session) return false;
@@ -486,12 +486,12 @@ bool SshFileHandle::move(AbstractFileHandleBackend * dest)
 
     // Get source and target filenames
     std::string src = m_path;
-    std::string dst = dest->path();
+    std::string dst = dest.path();
 
-    if (dest->isDirectory())
+    if (dest.isDirectory())
     {
         std::string filename = FilePath(m_path).fileName();
-        dst = FilePath(dest->path()).resolve(filename).fullPath();
+        dst = FilePath(dest.path()).resolve(filename).fullPath();
     }
 
     // Move file
@@ -508,13 +508,13 @@ bool SshFileHandle::move(AbstractFileHandleBackend * dest)
     return true;
 }
 
-bool SshFileHandle::createLink(AbstractFileHandleBackend *)
+bool SshFileHandle::createLink(AbstractFileHandleBackend &)
 {
     // Sorry, not possible with ssh/sftp
     return false;
 }
 
-bool SshFileHandle::createSymbolicLink(AbstractFileHandleBackend * dest)
+bool SshFileHandle::createSymbolicLink(AbstractFileHandleBackend & dest)
 {
     // Check handle
     if (!m_fs->m_session) return false;
@@ -528,12 +528,12 @@ bool SshFileHandle::createSymbolicLink(AbstractFileHandleBackend * dest)
 
     // Get source and target filenames
     std::string src = m_path;
-    std::string dst = dest->path();
+    std::string dst = dest.path();
 
-    if (dest->isDirectory())
+    if (dest.isDirectory())
     {
         std::string filename = FilePath(m_path).fileName();
-        dst = FilePath(dest->path()).resolve(filename).fullPath();
+        dst = FilePath(dest.path()).resolve(filename).fullPath();
     }
 
     // Create symbolic link
@@ -598,7 +598,7 @@ bool SshFileHandle::remove()
     return true;
 }
 
-std::istream * SshFileHandle::createInputStream(std::ios_base::openmode mode) const
+std::unique_ptr<std::istream> SshFileHandle::createInputStream(std::ios_base::openmode mode) const
 {
     // Check handle
     if (!m_fs->m_session) return nullptr;
@@ -611,10 +611,12 @@ std::istream * SshFileHandle::createInputStream(std::ios_base::openmode mode) co
     if (!isFile()) return nullptr;
 
     // Create stream
-    return new InputStream( new SshInputStreamBuffer(m_fs, m_path, mode) );
+    return std::unique_ptr<std::istream>(
+        new InputStream(new SshInputStreamBuffer(m_fs, m_path, mode))
+    );
 }
 
-std::ostream * SshFileHandle::createOutputStream(std::ios_base::openmode mode)
+std::unique_ptr<std::ostream> SshFileHandle::createOutputStream(std::ios_base::openmode mode)
 {
     // Check handle
     if (!m_fs->m_session) return nullptr;
@@ -624,7 +626,9 @@ std::ostream * SshFileHandle::createOutputStream(std::ios_base::openmode mode)
     if (!m_fs->m_sftpSession) return nullptr;
 
     // Create stream
-    return new OutputStream( new SshOutputStreamBuffer(m_fs, m_path, mode) );
+    return std::unique_ptr<std::ostream>(
+        new OutputStream(new SshOutputStreamBuffer(m_fs, m_path, mode))
+    );
 }
 
 void SshFileHandle::readFileInfo() const

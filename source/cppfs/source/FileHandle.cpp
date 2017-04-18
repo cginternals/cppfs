@@ -24,6 +24,7 @@
 #include <cppfs/Tree.h>
 #include <cppfs/AbstractFileSystem.h>
 #include <cppfs/AbstractFileHandleBackend.h>
+#include <cppfs/AbstractFileIteratorBackend.h>
 
 
 namespace cppfs
@@ -35,13 +36,13 @@ FileHandle::FileHandle()
 {
 }
 
-FileHandle::FileHandle(AbstractFileHandleBackend * backend)
-: m_backend(backend)
+FileHandle::FileHandle(std::unique_ptr<AbstractFileHandleBackend> && backend)
+: m_backend(std::move(backend))
 {
 }
 
 FileHandle::FileHandle(const FileHandle & fileHandle)
-: m_backend(fileHandle.m_backend ? fileHandle.m_backend->clone() : nullptr)
+: m_backend(fileHandle.m_backend ? std::move(fileHandle.m_backend->clone()) : nullptr)
 {
 }
 
@@ -56,7 +57,14 @@ FileHandle::~FileHandle()
 
 FileHandle & FileHandle::operator=(const FileHandle & fileHandle)
 {
-    m_backend.reset(fileHandle.m_backend ? fileHandle.m_backend->clone() : nullptr);
+    if (fileHandle.m_backend)
+    {
+        m_backend = fileHandle.m_backend->clone();
+    }
+    else
+    {
+        m_backend.reset(nullptr);
+    }
 
     return *this;
 }
@@ -147,7 +155,7 @@ void FileHandle::traverse(FileVisitor & visitor)
     }
 }
 
-Tree * FileHandle::readTree(const std::string & path, bool includeHash) const
+std::unique_ptr<Tree> FileHandle::readTree(const std::string & path, bool includeHash) const
 {
     // Check if file or directory exists
     if (!exists())
@@ -156,7 +164,7 @@ Tree * FileHandle::readTree(const std::string & path, bool includeHash) const
     }
 
     // Create tree
-    auto tree = new Tree;
+    auto tree = std::unique_ptr<Tree>(new Tree);
     tree->setPath(path);
     tree->setFileName(fileName());
     tree->setDirectory(isDirectory());
@@ -188,12 +196,12 @@ Tree * FileHandle::readTree(const std::string & path, bool includeHash) const
             subName += fh.fileName();
 
             // Read subtree
-            auto * subTree = fh.readTree(subName, includeHash);
+            auto subTree = fh.readTree(subName, includeHash);
 
             // Add subtree to list
             if (subTree)
             {
-                tree->add(subTree);
+                tree->add(std::move(subTree));
             }
         }
     }
@@ -266,7 +274,7 @@ std::string FileHandle::sha1() const
     }
 
     // Open file
-    std::istream * inputStream = createInputStream();
+    auto inputStream = createInputStream();
     if (!inputStream)
     {
         return "";
@@ -293,9 +301,6 @@ std::string FileHandle::sha1() const
         } else break;
     }
 
-    // Close file
-    delete inputStream;
-
     // Compute hash
     SHA1_Final(hash, &context);
     return fs::hashToString(hash);
@@ -310,7 +315,7 @@ std::string FileHandle::base64() const
     }
 
     // Open file
-    std::istream * inputStream = createInputStream();
+    auto inputStream = createInputStream();
 
     if (!inputStream)
     {
@@ -453,7 +458,7 @@ bool FileHandle::copy(FileHandle & dest)
     // If both handles are from the same file system, use internal method
     if (m_backend->fs() == dest.m_backend->fs())
     {
-        bool result = m_backend->copy(dest.m_backend.get());
+        bool result = m_backend->copy(*dest.m_backend.get());
         dest.updateFileInfo();
         return result;
     }
@@ -476,7 +481,7 @@ bool FileHandle::move(FileHandle & dest)
     // If both handles are from the same file system, use internal method
     if (m_backend->fs() == dest.m_backend->fs())
     {
-        bool result = m_backend->move(dest.m_backend.get());
+        bool result = m_backend->move(*dest.m_backend.get());
         dest.updateFileInfo();
         return result;
     }
@@ -499,7 +504,7 @@ bool FileHandle::createLink(FileHandle & dest)
     // If both handles are from the same file system, use internal method
     if (m_backend->fs() == dest.m_backend->fs())
     {
-        bool result = m_backend->createLink(dest.m_backend.get());
+        bool result = m_backend->createLink(*dest.m_backend.get());
         dest.updateFileInfo();
         return result;
     }
@@ -522,7 +527,7 @@ bool FileHandle::createSymbolicLink(FileHandle & dest)
     // If both handles are from the same file system, use internal method
     if (m_backend->fs() == dest.m_backend->fs())
     {
-        bool result = m_backend->createSymbolicLink(dest.m_backend.get());
+        bool result = m_backend->createSymbolicLink(*dest.m_backend.get());
         dest.updateFileInfo();
         return result;
     }
@@ -570,7 +575,7 @@ bool FileHandle::remove()
     return true;
 }
 
-std::istream * FileHandle::createInputStream(std::ios_base::openmode mode) const
+std::unique_ptr<std::istream> FileHandle::createInputStream(std::ios_base::openmode mode) const
 {
     // Check backend
     if (!m_backend)
@@ -582,7 +587,7 @@ std::istream * FileHandle::createInputStream(std::ios_base::openmode mode) const
     return m_backend->createInputStream(mode);
 }
 
-std::ostream * FileHandle::createOutputStream(std::ios_base::openmode mode)
+std::unique_ptr<std::ostream> FileHandle::createOutputStream(std::ios_base::openmode mode)
 {
     // Check backend
     if (!m_backend)
@@ -600,15 +605,12 @@ std::string FileHandle::readFile() const
     if (isFile())
     {
         // Open input stream
-        std::istream * inputStream = createInputStream();
+        auto inputStream = createInputStream();
         if (!inputStream) return "";
 
         // Read content
         std::stringstream buffer;
         buffer << inputStream->rdbuf();
-
-        // Clean up
-        delete inputStream;
 
         // Return string
         return buffer.str();
@@ -621,14 +623,11 @@ std::string FileHandle::readFile() const
 bool FileHandle::writeFile(const std::string & content)
 {
     // Open output stream
-    std::ostream * outputStream = createOutputStream();
+    auto outputStream = createOutputStream();
     if (!outputStream) return false;
 
     // Write content to file
     (*outputStream) << content;
-
-    // Clean up
-    delete outputStream;
 
     // Done
     return true;
@@ -637,14 +636,11 @@ bool FileHandle::writeFile(const std::string & content)
 bool FileHandle::writeFileBase64(const std::string & base64)
 {
     // Open output stream
-    std::ostream * outputStream = createOutputStream();
+    auto outputStream = createOutputStream();
     if (!outputStream) return false;
 
     // Write content to file
     (*outputStream) << fs::fromBase64(base64);
-
-    // Clean up
-    delete outputStream;
 
     // Done
     return true;
@@ -659,15 +655,11 @@ bool FileHandle::genericCopy(FileHandle & dest)
     }
 
     // Open files
-    std::istream * in  = createInputStream(std::ios::binary);
-    std::ostream * out = dest.createOutputStream(std::ios::binary | std::ios::trunc);
+    auto in  = createInputStream(std::ios::binary);
+    auto out = dest.createOutputStream(std::ios::binary | std::ios::trunc);
 
     if (!in || !out)
     {
-        // Clean up streams
-        delete in;
-        delete out;
-
         // Error!
         return false;
     }
@@ -675,10 +667,6 @@ bool FileHandle::genericCopy(FileHandle & dest)
     // Copy file
     (*out) << in->rdbuf();
     out->flush();
-
-    // Clean up streams
-    delete in;
-    delete out;
 
     // Reload information on destination file
     dest.updateFileInfo();

@@ -40,7 +40,7 @@ SshFileIterator::~SshFileIterator()
     }
 }
 
-AbstractFileIteratorBackend * SshFileIterator::clone() const
+std::unique_ptr<AbstractFileIteratorBackend> SshFileIterator::clone() const
 {
     auto * twin = new SshFileIterator(m_fs, m_path);
 
@@ -49,7 +49,7 @@ AbstractFileIteratorBackend * SshFileIterator::clone() const
         twin->readNextEntry();
     }
 
-    return twin;
+    return std::unique_ptr<AbstractFileIteratorBackend>(twin);
 }
 
 AbstractFileSystem * SshFileIterator::fs() const
