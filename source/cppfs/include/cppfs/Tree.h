@@ -363,6 +363,11 @@ public:
 
 
 protected:
+    Tree(const Tree &);
+    const Tree & operator=(const Tree &);
+
+
+protected:
     static void createDiff(const Tree * currentState, const Tree * targetState, Diff & diff);
 
 

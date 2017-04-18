@@ -45,7 +45,7 @@ public:
     *
     *    See https://c-ares.haxx.se/mail/libssh2-devel-archive-2010-02/0170.shtml
     */
-    SshOutputStreamBuffer(std::shared_ptr<SshFileSystem> fs, const std::string & path, std::ios_base::openmode mode, size_t bufferSize = 24_kB);
+    SshOutputStreamBuffer(std::shared_ptr<SshFileSystem> fs, const std::string & path, std::ios_base::openmode mode, size_t bufferSize = SIZE_KB(24));
 
     /**
     *  @brief

@@ -293,6 +293,15 @@ std::unique_ptr<Diff> Tree::createDiff(const Tree & target) const
     return std::unique_ptr<Diff>(diff);
 }
 
+Tree::Tree(const Tree &)
+{
+}
+
+const Tree & Tree::operator=(const Tree &)
+{
+    return *this;
+}
+
 void Tree::createDiff(const Tree * currentState, const Tree * targetState, Diff & diff)
 {
     // Check target state
