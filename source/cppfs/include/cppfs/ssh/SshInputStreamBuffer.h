@@ -40,7 +40,7 @@ public:
     *  @param[n] putbackSize
     *    Size of the putback area
     */
-    SshInputStreamBuffer(std::shared_ptr<SshFileSystem> fs, const std::string & path, std::ios_base::openmode mode, size_t bufferSize = SIZE_KB(32), size_t putBackSize = SIZE_B(128));
+    SshInputStreamBuffer(std::shared_ptr<SshFileSystem> fs, const std::string & path, std::ios_base::openmode mode, size_t bufferSize = size_kb(32), size_t putBackSize = size_b(128));
 
     /**
     *  @brief

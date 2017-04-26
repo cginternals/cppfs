@@ -6,11 +6,30 @@ namespace cppfs
 {
 
 
-#define SIZE_B(v)  (v)
-#define SIZE_KB(v) (v*1024)
-#define SIZE_MB(v) (v*1024*1024)
-#define SIZE_GB(v) (v*1024*1024*1024)
-#define SIZE_TB(v) (v*1024*1024*1024*1024)
+inline unsigned long long size_b(unsigned long long value)
+{
+    return value;
+}
+
+inline unsigned long long size_kb(unsigned long long value)
+{
+    return value * 1024;
+}
+
+inline unsigned long long size_mb(unsigned long long value)
+{
+    return value * 1024 * 1024;
+}
+
+inline unsigned long long size_gb(unsigned long long value)
+{
+    return value * 1024 * 1024 * 1024;
+}
+
+inline unsigned long long size_tb(unsigned long long value)
+{
+    return value * 1024 * 1024 * 1024 * 1024;
+}
 
 
 /*
