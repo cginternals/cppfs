@@ -13,7 +13,7 @@ namespace cppfs
 *  @brief
 *    File permission flags
 */
-enum class FilePermissions
+enum FilePermissions
 {
     UserRead   = 0x400,
     UserWrite  = 0x200,

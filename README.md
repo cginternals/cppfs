@@ -45,9 +45,9 @@ void openFile(const std::string & filename)
 {
     FileHandle fh = fs::open(filename);
 
-         if (fh.isFile())      { // File ... }
-    else if (fh.isDirectory()) { // Directory ... }
-    else if (!fh.exists())     { // Not there ... }
+         if (fh.isFile())      { /* File ... */ }
+    else if (fh.isDirectory()) { /* Directory ... */ }
+    else if (!fh.exists())     { /* Not there ... */ }
 }
 ```
 
@@ -65,11 +65,11 @@ void openFile(const std::string & filename)
 
     if (fh.isFile())
     {
-        std::istream * in = fh.createInputStream();
-        ...
+        auto in = fh.createInputStream();
+        // ...
 
-        std::istream * out = fh.createOutputStream();
-        ...
+        auto out = fh.createOutputStream();
+        // ...
     }
 }
 ```
@@ -323,6 +323,7 @@ the given directory).
 ```C++
 FileHandle dir  = fs::open("data");
 FileHandle file = fs::open("readme.txt");
+FileHandle dest;
 
 // Create directory if it does not yet exist
 if (!dir.isDirectory()) dir.createDirectory();
@@ -331,7 +332,8 @@ if (!dir.isDirectory()) dir.createDirectory();
 file.copy(dir);
 
 // Copy file to another file
-file.copy(dir.open("readme2.txt"));
+dest = dir.open("readme2.txt");
+file.copy(dest);
 
 // Rename file
 file.rename("readme3.txt");
@@ -340,10 +342,12 @@ file.rename("readme3.txt");
 file.move(dir);
 
 // Create hard link
-file.createLink(dir.open("readme4.txt"));
+dest = dir.open("readme4.txt");
+file.createLink(dest);
 
 // Create symbolic link
-file.createSymbolicLink(dir.open("readme5.txt"));
+dest = dir.open("readme5.txt");
+file.createSymbolicLink(dest);
 
 // Delete file
 file.remove();
@@ -361,11 +365,11 @@ file, call *createInputStream*. To create an output stream, call *createOutputSt
 ```C++
 FileHandle file = fs::open("readme.txt");
 
-std::istream * in = file.createInputStream();
-...
+std::unique_ptr<std::istream> in = file.createInputStream();
+// ...
 
-std::ostream * out = file.createOutputStream();
-...
+std::unique_ptr<std::ostream> out = file.createOutputStream();
+// ...
 ```
 
 For convience, there are also functions for reading and writing entire files using strings:
@@ -408,19 +412,21 @@ To check if a file handle points to a directory, the function
 FileHandle dir = fs::open("data");
 if (dir.isDirectory())
 {
-    ...
+    // ...
 }
 ```
 
 To list all files in a directory, call *listFiles*:
 
 ```C++
+FileHandle dir = fs::open("data");
 std::vector<std::string> files = dir.listFiles();
 ```
 
 For better control, the C++ iterator interface can be used:
 
 ```C++
+FileHandle dir = fs::open("data");
 for (FileIterator it = dir.begin(); it != dir.end(); ++it)
 {
     std::string path = *it;
@@ -434,6 +440,8 @@ function can be called. It can be passed  either
 - a visitor object
 
 ```C++
+FileHandle dir = fs::open("data");
+
 // Traverse all file entries
 dir.traverse([](FileHandle & fh) -> bool {
     std::cout << fh.path() << std::endl;
@@ -454,6 +462,8 @@ When a handle to a directory has been obtained, it can
 be used to open file handles relative to that directory:
 
 ```C++
+FileHandle dir = fs::open("data");
+
 // Open parent directory
 FileHandle parentDir = dir.parentDirectory();
 
@@ -474,10 +484,10 @@ directory handle by calling *readTree*.
 
 ```C++
 // Read directory tree from current directory
-Tree * tree = dir.readTree();
+std::unique_ptr<Tree> tree1 = dir.readTree();
 
 // Read directory tree from current directory, giving it a virtual root
-Tree * tree = dir.readTree("/root");
+std::unique_ptr<Tree> tree2 = dir.readTree("/root");
 ```
 
 Given two directory trees, the differences between them can be calculated,
@@ -486,12 +496,18 @@ that need to be performed in order to transform from the source tree to
 the destination tree. This can be utilized to implement basic file syncing:
 
 ```C++
+// Open directories
+FileHandle srcDir = fs::open("data1");
+FileHandle dstDir = fs::open("data2");
+
+// Read both directory trees
+auto srcTree = srcDir.readTree();
+auto dstTree = dstDir.readTree();
+
+// Calculate differences
+auto diff = dstTree->createDiff(*srcTree);
+
 // Sync directories
-Tree * srcTree = srcDir.readTree();
-Tree * dstTree = dstDir.readTree();
-
-Diff * diff = dstTree->createDiff(*srcTree);
-
 for (Change change : diff->changes())
 {
     if (change.operation() == Change::CopyFile) {
@@ -516,8 +532,4 @@ for (Change change : diff->changes())
         dst.removeDirectoryRec();
     }
 }
-
-delete diff;
-delete srcTree;
-delete dstTree;
 ```
