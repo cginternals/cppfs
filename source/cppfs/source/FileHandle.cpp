@@ -42,7 +42,7 @@ FileHandle::FileHandle(std::unique_ptr<AbstractFileHandleBackend> && backend)
 }
 
 FileHandle::FileHandle(const FileHandle & fileHandle)
-: m_backend(fileHandle.m_backend ? std::move(fileHandle.m_backend->clone()) : nullptr)
+: m_backend(fileHandle.m_backend ? fileHandle.m_backend->clone() : nullptr)
 {
 }
 

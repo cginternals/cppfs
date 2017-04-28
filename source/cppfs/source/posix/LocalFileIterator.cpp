@@ -78,8 +78,9 @@ std::string LocalFileIterator::name() const
         return "";
     }
 
-    // Return filename of current item but it's a bad idea to construct an std::string from a nullptr
-    return m_entry->d_name ? std::string(m_entry->d_name) : std::string();
+    // Return filename of current item
+    // m_entry->d_name is an array, not a pointer, so it cannot be nullptr. If m_entry is valid, d_name is also valid.
+    return std::string(m_entry->d_name);
 }
 
 void LocalFileIterator::next()
@@ -95,15 +96,15 @@ void LocalFileIterator::readNextEntry()
     // Read next entry
     m_entry = readdir(m_dir);
     m_index++;
-    if (!m_entry || !m_entry->d_name) return;
+    if (!m_entry) return;
 
     // Omit '.' and '..'
-    std::string name = m_entry->d_name;
-    while (m_entry && m_entry->d_name && (name == ".." || name == "."))
+    std::string name(m_entry->d_name);
+    while (m_entry && (name == ".." || name == "."))
     {
         m_entry = readdir(m_dir);
 
-        name = m_entry && m_entry->d_name ? std::string(m_entry->d_name) : std::string();
+        name = m_entry ? std::string(m_entry->d_name) : std::string();
     }
 }
 

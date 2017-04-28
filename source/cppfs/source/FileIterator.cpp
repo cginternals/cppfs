@@ -18,7 +18,7 @@ FileIterator::FileIterator(std::unique_ptr<AbstractFileIteratorBackend> && backe
 }
 
 FileIterator::FileIterator(const FileIterator & fileIterator)
-: m_backend(fileIterator.m_backend ? std::move(fileIterator.m_backend->clone()) : nullptr)
+: m_backend(fileIterator.m_backend ? fileIterator.m_backend->clone() : nullptr)
 {
 }
 
