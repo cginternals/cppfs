@@ -3,9 +3,6 @@
 # External dependencies
 # 
 
-find_package(cpplocate REQUIRED)
-find_package(cppassist REQUIRED)
-find_package(cppexpose REQUIRED)
 find_package(LibSSH2 REQUIRED)
 find_package(LibCrypto)
 find_package(ZLIB)
@@ -182,8 +179,6 @@ target_link_libraries(${target}
 
     PUBLIC
     ${DEFAULT_LIBRARIES}
-    cppassist::cppassist
-    cppexpose::cppexpose
 
     INTERFACE
 )

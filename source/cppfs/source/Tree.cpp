@@ -4,14 +4,9 @@
 #include <algorithm>
 #include <iostream>
 
-#include <cppexpose/variant/Variant.h>
-
 #include <cppfs/fs.h>
 #include <cppfs/FileHandle.h>
 #include <cppfs/Diff.h>
-
-
-using namespace cppexpose;
 
 
 namespace cppfs
@@ -198,90 +193,14 @@ void Tree::add(std::unique_ptr<Tree> && tree)
     m_children.push_back(std::move(tree));
 }
 
-Variant Tree::toVariant() const
+void Tree::print(const std::string & indent) const
 {
-    Variant obj = Variant::map();
-    VariantMap & map = *obj.asMap();
-
-    map["path"]             = m_path;
-    map["filename"]         = m_filename;
-    map["isFile"]           = !m_directory;
-    map["isDirectory"]      = m_directory;
-    map["size"]             = m_size;
-    map["accessTime"]       = m_accessTime;
-    map["modificationTime"] = m_modificationTime;
-    map["userId"]           = m_userId;
-    map["groupId"]          = m_groupId;
-    map["permissions"]      = m_permissions;
-    map["sha1"]             = m_sha1;
-    map["children"]         = Variant::array();
-
-    VariantArray & array = *map["children"].asArray();
+    std::cout << indent << m_filename << std::endl;
 
     for (auto & tree : m_children)
     {
-        array.push_back(tree->toVariant());
+        tree->print(indent + "  ");
     }
-
-    return obj;
-}
-
-void Tree::fromVariant(const cppexpose::Variant & obj)
-{
-    // Clear old data
-    clear();
-
-    // Check object
-    if (!obj.isVariantMap())
-    {
-        return;
-    }
-
-    // Read data
-    const VariantMap & map = *obj.asMap();
-    m_path             = map.at("path").toString();
-    m_filename         = map.at("filename").toString();
-    m_directory        = map.at("isDirectory").toBool();
-    m_size             = map.at("size").value<unsigned int>();
-    m_accessTime       = map.at("accessTime").value<unsigned int>();
-    m_modificationTime = map.at("modificationTime").value<unsigned int>();
-    m_userId           = map.at("userId").value<unsigned int>();
-    m_groupId          = map.at("groupId").value<unsigned int>();
-    m_permissions      = map.at("permissions").value<unsigned int>();
-    m_sha1             = map.at("sha1").toString();
-
-    // Read children
-    const auto it = map.find("children");
-    if (it != map.end())
-    {
-        const cppexpose::Variant & children = (*it).second;
-        const cppexpose::VariantArray & array = *children.asArray();
-
-        for (auto & childObj : array)
-        {
-            std::unique_ptr<Tree> tree(new Tree);
-            tree->fromVariant(childObj);
-
-            add(std::move(tree));
-        }
-    }
-}
-
-void Tree::save(const std::string & path) const
-{
-    FileHandle file = fs::open(path);
-    file.writeFile(toVariant().toJSON(JSON::Beautify));
-}
-
-void Tree::load(const std::string & path)
-{
-    FileHandle file = fs::open(path);
-    std::string json = file.readFile();
-
-    Variant obj;
-    JSON::parse(obj, json);
-
-    fromVariant(obj);
 }
 
 std::unique_ptr<Diff> Tree::createDiff(const Tree & target) const

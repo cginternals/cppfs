@@ -7,8 +7,6 @@
 #include <cppassist/cmdline/CommandLineOption.h>
 #include <cppassist/cmdline/CommandLineParameter.h>
 
-#include <cppexpose/variant/Variant.h>
-
 #include <cppfs/cppfs-version.h>
 #include <cppfs/fs.h>
 #include <cppfs/LoginCredentials.h>
@@ -76,8 +74,8 @@ int main(int argc, char * argv[])
     auto tree = dir.readTree();
 
     // Print tree
-    std::string json = tree->toVariant().toJSON(cppexpose::JSON::Beautify);
-    std::cout << json << std::endl;
+    tree->print();
+    std::cout << std::endl;
 
     // Done
     return 0;

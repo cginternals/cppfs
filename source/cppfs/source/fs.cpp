@@ -15,8 +15,6 @@
     #include <openssl/sha.h>
 #endif
 
-#include <cppassist/string/conversion.h>
-
 #include <cppfs/system.h>
 #include <cppfs/LoginCredentials.h>
 #include <cppfs/Url.h>
@@ -29,9 +27,6 @@
 #else
     #include <cppfs/posix/LocalFileSystem.h>
 #endif
-
-
-using namespace cppassist;
 
 
 namespace cppfs
@@ -62,7 +57,7 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
         // Apply login credentials
         if (credentials)
         {
-            if (credentials->isSet("port"))       port = string::fromString<int>(credentials->value("port"));
+            if (credentials->isSet("port"))       port = std::stoi(credentials->value("port"));
             if (credentials->isSet("username"))   user = credentials->value("username");
             if (credentials->isSet("password"))   pass = credentials->value("password");
             if (credentials->isSet("publicKey"))  publicKey = credentials->value("publicKey");

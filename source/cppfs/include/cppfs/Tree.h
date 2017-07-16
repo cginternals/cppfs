@@ -9,12 +9,6 @@
 #include <cppfs/cppfs_api.h>
 
 
-namespace cppexpose
-{
-    class Variant;
-}
-
-
 namespace cppfs
 {
 
@@ -310,39 +304,12 @@ public:
 
     /**
     *  @brief
-    *    Get JSON representation of the tree
+    *    Print tree to stdout
     *
-    *  @return
-    *    Variant
+    *  @param[in] indent
+    *    Indentation
     */
-    cppexpose::Variant toVariant() const;
-
-    /**
-    *  @brief
-    *    Load tree from JSON representation
-    *
-    *  @param[in] obj
-    *    Variant (must be an object)
-    */
-    void fromVariant(const cppexpose::Variant & obj);
-
-    /**
-    *  @brief
-    *    Save tree to .json file
-    *
-    *  @param[in] path
-    *    Path to file
-    */
-    void save(const std::string & path) const;
-
-    /**
-    *  @brief
-    *    Load tree from .json file
-    *
-    *  @param[in] path
-    *    Path to file
-    */
-    void load(const std::string & path);
+    void print(const std::string & indent = "") const;
 
     /**
     *  @brief

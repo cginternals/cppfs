@@ -15,13 +15,8 @@
 #include <libssh2.h>
 #include <libssh2_sftp.h>
 
-#include <cppassist/string/conversion.h>
-
 #include <cppfs/FileHandle.h>
 #include <cppfs/ssh/SshFileHandle.h>
-
-
-using namespace cppassist;
 
 
 namespace cppfs
@@ -96,7 +91,7 @@ void SshFileSystem::connect()
     hints.ai_socktype = SOCK_STREAM;
 
     struct addrinfo * addrInfo = nullptr;
-    if ((getaddrinfo(m_host.c_str(), string::toString<int>(m_port).c_str(), &hints, &addrInfo)) != 0)
+    if ((getaddrinfo(m_host.c_str(), std::to_string(m_port).c_str(), &hints, &addrInfo)) != 0)
     {
         // Error!
         return;
