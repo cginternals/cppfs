@@ -5,8 +5,8 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <istream>
-#include <ostream>
+#include <ios>
+#include <iosfwd>
 
 #include <cppfs/cppfs_api.h>
 
