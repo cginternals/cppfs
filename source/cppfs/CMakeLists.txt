@@ -3,7 +3,7 @@
 # External dependencies
 # 
 
-find_package(LibSSH2 REQUIRED)
+find_package(LibSSH2)
 find_package(LibCrypto)
 find_package(ZLIB)
 find_package(OpenSSL)
@@ -62,12 +62,6 @@ set(headers
     ${include_path}/${localfs}/LocalFileSystem.h
     ${include_path}/${localfs}/LocalFileHandle.h
     ${include_path}/${localfs}/LocalFileIterator.h
-
-    ${include_path}/ssh/SshFileSystem.h
-    ${include_path}/ssh/SshFileHandle.h
-    ${include_path}/ssh/SshFileIterator.h
-    ${include_path}/ssh/SshInputStreamBuffer.h
-    ${include_path}/ssh/SshOutputStreamBuffer.h
 )
 
 set(sources
@@ -92,13 +86,25 @@ set(sources
     ${source_path}/${localfs}/LocalFileSystem.cpp
     ${source_path}/${localfs}/LocalFileHandle.cpp
     ${source_path}/${localfs}/LocalFileIterator.cpp
-
-    ${source_path}/ssh/SshFileSystem.cpp
-    ${source_path}/ssh/SshFileHandle.cpp
-    ${source_path}/ssh/SshFileIterator.cpp
-    ${source_path}/ssh/SshInputStreamBuffer.cpp
-    ${source_path}/ssh/SshOutputStreamBuffer.cpp
 )
+
+if (LibSSH2_FOUND)
+    set(headers ${headers}
+        ${include_path}/ssh/SshFileSystem.h
+        ${include_path}/ssh/SshFileHandle.h
+        ${include_path}/ssh/SshFileIterator.h
+        ${include_path}/ssh/SshInputStreamBuffer.h
+        ${include_path}/ssh/SshOutputStreamBuffer.h
+)
+    
+    set(sources ${sources}
+        ${source_path}/ssh/SshFileSystem.cpp
+        ${source_path}/ssh/SshFileHandle.cpp
+        ${source_path}/ssh/SshFileIterator.cpp
+        ${source_path}/ssh/SshInputStreamBuffer.cpp
+        ${source_path}/ssh/SshOutputStreamBuffer.cpp
+    )
+endif ()
 
 # Group source files
 set(header_group "Header Files (API)")
@@ -155,9 +161,9 @@ target_include_directories(${target}
     ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
-    ${OPENSSL_INCLUDE_DIR}
-    ${LIBSSH2_INCLUDE_DIR}
-
+    $<$<BOOL:${OpenSSL_FOUND}>:${OPENSSL_INCLUDE_DIR}>
+    $<$<BOOL:${LibSSH2_FOUND}>:${LIBSSH2_INCLUDE_DIR}>
+    
     PUBLIC
     ${DEFAULT_INCLUDE_DIRECTORIES}
 
@@ -172,10 +178,16 @@ target_include_directories(${target}
 # Libraries
 # 
 
+message(STATUS "$<BOOL:${OpenSSL_FOUND}>:${OPENSSL_LIBRARIES}")
+message(STATUS "$<BOOL:${LibSSH2_FOUND}>:${LIBSSH2_LIBRARY}")
+message(STATUS "$<BOOL:${LibCrypto_FOUND}>:${LIBCRYPTO_LIBRARY}")
+message(STATUS "$<BOOL:${ZLIB_FOUND}>:${ZLIB_LIBRARY}")
+
 target_link_libraries(${target}
     PRIVATE
-    ${OPENSSL_LIBRARIES}
-    ${LIBSSH2_LIBRARY}
+    $<$<BOOL:${LibSSH2_FOUND}>:${LIBSSH2_LIBRARY}>
+    $<$<BOOL:${LibCrypto_FOUND}>:${LIBCRYPTO_LIBRARY}>
+    $<$<BOOL:${ZLIB_FOUND}>:${ZLIB_LIBRARY}>
 
     PUBLIC
     ${DEFAULT_LIBRARIES}
@@ -191,19 +203,12 @@ if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
     )
 endif()
 
-if(LibCrypto_FOUND)
+if (OpenSSL_FOUND)
     target_link_libraries(${target}
         PRIVATE
-        ${LIBCRYPTO_LIBRARY}
+        {OPENSSL_LIBRARIES}
     )
-endif()
-
-if(ZLIB_FOUND)
-    target_link_libraries(${target}
-        PRIVATE
-        ${ZLIB_LIBRARY}
-    )
-endif()
+endif ()
 
 # 
 # Compile definitions
@@ -214,6 +219,10 @@ target_compile_definitions(${target}
 
     PUBLIC
     $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${target_id}_STATIC_DEFINE>
+    $<$<BOOL:${LibSSH2_FOUND}>:${META_PROJECT_ID}_USE_LibSSH2>
+    $<$<BOOL:${LibCrypto_FOUND}>:${META_PROJECT_ID}_USE_LibCrypto>
+    $<$<BOOL:${ZLIB_FOUND}>:${META_PROJECT_ID}_USE_ZLIB>
+    $<$<BOOL:${OpenSSL_FOUND}>:${META_PROJECT_ID}_USE_OpenSSL>
     ${DEFAULT_COMPILE_DEFINITIONS}
 
     INTERFACE

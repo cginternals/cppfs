@@ -11,7 +11,7 @@
     #define COMMON_DIGEST_FOR_OPENSSL
     #include <CommonCrypto/CommonDigest.h>
     #define SHA1 CC_SHA1
-#else
+#elif defined(CPPFS_USE_OpenSSL)
     #include <openssl/sha.h>
 #endif
 
@@ -89,6 +89,7 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
 
 std::string sha1(const std::string & str)
 {
+#ifdef CPPFS_USE_OpenSSL
     // Initialize hash
     unsigned char hash[20];
     SHA_CTX context;
@@ -100,6 +101,9 @@ std::string sha1(const std::string & str)
     // Compute hash
     SHA1_Final(hash, &context);
     return hashToString(hash);
+#else
+    return "";
+#endif
 }
 
 std::string base64(const std::string & str)

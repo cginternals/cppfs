@@ -10,7 +10,7 @@
     #define COMMON_DIGEST_FOR_OPENSSL
     #include <CommonCrypto/CommonDigest.h>
     #define SHA1 CC_SHA1
-#else
+#elif defined(CPPFS_USE_OpenSSL)
     #include <openssl/sha.h>
 #endif
 
@@ -273,6 +273,7 @@ std::string FileHandle::sha1() const
         return "";
     }
 
+#ifdef CPPFS_USE_OpenSSL
     // Open file
     auto inputStream = createInputStream();
     if (!inputStream)
@@ -304,6 +305,9 @@ std::string FileHandle::sha1() const
     // Compute hash
     SHA1_Final(hash, &context);
     return fs::hashToString(hash);
+#else
+    return "";
+#endif
 }
 
 std::string FileHandle::base64() const
