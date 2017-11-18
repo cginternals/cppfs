@@ -75,7 +75,7 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
         // Open path
         return fs->open(localPath);
 #else 
-        return nullptr;
+        return FileHandle{};
 #endif
     }
 
