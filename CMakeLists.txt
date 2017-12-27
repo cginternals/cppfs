@@ -42,7 +42,7 @@ endif()
 
 # Meta information about the project
 set(META_PROJECT_NAME        "cppfs")
-set(META_PROJECT_DESCRIPTION "Cross-platform C++ file system library supporting multiple backends (Local-FS, SSH)")
+set(META_PROJECT_DESCRIPTION "Cross-platform C++ file system library")
 set(META_AUTHOR_ORGANIZATION "CG Internals GmbH")
 set(META_AUTHOR_DOMAIN       "https://github.com/cginternals/cppfs/")
 set(META_AUTHOR_MAINTAINER   "opensource@cginternals.com")
