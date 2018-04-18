@@ -8,6 +8,17 @@ find_package(LibCrypto)
 find_package(ZLIB)
 find_package(OpenSSL)
 
+if (LibSSH2_FOUND AND LibCrypto_FOUND AND ZLIB_FOUND AND OpenSSL_FOUND)
+    set(SSH_DEPS_MET TRUE)
+else()
+    set(SSH_DEPS_MET FALSE)
+endif()
+
+option(CPPFS_BUILD_SSH_MODULE "Build the ssh module" ${SSH_DEPS_MET})
+
+if (CPPFS_BUILD_SSH_MODULE AND NOT SSH_DEPS_MET )
+   message(FATAL_ERROR "Requested to build ssh module but not all dependencies are found! LibSSH2: ${LibSSH2_FOUND}, LibCrypto: ${LibCrypto_FOUND}, ZLIB: ${ZLIB_FOUND}, OpenSSL: ${OpenSSL_FOUND}")
+endif()
 
 # 
 # Library name and options
@@ -88,7 +99,7 @@ set(sources
     ${source_path}/${localfs}/LocalFileIterator.cpp
 )
 
-if (LibSSH2_FOUND)
+if (CPPFS_BUILD_SSH_MODULE)
     set(headers ${headers}
         ${include_path}/ssh/SshFileSystem.h
         ${include_path}/ssh/SshFileHandle.h
@@ -161,8 +172,7 @@ target_include_directories(${target}
     ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
-    $<$<BOOL:${OpenSSL_FOUND}>:${OPENSSL_INCLUDE_DIR}>
-    $<$<BOOL:${LibSSH2_FOUND}>:${LIBSSH2_INCLUDE_DIR}>
+
     
     PUBLIC
     ${DEFAULT_INCLUDE_DIRECTORIES}
@@ -178,16 +188,9 @@ target_include_directories(${target}
 # Libraries
 # 
 
-message(STATUS "$<BOOL:${OpenSSL_FOUND}>:${OPENSSL_LIBRARIES}")
-message(STATUS "$<BOOL:${LibSSH2_FOUND}>:${LIBSSH2_LIBRARY}")
-message(STATUS "$<BOOL:${LibCrypto_FOUND}>:${LIBCRYPTO_LIBRARY}")
-message(STATUS "$<BOOL:${ZLIB_FOUND}>:${ZLIB_LIBRARY}")
 
 target_link_libraries(${target}
     PRIVATE
-    $<$<BOOL:${LibSSH2_FOUND}>:${LIBSSH2_LIBRARY}>
-    $<$<BOOL:${LibCrypto_FOUND}>:${LIBCRYPTO_LIBRARY}>
-    $<$<BOOL:${ZLIB_FOUND}>:${ZLIB_LIBRARY}>
 
     PUBLIC
     ${DEFAULT_LIBRARIES}
@@ -195,18 +198,47 @@ target_link_libraries(${target}
     INTERFACE
 )
 
-if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
-    target_link_libraries(${target}
-        PRIVATE
-        wsock32.lib
-        ws2_32.lib
-    )
-endif()
 
-if (OpenSSL_FOUND)
+
+if (CPPFS_BUILD_SSH_MODULE)
+    message(STATUS "$<BOOL:${OpenSSL_FOUND}>:${OPENSSL_LIBRARIES}")
+    message(STATUS "$<BOOL:${LibSSH2_FOUND}>:${LIBSSH2_LIBRARY}")
+    message(STATUS "$<BOOL:${LibCrypto_FOUND}>:${LIBCRYPTO_LIBRARY}")
+    message(STATUS "$<BOOL:${ZLIB_FOUND}>:${ZLIB_LIBRARY}")
+
+    if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+        target_link_libraries(${target}
+            PRIVATE
+            wsock32.lib
+            ws2_32.lib
+        )
+    endif()
+    
+    target_include_directories(${target}
+        PRIVATE
+        ${OPENSSL_INCLUDE_DIR}
+        ${LIBSSH2_INCLUDE_DIR}
+    )
+    
+
     target_link_libraries(${target}
         PRIVATE
-        {OPENSSL_LIBRARIES}
+        ${OPENSSL_LIBRARIES}
+        ${LIBSSH2_LIBRARY}
+        ${LIBCRYPTO_LIBRARY}
+        ${ZLIB_LIBRARY}
+    )
+
+    target_compile_definitions(${target}
+        PRIVATE
+
+        PUBLIC
+        ${META_PROJECT_ID}_USE_LibSSH2
+        ${META_PROJECT_ID}_USE_LibCrypto
+        ${META_PROJECT_ID}_USE_OpenSSL
+        ${META_PROJECT_ID}_USE_ZLIB
+
+        INTERFACE
     )
 endif ()
 
@@ -219,25 +251,7 @@ target_compile_definitions(${target}
 
     PUBLIC
     $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:${target_id}_STATIC_DEFINE>
-    $<$<BOOL:${LibSSH2_FOUND}>:${META_PROJECT_ID}_USE_LibSSH2>
-    $<$<BOOL:${LibCrypto_FOUND}>:${META_PROJECT_ID}_USE_LibCrypto>
-    $<$<BOOL:${ZLIB_FOUND}>:${META_PROJECT_ID}_USE_ZLIB>
-    $<$<BOOL:${OpenSSL_FOUND}>:${META_PROJECT_ID}_USE_OpenSSL>
     ${DEFAULT_COMPILE_DEFINITIONS}
-
-    INTERFACE
-)
-
-
-# 
-# Compile options
-# 
-
-target_compile_options(${target}
-    PRIVATE
-
-    PUBLIC
-    ${DEFAULT_COMPILE_OPTIONS}
 
     INTERFACE
 )
