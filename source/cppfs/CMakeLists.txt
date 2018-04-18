@@ -1,7 +1,7 @@
 
-# 
+#
 # External dependencies
-# 
+#
 
 find_package(LibSSH2)
 find_package(LibCrypto)
@@ -14,15 +14,14 @@ else()
     set(SSH_DEPS_MET FALSE)
 endif()
 
-option(CPPFS_BUILD_SSH_MODULE "Build the ssh module" ${SSH_DEPS_MET})
-
-if (CPPFS_BUILD_SSH_MODULE AND NOT SSH_DEPS_MET )
-   message(FATAL_ERROR "Requested to build ssh module but not all dependencies are found! LibSSH2: ${LibSSH2_FOUND}, LibCrypto: ${LibCrypto_FOUND}, ZLIB: ${ZLIB_FOUND}, OpenSSL: ${OpenSSL_FOUND}")
+if (OPTION_BUILD_SSH_BACKEND AND NOT SSH_DEPS_MET)
+    message(FATAL_ERROR "Requested to build ssh module but not all dependencies are found! LibSSH2: ${LibSSH2_FOUND}, LibCrypto: ${LibCrypto_FOUND}, ZLIB: ${ZLIB_FOUND}, OpenSSL: ${OpenSSL_FOUND}")
 endif()
 
-# 
+
+#
 # Library name and options
-# 
+#
 
 # Target name
 set(target cppfs)
@@ -36,9 +35,9 @@ set(export_file  "include/${target}/${target}_api.h")
 set(export_macro "${target_id}_API")
 
 
-# 
+#
 # Sources
-# 
+#
 
 set(include_path "${CMAKE_CURRENT_SOURCE_DIR}/include/${target}")
 set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
@@ -99,15 +98,15 @@ set(sources
     ${source_path}/${localfs}/LocalFileIterator.cpp
 )
 
-if (CPPFS_BUILD_SSH_MODULE)
+if (OPTION_BUILD_SSH_BACKEND)
     set(headers ${headers}
         ${include_path}/ssh/SshFileSystem.h
         ${include_path}/ssh/SshFileHandle.h
         ${include_path}/ssh/SshFileIterator.h
         ${include_path}/ssh/SshInputStreamBuffer.h
         ${include_path}/ssh/SshOutputStreamBuffer.h
-)
-    
+    )
+
     set(sources ${sources}
         ${source_path}/ssh/SshFileSystem.cpp
         ${source_path}/ssh/SshFileHandle.cpp
@@ -120,15 +119,15 @@ endif ()
 # Group source files
 set(header_group "Header Files (API)")
 set(source_group "Source Files")
-source_group_by_path(${include_path} "\\\\.h$|\\\\.hpp$" 
+source_group_by_path(${include_path} "\\\\.h$|\\\\.hpp$"
     ${header_group} ${headers})
-source_group_by_path(${source_path}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$" 
+source_group_by_path(${source_path}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
     ${source_group} ${sources})
 
 
-# 
+#
 # Create library
-# 
+#
 
 # Build library
 add_library(${target}
@@ -149,9 +148,9 @@ generate_export_header(${target}
 )
 
 
-# 
+#
 # Project options
-# 
+#
 
 set_target_properties(${target}
     PROPERTIES
@@ -162,9 +161,9 @@ set_target_properties(${target}
 )
 
 
-# 
+#
 # Include directories
-# 
+#
 
 target_include_directories(${target}
     PRIVATE
@@ -173,7 +172,7 @@ target_include_directories(${target}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
 
-    
+
     PUBLIC
     ${DEFAULT_INCLUDE_DIRECTORIES}
 
@@ -183,11 +182,18 @@ target_include_directories(${target}
     $<INSTALL_INTERFACE:include>
 )
 
+if (OPTION_BUILD_SSH_BACKEND)
+    target_include_directories(${target}
+        PRIVATE
+        ${OPENSSL_INCLUDE_DIR}
+        ${LIBSSH2_INCLUDE_DIR}
+    )
+endif()
 
-# 
+
+#
 # Libraries
-# 
-
+#
 
 target_link_libraries(${target}
     PRIVATE
@@ -198,29 +204,7 @@ target_link_libraries(${target}
     INTERFACE
 )
 
-
-
-if (CPPFS_BUILD_SSH_MODULE)
-    message(STATUS "$<BOOL:${OpenSSL_FOUND}>:${OPENSSL_LIBRARIES}")
-    message(STATUS "$<BOOL:${LibSSH2_FOUND}>:${LIBSSH2_LIBRARY}")
-    message(STATUS "$<BOOL:${LibCrypto_FOUND}>:${LIBCRYPTO_LIBRARY}")
-    message(STATUS "$<BOOL:${ZLIB_FOUND}>:${ZLIB_LIBRARY}")
-
-    if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
-        target_link_libraries(${target}
-            PRIVATE
-            wsock32.lib
-            ws2_32.lib
-        )
-    endif()
-    
-    target_include_directories(${target}
-        PRIVATE
-        ${OPENSSL_INCLUDE_DIR}
-        ${LIBSSH2_INCLUDE_DIR}
-    )
-    
-
+if (OPTION_BUILD_SSH_BACKEND)
     target_link_libraries(${target}
         PRIVATE
         ${OPENSSL_LIBRARIES}
@@ -229,22 +213,19 @@ if (CPPFS_BUILD_SSH_MODULE)
         ${ZLIB_LIBRARY}
     )
 
-    target_compile_definitions(${target}
-        PRIVATE
+    if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+        target_link_libraries(${target}
+            PRIVATE
+            wsock32.lib
+            ws2_32.lib
+        )
+    endif()
+endif()
 
-        PUBLIC
-        ${META_PROJECT_ID}_USE_LibSSH2
-        ${META_PROJECT_ID}_USE_LibCrypto
-        ${META_PROJECT_ID}_USE_OpenSSL
-        ${META_PROJECT_ID}_USE_ZLIB
 
-        INTERFACE
-    )
-endif ()
-
-# 
+#
 # Compile definitions
-# 
+#
 
 target_compile_definitions(${target}
     PRIVATE
@@ -256,10 +237,24 @@ target_compile_definitions(${target}
     INTERFACE
 )
 
+if (OPTION_BUILD_SSH_BACKEND)
+    target_compile_definitions(${target}
+        PRIVATE
 
-# 
+        PUBLIC
+        ${META_PROJECT_ID}_USE_LibSSH2
+        ${META_PROJECT_ID}_USE_LibCrypto
+        ${META_PROJECT_ID}_USE_OpenSSL
+        ${META_PROJECT_ID}_USE_ZLIB
+
+        INTERFACE
+    )
+endif()
+
+
+#
 # Linker options
-# 
+#
 
 target_link_libraries(${target}
     PRIVATE
@@ -271,9 +266,9 @@ target_link_libraries(${target}
 )
 
 
-# 
+#
 # Target Health
-# 
+#
 
 perform_health_checks(
     ${target}
@@ -282,9 +277,9 @@ perform_health_checks(
 )
 
 
-# 
+#
 # Deployment
-# 
+#
 
 # Library
 install(TARGETS ${target}
