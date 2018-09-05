@@ -12,14 +12,16 @@ namespace cppfs
 
 
 FilePath::FilePath()
-: m_path("")
+: m_originalPath("")
+, m_path("")
 , m_pointsToContent(false)
 , m_details(false)
 {
 }
 
 FilePath::FilePath(const FilePath & filePath)
-: m_path(filePath.m_path)
+: m_originalPath(filePath.m_originalPath)
+, m_path(filePath.m_path)
 , m_pointsToContent(filePath.m_pointsToContent)
 , m_details(filePath.m_details)
 , m_fullPath(filePath.m_fullPath)
@@ -33,7 +35,8 @@ FilePath::FilePath(const FilePath & filePath)
 }
 
 FilePath::FilePath(FilePath && filePath)
-: m_path(std::move(filePath.m_path))
+: m_originalPath(std::move(filePath.m_path))
+, m_path(std::move(filePath.m_path))
 , m_pointsToContent(std::move(filePath.m_pointsToContent))
 , m_details(std::move(filePath.m_details))
 , m_fullPath(std::move(filePath.m_fullPath))
@@ -73,6 +76,7 @@ FilePath::~FilePath()
 
 FilePath & FilePath::operator=(const FilePath & filePath)
 {
+    m_originalPath    = filePath.m_originalPath;
     m_path            = filePath.m_path;
     m_pointsToContent = filePath.m_pointsToContent;
     m_details         = filePath.m_details;
@@ -89,6 +93,7 @@ FilePath & FilePath::operator=(const FilePath & filePath)
 
 FilePath & FilePath::operator=(FilePath && filePath)
 {
+    m_originalPath    = std::move(filePath.m_originalPath);
     m_path            = std::move(filePath.m_path);
     m_pointsToContent = std::move(filePath.m_pointsToContent);
     m_details         = std::move(filePath.m_details);
@@ -103,14 +108,40 @@ FilePath & FilePath::operator=(FilePath && filePath)
     return *this;
 }
 
+bool FilePath::operator==(const FilePath & other) const
+{
+    if (this == &other)
+    {
+        return true;
+    }
+
+    return m_path == other.m_path;
+}
+
+bool FilePath::operator!=(const FilePath & other) const
+{
+    if (this == &other)
+    {
+        return false;
+    }
+
+    return m_path != other.m_path;
+}
+
 const std::string & FilePath::path() const
 {
     return m_path;
 }
 
+const std::string & FilePath::originalPath() const
+{
+    return m_originalPath;
+}
+
 void FilePath::setPath(const std::string & path)
 {
     // Set new path
+    m_originalPath = path;
     m_path = path;
 
     // Reset state
@@ -138,6 +169,7 @@ void FilePath::setPath(const std::string & path)
 void FilePath::setPath(std::string && path)
 {
     // Set new path
+    m_originalPath = path;
     m_path = std::move(path);
 
     // Reset state

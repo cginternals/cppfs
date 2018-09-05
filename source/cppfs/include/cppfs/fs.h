@@ -85,6 +85,18 @@ CPPFS_API std::string fromBase64(const std::string & base64);
 */
 CPPFS_API std::string hashToString(const unsigned char * hash);
 
+/**
+*  @brief
+*    Create directory
+*
+*  @param[in] path
+*    Path to directory
+*
+*  @return
+*    0 on success, error code > 0 otherwise
+*/
+CPPFS_API int makeDir(const std::string & path);
+
 
 } // namespace fs
 

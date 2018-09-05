@@ -115,6 +115,36 @@ public:
 
     /**
     *  @brief
+    *    Equality operator
+    *
+    *  @param[in] other
+    *    The other file path for comparison
+    *
+    *  @return
+    *    `true` if both file paths are equal, else `false`
+    *
+    *  @remark
+    *    Two file paths are considered equal if the contents of the path are equal
+    */
+    bool operator==(const FilePath & other) const;
+
+    /**
+    *  @brief
+    *    Inequality operator
+    *
+    *  @param[in] other
+    *    The other file path for comparison
+    *
+    *  @return
+    *    `true` if both file paths differ, else `false`
+    *
+    *  @remark
+    *    Two file paths are considered equal if the contents of the path are equal
+    */
+    bool operator!=(const FilePath & other) const;
+
+    /**
+    *  @brief
     *    Get path as string
     *
     *  @return
@@ -126,6 +156,15 @@ public:
     *    trailing separators, use fullPath().
     */
     const std::string & path() const;
+
+    /**
+    *  @brief
+    *    Get original (unprocessed) input string
+    *
+    *  @return
+    *    Path that was originally provided
+    */
+    const std::string & originalPath() const;
 
     /**
     *  @brief
@@ -345,6 +384,7 @@ protected:
 
 
 protected:
+    std::string m_originalPath;          ///< Original unprocessed input string
     std::string m_path;                  ///< Path (unified format)
     bool        m_pointsToContent;       ///< 'true' if the path has a trailing separator, else 'false'
 

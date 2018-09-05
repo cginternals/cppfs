@@ -25,15 +25,17 @@
 #include <cppfs/FileIterator.h>
 
 #ifdef SYSTEM_WINDOWS
+    #include <direct.h>
+
     #include <cppfs/windows/LocalFileSystem.h>
 #else
+    #include <sys/stat.h>
+
     #include <cppfs/posix/LocalFileSystem.h>
 #endif
 
 
-namespace cppfs
-{
-namespace fs
+namespace cppfs { namespace fs
 {
 
 
@@ -145,6 +147,14 @@ std::string hashToString(const unsigned char * hash)
     return stream.str();
 }
 
+int makeDir(const std::string & path)
+{
+#ifdef WIN32
+    return _mkdir(path.c_str());
+#else
+    return mkdir(path.c_str(), 0755);
+#endif
+}
 
-} // namespace fs
-} // namespace cppfs
+
+}} // namespace cppfs::fs
