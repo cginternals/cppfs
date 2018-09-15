@@ -11,16 +11,18 @@
     #define COMMON_DIGEST_FOR_OPENSSL
     #include <CommonCrypto/CommonDigest.h>
     #define SHA1 CC_SHA1
-#else
+    #include <cppfs/ssh/SshFileSystem.h>
+#elif defined(CPPFS_USE_OpenSSL)
     #include <openssl/sha.h>
+    #include <cppfs/ssh/SshFileSystem.h>
 #endif
 
 #include <cppfs/system.h>
 #include <cppfs/LoginCredentials.h>
 #include <cppfs/Url.h>
 #include <cppfs/FileHandle.h>
+#include <cppfs/AbstractFileSystem.h>
 #include <cppfs/FileIterator.h>
-#include <cppfs/ssh/SshFileSystem.h>
 
 #ifdef SYSTEM_WINDOWS
     #include <cppfs/windows/LocalFileSystem.h>
@@ -45,6 +47,7 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
     // SSH
     if (url.protocol() == "ssh://")
     {
+#if defined(CPPFS_USE_OpenSSL)
         // Get connection parameters
         std::string host       = url.host();
         std::string user       = url.username();
@@ -71,6 +74,9 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
 
         // Open path
         return fs->open(localPath);
+#else 
+        return FileHandle{};
+#endif
     }
 
     // Local file system
@@ -89,6 +95,7 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
 
 std::string sha1(const std::string & str)
 {
+#ifdef CPPFS_USE_OpenSSL
     // Initialize hash
     unsigned char hash[20];
     SHA_CTX context;
@@ -100,6 +107,9 @@ std::string sha1(const std::string & str)
     // Compute hash
     SHA1_Final(hash, &context);
     return hashToString(hash);
+#else
+    return "";
+#endif
 }
 
 std::string base64(const std::string & str)

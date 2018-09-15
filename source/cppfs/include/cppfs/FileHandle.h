@@ -9,13 +9,13 @@
 #include <string>
 
 #include <cppfs/cppfs_api.h>
+#include <cppfs/AbstractFileHandleBackend.h>
 
 
 namespace cppfs
 {
 
 
-class AbstractFileHandleBackend;
 class FileIterator;
 class FileVisitor;
 class Tree;
