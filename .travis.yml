@@ -7,37 +7,35 @@ env:
 matrix:
   include:
 
-    - os: osx
-      osx_image: xcode9.1
-      env: CMAKE_CONFIGURATION=release BUILD_DIR=build
-
-    - os: osx
-      osx_image: xcode9.1
-      env: CMAKE_CONFIGURATION=debug BUILD_DIR=build-debug
-
     - os: linux
       compiler: clang
       env: CMAKE_CONFIGURATION=release BUILD_DIR=build
       addons:
         apt:
+          sources:
+            - sourceline: 'ppa:cginternals/backports-ppa'
           packages:
           - libssh2-1-dev
-          - libminizip-dev
+          - lib64z1-dev
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
+          - libcppassist-dev
 
     - os: linux
       compiler: clang
       env: CMAKE_CONFIGURATION=debug BUILD_DIR=build-debug
       addons:
         apt:
+          sources:
+            - sourceline: 'ppa:cginternals/backports-ppa'
           packages:
           - libssh2-1-dev
-          - libminizip-dev
+          - lib64z1-dev
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
+          - libcppassist-dev
 
     - os: linux
       compiler: gcc
@@ -48,14 +46,16 @@ matrix:
         apt:
           sources:
           - ubuntu-toolchain-r-test
+          - sourceline: 'ppa:cginternals/backports-ppa'
           packages:
           - cmake
           - g++-5
           - libssh2-1-dev
-          - libminizip-dev
+          - lib64z1-dev
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
+          - libcppassist-dev
 
     - os: linux
       compiler: gcc
@@ -66,14 +66,16 @@ matrix:
         apt:
           sources:
           - ubuntu-toolchain-r-test
+          - sourceline: 'ppa:cginternals/backports-ppa'
           packages:
           - cmake
           - g++-5
           - libssh2-1-dev
-          - libminizip-dev
+          - lib64z1-dev
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
+          - libcppassist-dev
 
 before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then export CMAKE_OPTIONS="$CMAKE_OPTIONS"; fi
