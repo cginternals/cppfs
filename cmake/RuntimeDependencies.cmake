@@ -16,4 +16,15 @@ if(OPTION_SELF_CONTAINED)
     # Install 3rd-party runtime dependencies into runtime-component
     # install(FILES ... COMPONENT runtime)
 
+    find_file(DLLS_CPPASSIST cppassist.dll)
+
+    set(DLLS
+        ${DLLS_CPPASSIST}
+    )
+    set(PLATFORMS
+        ${DLLS_WIN}
+    )
+    install(FILES ${DLLS} DESTINATION ${INSTALL_BIN} COMPONENT examples)
+    install(FILES ${PLATFORMS} DESTINATION ${INSTALL_BIN}/platforms COMPONENT examples)
+
 endif()
