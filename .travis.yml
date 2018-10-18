@@ -1,5 +1,7 @@
 language: cpp
 
+sudo: required
+
 env:
   global:
     - CMAKE_OPTIONS="-DOPTION_BUILD_EXAMPLES=On"
@@ -12,7 +14,7 @@ matrix:
       env: CMAKE_CONFIGURATION=release BUILD_DIR=build
       addons:
         sources:
-          - cginternals/backports-ppa
+          - sourceline: 'ppa:cginternals/backports-ppa'
         apt:
           packages:
           - libssh2-1-dev
@@ -27,7 +29,7 @@ matrix:
       env: CMAKE_CONFIGURATION=debug BUILD_DIR=build-debug
       addons:
         sources:
-          - cginternals/backports-ppa
+          - sourceline: 'ppa:cginternals/backports-ppa'
         apt:
           packages:
           - libssh2-1-dev
@@ -46,7 +48,7 @@ matrix:
         apt:
           sources:
           - ubuntu-toolchain-r-test
-          - cginternals/backports-ppa
+          - sourceline: 'ppa:cginternals/backports-ppa'
           packages:
           - cmake
           - g++-5
@@ -66,7 +68,7 @@ matrix:
         apt:
           sources:
           - ubuntu-toolchain-r-test
-          - cginternals/backports-ppa
+          - sourceline: 'ppa:cginternals/backports-ppa'
           packages:
           - cmake
           - g++-5
