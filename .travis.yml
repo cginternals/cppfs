@@ -1,7 +1,5 @@
 language: cpp
 
-sudo: required
-
 env:
   global:
     - CMAKE_OPTIONS="-DOPTION_BUILD_EXAMPLES=On"
