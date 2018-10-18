@@ -23,7 +23,10 @@ enum FilePermissions
     GroupExec  = 0x010,
     OtherRead  = 0x004,
     OtherWrite = 0x002,
-    OtherExec  = 0x001
+    OtherExec  = 0x001,
+    SetUid     = 04000,
+    SetGid     = 02000,
+    Sticky     = 01000
 };
 
 

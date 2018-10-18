@@ -54,7 +54,15 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
         _SCL_SECURE_NO_WARNINGS  # Calling any one of the potentially unsafe methods in the Standard C++ Library
         _CRT_SECURE_NO_WARNINGS  # Calling any one of the potentially unsafe methods in the CRT Library
     )
-endif ()
+endif()
+
+# MINGW
+if (MINGW)
+    set(DEFAULT_COMPILE_DEFINITIONS ${DEFAULT_COMPILE_DEFINITIONS}
+        WINVER=0x0600
+        _WIN32_WINNT=0x0600
+    )
+endif()
 
 
 # 

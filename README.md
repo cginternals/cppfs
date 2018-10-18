@@ -12,17 +12,28 @@ The following backends are currently implemented:
 - Local file system (POSIX, win32)
 - SSH (libssh2)
 
+[![Travis](https://img.shields.io/travis/cginternals/cppfs/master.svg?style=flat&logo=travis)](https://travis-ci.org/cginternals/cppfs)
+[![Tokei](https://tokei.rs/b1/github/cginternals/cppfs)](https://github.com/Aaronepower/tokei)
 
-## Project Health
 
-| Service | System | Compiler | Status |
-| ------- | ------ | -------- | -----: |
-|  [Travis-CI](https://travis-ci.org/cginternals/cppfs) | Ubuntu 14.04, macOS | GCC 4.8, Clang 3.5, AppleClang 7 | [![Build Status](https://travis-ci.org/cginternals/cppfs.svg?branch=master)](https://travis-ci.org/cginternals/cppfs) |
-| [Coverity](https://scan.coverity.com/projects/6828?tab=overview) | Ubuntu 14.04 | GCC 5.3 | upcoming |
-| Jenkins <br><br><br><br> | Ubuntu 14.04 <br><br><br><br> | GCC 4.8 <br> GCC 4.9 <br> GCC 5.4 <br> Clang 3.9 <br> | [![Build Status](https://jenkins.hpi3d.de/buildStatus/icon?job=cppfs-linux-gcc4.8)](https://jenkins.hpi3d.de/job/cppfs-linux-gcc4.8) <br> [![Build Status](https://jenkins.hpi3d.de/buildStatus/icon?job=cppfs-linux-gcc4.9)](https://jenkins.hpi3d.de/job/cppfs-linux-gcc4.9) <br> [![Build Status](https://jenkins.hpi3d.de/buildStatus/icon?job=cppfs-linux-gcc5)](https://jenkins.hpi3d.de/job/cppfs-linux-gcc5.4) <br> [![Build Status](https://jenkins.hpi3d.de/buildStatus/icon?job=cppfs-linux-clang3.9)](https://jenkins.hpi3d.de/job/cppfs-linux-clang3.9) <br> |
-| Jenkins <br><br> | Windows 10 <br><br> | MSVC 2013 Update 5 <br>  MSVC 2015 Update 1 <br> | [![Build Status](https://jenkins.hpi3d.de/buildStatus/icon?job=cppfs-windows-msvc2013)](https://jenkins.hpi3d.de/job/cppfs-windows-msvc2013) <br> [![Build Status](https://jenkins.hpi3d.de/buildStatus/icon?job=cppfs-windows-msvc2015)](https://jenkins.hpi3d.de/job/cppfs-windows-msvc2015) <br> |
+# Resources
 
-Please note that our macOS build node is currently broken (physically). However, *cppfs* is maintained for macOS as well and there are many people using it on macOS on a regular basis.
+# [Basic Examples](#basic-examples)
+
+##### Installation and Development
+
+* [Build form Source](#build-instructions)
+* [Tips for Linking](#tips-for-linking)
+
+##### Features
+ * [Paths and URLs](#paths-and-urls)
+ * [Accessing the file system](#accessing-the-file-system)
+ * [Getting file information](#getting-file-information)
+ * [File operations](#file-operations)
+ * [Reading and writing to files](#reading-and-writing-to-files)
+ * [Advanced functions on files](#advanced-functions-on-files)
+ * [Accessing and traversing directories](#accessing-and-traversing-directories)
+ * [File trees and diffs](#file-trees-and-diffs)
 
 
 ## Build Instructions
