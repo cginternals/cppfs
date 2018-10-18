@@ -13,7 +13,7 @@
 
 if(OPTION_SELF_CONTAINED)
 
-    if(SYSTEM_WINDOWS)
+    if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
 
         # Install 3rd-party runtime dependencies into runtime-component
         # install(FILES ... COMPONENT runtime)
