@@ -7,14 +7,6 @@ env:
 matrix:
   include:
 
-    - os: osx
-      osx_image: xcode9.1
-      env: CMAKE_CONFIGURATION=release BUILD_DIR=build
-
-    - os: osx
-      osx_image: xcode9.1
-      env: CMAKE_CONFIGURATION=debug BUILD_DIR=build-debug
-
     - os: linux
       compiler: clang
       env: CMAKE_CONFIGURATION=release BUILD_DIR=build
@@ -28,6 +20,7 @@ matrix:
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
+          - cppassist-dev
 
     - os: linux
       compiler: clang
@@ -42,6 +35,7 @@ matrix:
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
+          - cppassist-dev
 
     - os: linux
       compiler: gcc
@@ -61,6 +55,7 @@ matrix:
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
+          - cppassist-dev
 
     - os: linux
       compiler: gcc
@@ -80,6 +75,7 @@ matrix:
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
+          - cppassist-dev
 
 before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then export CMAKE_OPTIONS="$CMAKE_OPTIONS"; fi
