@@ -1,3 +1,0 @@
-# git-build-recipe format 0.4 deb-version {debupstream}+{revno}
-lp:cppfs v1.0
-nest-part packaging lp:cppfs deploy/ubuntu-ppa/debian-backports debian v1.0
