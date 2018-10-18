@@ -2,18 +2,18 @@ Source: libcppfs
 Section: misc
 Priority: optional
 Maintainer: Willy Scheibel <willy.scheibel@cginternals.com>
-Build-Depends: build-essential, cmake, libminizip-dev, libssl-dev, libssh2-1-dev, libcppassist-dev, doxygen, graphviz
+Build-Depends: build-essential, cmake, zlib1g-dev, libssl-dev, libssh2-1-dev, libcppassist-dev, doxygen, graphviz
 Standards-Version: 3.8.0
 
 Package: libcppfs
 Architecture: any
-Depends: libminizip1, libssh2-1, libssl1.0.0, libcppassist
+Depends: zlib1g, libssh2-1, libssl1.0.0, libcppassist
 Homepage: https://github.com/cginternals/cppfs
 Description: Cross-platform C++ file system library supporting multiple backends.
 
 Package: libcppfs-dev
 Architecture: any
-Depends: libcppfs, libminizip-dev, libssl-dev, libssh2-1-dev, libcppassist-dev
+Depends: libcppfs, zlib1g-dev, libssl-dev, libssh2-1-dev, libcppassist-dev
 Homepage: https://github.com/cginternals/cppfs
 Description: Cross-platform C++ file system library supporting multiple backends.
 
