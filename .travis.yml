@@ -13,9 +13,9 @@ matrix:
       compiler: clang
       env: CMAKE_CONFIGURATION=release BUILD_DIR=build
       addons:
-        sources:
-          - sourceline: 'ppa:cginternals/backports-ppa'
         apt:
+          sources:
+            - sourceline: 'ppa:cginternals/backports-ppa'
           packages:
           - libssh2-1-dev
           - lib64z1-dev
@@ -28,9 +28,9 @@ matrix:
       compiler: clang
       env: CMAKE_CONFIGURATION=debug BUILD_DIR=build-debug
       addons:
-        sources:
-          - sourceline: 'ppa:cginternals/backports-ppa'
         apt:
+          sources:
+            - sourceline: 'ppa:cginternals/backports-ppa'
           packages:
           - libssh2-1-dev
           - lib64z1-dev
