@@ -1,6 +1,6 @@
 [//]: # (Comment)
 
-# Cross-platform C++ file system library supporting multiple backends
+<br><a href="https://github.com/cginternals/cppfs/"><img src="https://raw.githubusercontent.com/cginternals/cppfs/master/cppfs-logo.svg?sanitize=true" width="50%"></a>
 
 *cppfs* is a [MIT licensed](http://opensource.org/licenses/MIT), cross-platform C++ library that
 provides an object-oriented abstraction for working with files and the file system. It can be
