@@ -18,7 +18,7 @@ The following backends are currently implemented:
 
 # Resources
 
-# [Basic Examples](#basic-examples)
+* [Basic Examples](#basic-examples)
 
 ##### Installation and Development
 
