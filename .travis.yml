@@ -22,7 +22,7 @@ matrix:
         apt:
           packages:
           - libssh2-1-dev
-          - libminizip-dev
+          - lib64z1-dev
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
@@ -34,7 +34,7 @@ matrix:
         apt:
           packages:
           - libssh2-1-dev
-          - libminizip-dev
+          - lib64z1-dev
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
@@ -52,7 +52,7 @@ matrix:
           - cmake
           - g++-5
           - libssh2-1-dev
-          - libminizip-dev
+          - lib64z1-dev
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
@@ -70,7 +70,7 @@ matrix:
           - cmake
           - g++-5
           - libssh2-1-dev
-          - libminizip-dev
+          - lib64z1-dev
           - libssl-dev
           - cppcheck
           - clang-tidy-3.8
