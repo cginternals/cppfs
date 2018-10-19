@@ -4,7 +4,7 @@
 
 *cppfs* is a cross-platform C++ library that provides an object-oriented abstraction for working with files and the file system. 
 
-![GitHub release](https://img.shields.io/github/release/cginternals/cppfs.svg)
+![GitHub release](https://img.shields.io/github/release/cginternals/cppfsf.svg) 
 [![Travis](https://img.shields.io/travis/cginternals/cppfs/master.svg?style=flat&logo=travis)](https://travis-ci.org/cginternals/cppfs)
 [![Appveyor](https://img.shields.io/appveyor/ci/scheibel/cppfs/master.svg?style=flat&logo=appveyor)](https://ci.appveyor.com/project/scheibel/cppfs/branch/master)
 [![Tokei](https://tokei.rs/b1/github/cginternals/cppfs)](https://github.com/Aaronepower/tokei)
