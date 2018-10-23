@@ -8,6 +8,7 @@
 [![Travis](https://img.shields.io/travis/cginternals/cppfs/master.svg?style=flat&logo=travis)](https://travis-ci.org/cginternals/cppfs)
 [![Appveyor](https://img.shields.io/appveyor/ci/scheibel/cppfs/master.svg?style=flat&logo=appveyor)](https://ci.appveyor.com/project/scheibel/cppfs/branch/master)
 [![Tokei](https://tokei.rs/b1/github/cginternals/cppfs)](https://github.com/Aaronepower/tokei)
+[![Tokei](https://tokei.rs/b1/github/cginternals/cppfs?category=comments)](https://github.com/Aaronepower/tokei)
 
 *cppfs* can be used not only to access the local file system, but for remote and virtual file systems as well.
 By specializing the virtual backend interface, *cppfs* can be easily extended to support additional
