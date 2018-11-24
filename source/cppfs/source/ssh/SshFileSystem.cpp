@@ -17,6 +17,7 @@
 
 #include <cppfs/FileHandle.h>
 #include <cppfs/ssh/SshFileHandle.h>
+#include <cppfs/null/NullFileWatcher.h>
 
 
 namespace cppfs
@@ -67,6 +68,13 @@ FileHandle SshFileSystem::open(std::string && path)
         std::unique_ptr<AbstractFileHandleBackend>(
             new SshFileHandle(shared_from_this(), path)
         )
+    );
+}
+
+std::unique_ptr<AbstractFileWatcherBackend> SshFileSystem::createFileWatcher(FileWatcher & fileWatcher)
+{
+    return std::unique_ptr<AbstractFileWatcherBackend>(
+            new NullFileWatcher(fileWatcher, shared_from_this())
     );
 }
 

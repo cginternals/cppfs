@@ -55,10 +55,12 @@ set(headers
     ${include_path}/FileHandle.h
     ${include_path}/FileIterator.h
     ${include_path}/FileVisitor.h
+    ${include_path}/FileWatcher.h
     ${include_path}/FunctionalFileVisitor.h
     ${include_path}/AbstractFileSystem.h
     ${include_path}/AbstractFileHandleBackend.h
     ${include_path}/AbstractFileIteratorBackend.h
+    ${include_path}/AbstractFileWatcherBackend.h
     ${include_path}/InputStream.h
     ${include_path}/OutputStream.h
     ${include_path}/LoginCredentials.h
@@ -69,9 +71,12 @@ set(headers
     ${include_path}/Change.h
     ${include_path}/units.h
 
+    ${include_path}/null/NullFileWatcher.h
+
     ${include_path}/${localfs}/LocalFileSystem.h
     ${include_path}/${localfs}/LocalFileHandle.h
     ${include_path}/${localfs}/LocalFileIterator.h
+    ${include_path}/${localfs}/LocalFileWatcher.h
 )
 
 set(sources
@@ -80,10 +85,12 @@ set(sources
     ${source_path}/FileHandle.cpp
     ${source_path}/FileIterator.cpp
     ${source_path}/FileVisitor.cpp
+    ${source_path}/FileWatcher.cpp
     ${source_path}/FunctionalFileVisitor.cpp
     ${source_path}/AbstractFileSystem.cpp
     ${source_path}/AbstractFileHandleBackend.cpp
     ${source_path}/AbstractFileIteratorBackend.cpp
+    ${source_path}/AbstractFileWatcherBackend.cpp
     ${source_path}/InputStream.cpp
     ${source_path}/OutputStream.cpp
     ${source_path}/LoginCredentials.cpp
@@ -93,9 +100,12 @@ set(sources
     ${source_path}/Diff.cpp
     ${source_path}/Change.cpp
 
+    ${source_path}/null/NullFileWatcher.cpp
+
     ${source_path}/${localfs}/LocalFileSystem.cpp
     ${source_path}/${localfs}/LocalFileHandle.cpp
     ${source_path}/${localfs}/LocalFileIterator.cpp
+    ${source_path}/${localfs}/LocalFileWatcher.cpp
 )
 
 if (OPTION_BUILD_SSH_BACKEND)

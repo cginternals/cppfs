@@ -29,5 +29,16 @@ enum FilePermissions
     Sticky     = 01000
 };
 
+/**
+*  @brief
+*    Type of event on the file system
+*/
+enum FileEvent
+{
+    FileCreated  = 0x01, ///< A file or directory has been created
+    FileRemoved  = 0x02, ///< A file or directory has been removed
+    FileModified = 0x04  ///< A file or directory has been modified
+};
+
 
 } // namespace cppfs

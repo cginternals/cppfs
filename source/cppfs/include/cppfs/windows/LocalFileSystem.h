@@ -33,6 +33,7 @@ public:
     // Virtual AbstractFileSystem functions
     virtual FileHandle open(const std::string & path) override;
     virtual FileHandle open(std::string && path) override;
+    virtual std::unique_ptr<AbstractFileWatcherBackend> createFileWatcher(FileWatcher & fileWatcher) override;
 };
 
 
