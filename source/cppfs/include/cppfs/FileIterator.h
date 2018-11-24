@@ -33,7 +33,7 @@ public:
     *    Constructor
     *
     *  @param[in] backend
-    *    Concrete file handle backend
+    *    Concrete file iterator backend
     */
     FileIterator(std::unique_ptr<AbstractFileIteratorBackend> && backend);
 
@@ -41,8 +41,8 @@ public:
     *  @brief
     *    Copy constructor
     *
-    *  @param[in] fileHandle
-    *    Source handle
+    *  @param[in] fileIterator
+    *    Source iterator
     */
     FileIterator(const FileIterator & fileIterator);
 
@@ -50,8 +50,8 @@ public:
     *  @brief
     *    Move constructor
     *
-    *  @param[in] fileHandle
-    *    Source handle
+    *  @param[in] fileIterator
+    *    Source iterator
     */
     FileIterator(FileIterator && fileIterator);
 
@@ -66,7 +66,7 @@ public:
     *    Copy operator
     *
     *  @param[in] fileIterator
-    *    Source handle
+    *    Source iterator
     */
     FileIterator & operator=(const FileIterator & fileIterator);
 
