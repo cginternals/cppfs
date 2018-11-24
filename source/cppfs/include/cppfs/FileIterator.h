@@ -12,6 +12,7 @@ namespace cppfs
 {
 
 
+class AbstractFileSystem;
 class AbstractFileIteratorBackend;
 
 
@@ -108,6 +109,15 @@ public:
     *    'true' if iterators are not equal, else 'false'
     */
     bool operator!=(const FileIterator & it) const;
+
+    /**
+    *  @brief
+    *    Get file system
+    *
+    *  @return
+    *    File system (can be null)
+    */
+    AbstractFileSystem * fs() const;
 
 
 protected:

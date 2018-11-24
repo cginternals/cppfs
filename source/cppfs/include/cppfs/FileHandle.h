@@ -16,6 +16,7 @@ namespace cppfs
 {
 
 
+class AbstractFileSystem;
 class FileIterator;
 class FileVisitor;
 class Tree;
@@ -103,6 +104,15 @@ public:
     *    Source handle
     */
     FileHandle & operator=(FileHandle && fileHandle);
+
+    /**
+    *  @brief
+    *    Get file system
+    *
+    *  @return
+    *    File system (can be null)
+    */
+    AbstractFileSystem * fs() const;
 
     /**
     *  @brief

@@ -2,9 +2,10 @@
 #pragma once
 
 
+#include <memory>
 #include <string>
 
-#include <cppfs/cppfs_api.h>
+#include <cppfs/AbstractFileSystem.h>
 
 
 namespace cppfs
@@ -22,6 +23,15 @@ class LoginCredentials;
 namespace fs
 {
 
+
+/**
+*  @brief
+*    Get local file system
+*
+*  @return
+*    Pointer to local file system (never null)
+*/
+CPPFS_API std::shared_ptr<AbstractFileSystem> localFS();
 
 /**
 *  @brief

@@ -76,6 +76,11 @@ FileHandle & FileHandle::operator=(FileHandle && fileHandle)
     return *this;
 }
 
+AbstractFileSystem * FileHandle::fs() const
+{
+    return m_backend ? m_backend->fs() : nullptr;
+}
+
 std::string FileHandle::path() const
 {
     return m_backend ? m_backend->path() : "";

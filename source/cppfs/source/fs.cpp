@@ -37,6 +37,13 @@ namespace fs
 {
 
 
+std::shared_ptr<AbstractFileSystem> localFS()
+{
+    static std::shared_ptr<LocalFileSystem> fs(new LocalFileSystem);
+
+    return fs;
+}
+
 FileHandle open(const std::string & path, const LoginCredentials * credentials)
 {
     // Parse url
@@ -74,8 +81,8 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
 
         // Open path
         return fs->open(localPath);
-#else 
-        return FileHandle{};
+#else
+        return FileHandle();
 #endif
     }
 
@@ -86,7 +93,7 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
         std::string localPath = url.path();
 
         // Open local file system
-        static std::shared_ptr<LocalFileSystem> fs(new LocalFileSystem);
+        auto fs = localFS();
 
         // Open path
         return fs->open(localPath);
