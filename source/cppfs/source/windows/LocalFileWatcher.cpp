@@ -18,11 +18,6 @@ LocalFileWatcher::~LocalFileWatcher()
 {
 }
 
-std::unique_ptr<AbstractFileWatcherBackend> LocalFileWatcher::clone() const
-{
-    return std::unique_ptr<AbstractFileWatcherBackend>(new LocalFileWatcher(m_fileWatcher, m_fs));
-}
-
 AbstractFileSystem * LocalFileWatcher::fs() const
 {
     return static_cast<AbstractFileSystem *>(m_fs.get());

@@ -39,15 +39,6 @@ public:
 
     /**
     *  @brief
-    *    Create a copy of this watcher
-    *
-    *  @return
-    *    File watcher
-    */
-    virtual std::unique_ptr<AbstractFileWatcherBackend> clone() const = 0;
-
-    /**
-    *  @brief
     *    Get file system
     *
     *  @return

@@ -21,11 +21,6 @@ NullFileWatcher::~NullFileWatcher()
 {
 }
 
-std::unique_ptr<AbstractFileWatcherBackend> NullFileWatcher::clone() const
-{
-    return std::unique_ptr<AbstractFileWatcherBackend>(new NullFileWatcher(m_fileWatcher, m_fs));
-}
-
 AbstractFileSystem * NullFileWatcher::fs() const
 {
     return m_fs.get();

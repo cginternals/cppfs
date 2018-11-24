@@ -36,12 +36,6 @@ LocalFileWatcher::~LocalFileWatcher()
     close(m_inotify);
 }
 
-std::unique_ptr<AbstractFileWatcherBackend> LocalFileWatcher::clone() const
-{
-    // Clone watcher
-    return std::unique_ptr<AbstractFileWatcherBackend>(new LocalFileWatcher(m_fileWatcher, m_fs));
-}
-
 AbstractFileSystem * LocalFileWatcher::fs() const
 {
     // Return file system

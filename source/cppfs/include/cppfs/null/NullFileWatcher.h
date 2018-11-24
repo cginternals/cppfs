@@ -52,7 +52,6 @@ public:
     virtual ~NullFileWatcher();
 
     // Virtual AbstractFileWatcherBackend functions
-    virtual std::unique_ptr<AbstractFileWatcherBackend> clone() const override;
     virtual AbstractFileSystem * fs() const override;
     virtual void add(const std::string & path, unsigned int mode) override;
     virtual void watch() override;
