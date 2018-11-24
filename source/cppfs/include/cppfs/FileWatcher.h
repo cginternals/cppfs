@@ -2,11 +2,13 @@
 #pragma once
 
 
+#include <vector>
 #include <memory>
 #include <functional>
 
-#include <cppfs/AbstractFileWatcherBackend.h>
 #include <cppfs/cppfs.h>
+#include <cppfs/AbstractFileWatcherBackend.h>
+#include <cppfs/FunctionalFileEventHandler.h>
 
 
 namespace cppfs
@@ -29,9 +31,9 @@ class CPPFS_API FileWatcher
 public:
     /**
     *  @brief
-    *    Callback function signature
+    *    Callback function for file system events
     */
-    using CallbackFunc = std::function<bool(FileHandle &)>;
+    using EventFunc = std::function<void(FileHandle &, FileEvent)>;
 
 
 public:
@@ -136,6 +138,39 @@ public:
 
     /**
     *  @brief
+    *    Add event handler
+    *
+    *  @param[in] eventHandler
+    *    File event handler (must NOT be null!)
+    *
+    *  @remarks
+    *    Adds the event handler to be called on each file system event.
+    */
+    void addHandler(FileEventHandler * eventHandler);
+
+    /**
+    *  @brief
+    *    Add callback function as event handler
+    *
+    *  @param[in] funcFileEvent
+    *    Function that is call on each file system event
+    */
+    void addHandler(EventFunc funcFileEvent);
+
+    /**
+    *  @brief
+    *    Remove event handler
+    *
+    *  @param[in] eventHandler
+    *    File event handler (must NOT be null!)
+    *
+    *  @remarks
+    *    Removes the event handler from the watcher.
+    */
+    void removeHandler(FileEventHandler * eventHandler);
+
+    /**
+    *  @brief
     *    Start watching files (blocking)
     *
     *  @remarks
@@ -151,7 +186,7 @@ public:
 protected:
     /**
     *  @brief
-    *    Called on each file event
+    *    Called on file event
     *
     *  @param[in] path
     *    Path to file or directory
@@ -166,7 +201,11 @@ protected:
 
 
 protected:
-    std::unique_ptr<AbstractFileWatcherBackend> m_backend; ///< Backend implementation (can be null)
+    std::unique_ptr<AbstractFileWatcherBackend> m_backend;       ///< Backend implementation (can be null)
+    std::vector<FileEventHandler *>             m_eventHandlers; ///< List of registered file event handlers
+
+    /// Functional event handlers that are owned by the file watcher
+    std::vector< std::unique_ptr<FunctionalFileEventHandler> > m_ownEventHandlers;
 };
 
 

@@ -55,8 +55,10 @@ set(headers
     ${include_path}/FileHandle.h
     ${include_path}/FileIterator.h
     ${include_path}/FileVisitor.h
-    ${include_path}/FileWatcher.h
     ${include_path}/FunctionalFileVisitor.h
+    ${include_path}/FileWatcher.h
+    ${include_path}/FileEventHandler.h
+    ${include_path}/FunctionalFileEventHandler.h
     ${include_path}/AbstractFileSystem.h
     ${include_path}/AbstractFileHandleBackend.h
     ${include_path}/AbstractFileIteratorBackend.h
@@ -85,8 +87,10 @@ set(sources
     ${source_path}/FileHandle.cpp
     ${source_path}/FileIterator.cpp
     ${source_path}/FileVisitor.cpp
-    ${source_path}/FileWatcher.cpp
     ${source_path}/FunctionalFileVisitor.cpp
+    ${source_path}/FileWatcher.cpp
+    ${source_path}/FileEventHandler.cpp
+    ${source_path}/FunctionalFileEventHandler.cpp
     ${source_path}/AbstractFileSystem.cpp
     ${source_path}/AbstractFileHandleBackend.cpp
     ${source_path}/AbstractFileIteratorBackend.cpp

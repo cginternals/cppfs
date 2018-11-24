@@ -1,10 +1,11 @@
 
 #include <cppfs/FileWatcher.h>
 
-#include <iostream>
+#include <algorithm>
 
 #include <cppfs/fs.h>
 #include <cppfs/FileHandle.h>
+#include <cppfs/FileEventHandler.h>
 #include <cppfs/AbstractFileSystem.h>
 #include <cppfs/null/NullFileWatcher.h>
 
@@ -60,6 +61,39 @@ void FileWatcher::add(const FileHandle & fileHandle, unsigned int mode)
     m_backend->add(fileHandle.path(), mode);
 }
 
+void FileWatcher::addHandler(FileEventHandler * eventHandler)
+{
+    // Check that event handler is valid and not already registered
+    if (!eventHandler || std::find(m_eventHandlers.begin(), m_eventHandlers.end(), eventHandler) != m_eventHandlers.end()) {
+        return;
+    }
+
+    // Add event handler to list
+    m_eventHandlers.push_back(eventHandler);
+}
+
+void FileWatcher::addHandler(EventFunc funcFileEvent)
+{
+    // Create event handler
+    auto ptr = std::unique_ptr<FunctionalFileEventHandler>(new FunctionalFileEventHandler(funcFileEvent));
+
+    // Register event handler
+    addHandler(ptr.get());
+
+    // Take ownership
+    m_ownEventHandlers.push_back(std::move(ptr));
+}
+
+void FileWatcher::removeHandler(FileEventHandler * eventHandler)
+{
+    // Check if event handler is registered
+    auto it = std::find(m_eventHandlers.begin(), m_eventHandlers.end(), eventHandler);
+    if (it != m_eventHandlers.end()) {
+        // Remove event handler
+        m_eventHandlers.erase(it);
+    }
+}
+
 void FileWatcher::watch()
 {
     // Check backend
@@ -75,21 +109,14 @@ void FileWatcher::onFileEvent(const std::string & path, FileEvent event)
 {
     // [TODO] Pass FileHandle instead of string
     // [TODO] Make sure that path is fully qualified
-    // [TODO] Add methods to register callback functions
 
     // Open file
     FileHandle fh = fs::open(path);
 
-    // Get file type
-    std::string type = (fh.isDirectory() ? "Directory" : "File");
-
-    // Get operation
-    std::string operation = ( (event & FileCreated) ? "created" :
-                            ( (event & FileRemoved) ? "removed" :
-                                                      "modified" ) );
-
-    // Log event
-    std::cout << type << " '" << path << "' has been " << operation << "." << std::endl;
+    // Call file event handlers
+    for (auto * eventHandler : m_eventHandlers) {
+        eventHandler->onFileEvent(fh, event);
+    }
 }
 
 

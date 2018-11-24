@@ -72,7 +72,21 @@ int main(int argc, char * argv[])
         // Watch directory
         watcher.add(dir);
 
-        // Begin watching and print events
+        // Create file event handler
+        watcher.addHandler([] (FileHandle & fh, FileEvent event) {
+            // Get file type
+            std::string type = (fh.isDirectory() ? "directory" : "file");
+
+            // Get operation
+            std::string operation = ( (event & FileCreated) ? "created" :
+                                    ( (event & FileRemoved) ? "removed" :
+                                                              "modified" ) );
+
+            // Log event
+            std::cout << "The " << type << " '" << fh.path() << "' was " << operation << "." << std::endl;
+        });
+
+        // Begin watching and printing events
         while (true) {
             watcher.watch();
         }
