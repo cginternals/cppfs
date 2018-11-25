@@ -51,14 +51,14 @@ public:
     *  @brief
     *    Watch file handle
     *
-    *  @param[in] fileHandle
+    *  @param[in] fh
     *    File handle
     *  @param[in] events
     *    Events that are watched (combination of FileEvent values)
     *  @param[in] recursive
     *    Watch file system recursively? (only relevant if fileHandle points to a directory)
     */
-    virtual void add(FileHandle & fileHandle, unsigned int events, RecursiveMode recursive) = 0;
+    virtual void add(FileHandle & fh, unsigned int events, RecursiveMode recursive) = 0;
 
     /**
     *  @brief
@@ -77,12 +77,12 @@ protected:
     *  @brief
     *    Called on each file event
     *
-    *  @param[in] fileHandle
+    *  @param[in] fh
     *    File handle
     *  @param[in] event
     *    Type of event that has occured
     */
-    void onFileEvent(FileHandle & fileHandle, FileEvent event);
+    void onFileEvent(FileHandle & fh, FileEvent event);
 
 
 protected:

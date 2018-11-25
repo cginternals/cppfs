@@ -44,7 +44,7 @@ AbstractFileSystem * LocalFileWatcher::fs() const
     return static_cast<AbstractFileSystem *>(m_fs.get());
 }
 
-void LocalFileWatcher::add(FileHandle & fileHandle, unsigned int events, RecursiveMode recursive)
+void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode recursive)
 {
     // Get watch mode
     uint32_t flags = 0;
@@ -53,27 +53,27 @@ void LocalFileWatcher::add(FileHandle & fileHandle, unsigned int events, Recursi
     if (events & FileModified) flags |= IN_MODIFY;
 
     // Create watcher
-    int handle = inotify_add_watch(m_inotify, fileHandle.path().c_str(), flags);
+    int handle = inotify_add_watch(m_inotify, fh.path().c_str(), flags);
     if (handle < 0) {
         return;
     }
 
     // Watch directories recursively
-    if (fileHandle.isDirectory() && recursive == Recursive) {
+    if (fh.isDirectory() && recursive == Recursive) {
         // List directory entries
-        for (auto it = fileHandle.begin(); it != fileHandle.end(); ++it)
+        for (auto it = fh.begin(); it != fh.end(); ++it)
         {
             // Check if entry is a directory
-            FileHandle fh = fileHandle.open(*it);
-            if (fh.isDirectory()) {
+            FileHandle fh2 = fh.open(*it);
+            if (fh2.isDirectory()) {
                 // Watch directory
-                add(fh, events, recursive);
+                add(fh2, events, recursive);
             }
         }
     }
 
     // Associate watcher handle with file handle
-    m_watchers[handle].fileHandle = fileHandle;
+    m_watchers[handle].fileHandle = fh;
     m_watchers[handle].events     = events;
     m_watchers[handle].recursive  = recursive;
 }

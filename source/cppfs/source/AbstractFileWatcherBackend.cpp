@@ -17,9 +17,9 @@ AbstractFileWatcherBackend::~AbstractFileWatcherBackend()
 {
 }
 
-void AbstractFileWatcherBackend::onFileEvent(FileHandle & fileHandle, FileEvent event)
+void AbstractFileWatcherBackend::onFileEvent(FileHandle & fh, FileEvent event)
 {
-    m_fileWatcher.onFileEvent(fileHandle, event);
+    m_fileWatcher.onFileEvent(fh, event);
 }
 
 
