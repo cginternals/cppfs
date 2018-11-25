@@ -588,7 +588,7 @@ bool FileHandle::remove()
 FileWatcher FileHandle::watch(unsigned int events, RecursiveMode recursive)
 {
     // Create file system watcher
-    FileWatcher watcher;
+    FileWatcher watcher(fs());
     watcher.add(*this, events, recursive);
 
     // Return watcher
