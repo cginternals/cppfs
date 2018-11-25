@@ -18,12 +18,21 @@ FileEventHandler::~FileEventHandler()
 
 void FileEventHandler::onFileEvent(FileHandle & fh, FileEvent event)
 {
-    if (event & FileCreated) {
-        onFileCreated(fh);
-    } else if (event & FileRemoved) {
-        onFileRemoved(fh);
-    } else if (event & FileModified) {
-        onFileModified(fh);
+    switch (event) {
+        case FileCreated:
+            onFileCreated(fh);
+            break;
+
+        case FileRemoved:
+            onFileRemoved(fh);
+            break;
+
+        case FileModified:
+            onFileModified(fh);
+            break;
+
+        default:
+            break;
     }
 }
 
