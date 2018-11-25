@@ -107,8 +107,7 @@ void LocalFileWatcher::watch()
             auto & watcher = m_watchers[event->wd];
 
             // Get file handle
-            std::string path = event->name;
-            FileHandle fh = watcher.fileHandle.open(path);
+            FileHandle fh = (event->len > 0 ? watcher.fileHandle.open(std::string(event->name)) : watcher.fileHandle);
 
             // Watch new directories
             if (fh.isDirectory() && eventType == FileCreated && watcher.recursive == Recursive) {
