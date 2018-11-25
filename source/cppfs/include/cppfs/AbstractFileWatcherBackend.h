@@ -11,6 +11,7 @@ namespace cppfs
 {
 
 
+class FileHandle;
 class FileWatcher;
 class AbstractFileSystem;
 
@@ -50,12 +51,12 @@ public:
     *  @brief
     *    Watch file handle
     *
-    *  @param[in] path
-    *    File path
+    *  @param[in] fileHandle
+    *    File handle
     *  @param[in] mode
     *    Watch mode (combination of FileEvent values)
     */
-    virtual void add(const std::string & path, unsigned int mode) = 0;
+    virtual void add(const FileHandle & fileHandle, unsigned int mode) = 0;
 
     /**
     *  @brief
@@ -74,12 +75,12 @@ protected:
     *  @brief
     *    Called on each file event
     *
-    *  @param[in] path
-    *    Path to file or directory
+    *  @param[in] fileHandle
+    *    File handle
     *  @param[in] event
     *    Type of event that has occured
     */
-    void onFileEvent(const std::string & path, FileEvent event);
+    void onFileEvent(FileHandle & fileHandle, FileEvent event);
 
 
 protected:

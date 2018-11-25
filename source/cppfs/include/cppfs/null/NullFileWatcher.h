@@ -53,7 +53,7 @@ public:
 
     // Virtual AbstractFileWatcherBackend functions
     virtual AbstractFileSystem * fs() const override;
-    virtual void add(const std::string & path, unsigned int mode) override;
+    virtual void add(const FileHandle & fileHandle, unsigned int mode) override;
     virtual void watch() override;
 
 

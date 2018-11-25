@@ -17,9 +17,9 @@ AbstractFileWatcherBackend::~AbstractFileWatcherBackend()
 {
 }
 
-void AbstractFileWatcherBackend::onFileEvent(const std::string & path, FileEvent event)
+void AbstractFileWatcherBackend::onFileEvent(FileHandle & fileHandle, FileEvent event)
 {
-    m_fileWatcher.onFileEvent(path, event);
+    m_fileWatcher.onFileEvent(fileHandle, event);
 }
 
 

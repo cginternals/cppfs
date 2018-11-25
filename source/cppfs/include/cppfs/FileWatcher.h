@@ -188,8 +188,8 @@ protected:
     *  @brief
     *    Called on file event
     *
-    *  @param[in] path
-    *    Path to file or directory
+    *  @param[in] fileHandle
+    *    File handle
     *  @param[in] event
     *    Type of event that has occured
     *
@@ -197,7 +197,7 @@ protected:
     *    The default implementation checks the event and calls
     *    the registered callback functions.
     */
-    virtual void onFileEvent(const std::string & path, FileEvent event);
+    virtual void onFileEvent(FileHandle & fileHandle, FileEvent event);
 
 
 protected:

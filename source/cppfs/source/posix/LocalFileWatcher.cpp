@@ -7,6 +7,7 @@
 
 #include <cppfs/cppfs.h>
 #include <cppfs/FilePath.h>
+#include <cppfs/FileHandle.h>
 #include <cppfs/FileWatcher.h>
 #include <cppfs/posix/LocalFileSystem.h>
 #include <cppfs/posix/LocalFileIterator.h>
@@ -28,8 +29,8 @@ LocalFileWatcher::LocalFileWatcher(FileWatcher & fileWatcher, std::shared_ptr<Lo
 LocalFileWatcher::~LocalFileWatcher()
 {
     // Close watch handles
-    for (int handle : m_watchers) {
-        inotify_rm_watch(m_inotify, handle);
+    for (auto it : m_watchers) {
+        inotify_rm_watch(m_inotify, it.first);
     }
 
     // Close inotify instance
@@ -42,7 +43,7 @@ AbstractFileSystem * LocalFileWatcher::fs() const
     return static_cast<AbstractFileSystem *>(m_fs.get());
 }
 
-void LocalFileWatcher::add(const std::string & path, unsigned int mode)
+void LocalFileWatcher::add(const FileHandle & fileHandle, unsigned int mode)
 {
     // Get watch mode
     uint32_t flags = 0;
@@ -51,13 +52,13 @@ void LocalFileWatcher::add(const std::string & path, unsigned int mode)
     if (mode & FileModified) flags |= IN_MODIFY;
 
     // Create watcher
-    int handle = inotify_add_watch(m_inotify, path.c_str(), flags);
+    int handle = inotify_add_watch(m_inotify, fileHandle.path().c_str(), flags);
     if (handle < 0) {
         return;
     }
 
-    // Add watcher handle
-    m_watchers.push_back(handle);
+    // Associate watcher handle with file handle
+    m_watchers[handle] = fileHandle;
 }
 
 void LocalFileWatcher::watch()
@@ -78,17 +79,18 @@ void LocalFileWatcher::watch()
         // Get event
         auto * event = reinterpret_cast<inotify_event *>(&buffer.data()[i]);
         if (event->len) {
-            // Get path
-            std::string path = event->name;
-
             // Get event
             FileEvent eventType = (FileEvent)0;
                  if (event->mask & IN_CREATE) eventType = FileCreated;
             else if (event->mask & IN_DELETE) eventType = FileRemoved;
             else if (event->mask & IN_MODIFY) eventType = FileModified;
 
+            // Get file handle
+            std::string path = event->name;
+            FileHandle fh = m_watchers[event->wd].open(path);
+
             // Invoke callback function
-            onFileEvent(path, eventType);
+            onFileEvent(fh, eventType);
         }
 
         // Next event

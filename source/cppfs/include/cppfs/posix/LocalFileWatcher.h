@@ -3,7 +3,7 @@
 
 
 #include <memory>
-#include <vector>
+#include <map>
 
 #include <cppfs/AbstractFileWatcherBackend.h>
 
@@ -41,14 +41,14 @@ public:
 
     // Virtual AbstractFileWatcherBackend functions
     virtual AbstractFileSystem * fs() const override;
-    virtual void add(const std::string & path, unsigned int mode) override;
+    virtual void add(const FileHandle & fileHandle, unsigned int mode) override;
     virtual void watch() override;
 
 
 protected:
     std::shared_ptr<LocalFileSystem> m_fs;       ///< File system that created this watcher
     int                              m_inotify;  ///< File handle for the inotify instance
-    std::vector<int>                 m_watchers; ///< List of watcher handles
+    std::map<int, FileHandle>        m_watchers; ///< Map of watch handle -> file handle
 };
 
 

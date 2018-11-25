@@ -58,7 +58,7 @@ void FileWatcher::add(const FileHandle & fileHandle, unsigned int mode)
     }
 
     // Add file to watcher
-    m_backend->add(fileHandle.path(), mode);
+    m_backend->add(fileHandle, mode);
 }
 
 void FileWatcher::addHandler(FileEventHandler * eventHandler)
@@ -105,17 +105,11 @@ void FileWatcher::watch()
     m_backend->watch();
 }
 
-void FileWatcher::onFileEvent(const std::string & path, FileEvent event)
+void FileWatcher::onFileEvent(FileHandle & fileHandle, FileEvent event)
 {
-    // [TODO] Pass FileHandle instead of string
-    // [TODO] Make sure that path is fully qualified
-
-    // Open file
-    FileHandle fh = fs::open(path);
-
     // Call file event handlers
     for (auto * eventHandler : m_eventHandlers) {
-        eventHandler->onFileEvent(fh, event);
+        eventHandler->onFileEvent(fileHandle, event);
     }
 }
 
