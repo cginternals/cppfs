@@ -21,6 +21,7 @@
 #include <cppfs/FileIterator.h>
 #include <cppfs/FileVisitor.h>
 #include <cppfs/FunctionalFileVisitor.h>
+#include <cppfs/FileWatcher.h>
 #include <cppfs/Tree.h>
 #include <cppfs/AbstractFileSystem.h>
 #include <cppfs/AbstractFileHandleBackend.h>
@@ -582,6 +583,16 @@ bool FileHandle::remove()
 
     // Update file information
     return true;
+}
+
+FileWatcher FileHandle::watch(unsigned int events, RecursiveMode recursive)
+{
+    // Create file system watcher
+    FileWatcher watcher;
+    watcher.add(*this, events, recursive);
+
+    // Return watcher
+    return std::move(watcher);
 }
 
 std::unique_ptr<std::istream> FileHandle::createInputStream(std::ios_base::openmode mode) const

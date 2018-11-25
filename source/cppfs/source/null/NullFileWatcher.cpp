@@ -6,12 +6,12 @@ namespace cppfs
 {
 
 
-NullFileWatcher::NullFileWatcher(FileWatcher & fileWatcher)
+NullFileWatcher::NullFileWatcher(FileWatcher * fileWatcher)
 : AbstractFileWatcherBackend(fileWatcher)
 {
 }
 
-NullFileWatcher::NullFileWatcher(FileWatcher & fileWatcher, std::shared_ptr<AbstractFileSystem> fs)
+NullFileWatcher::NullFileWatcher(FileWatcher * fileWatcher, std::shared_ptr<AbstractFileSystem> fs)
 : AbstractFileWatcherBackend(fileWatcher)
 , m_fs(fs)
 {

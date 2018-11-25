@@ -30,20 +30,20 @@ public:
     *    Constructor
     *
     *  @param[in] fileWatcher
-    *    File watcher that owns the backend
+    *    File watcher that owns the backend (must NOT be null!)
     */
-    NullFileWatcher(FileWatcher & fileWatcher);
+    NullFileWatcher(FileWatcher * fileWatcher);
 
     /**
     *  @brief
     *    Constructor
     *
     *  @param[in] fileWatcher
-    *    File watcher that owns the backend
+    *    File watcher that owns the backend (must NOT be null!)
     *  @param[in] fs
     *    File system that created this watcher
     */
-    NullFileWatcher(FileWatcher & fileWatcher, std::shared_ptr<AbstractFileSystem> fs);
+    NullFileWatcher(FileWatcher * fileWatcher, std::shared_ptr<AbstractFileSystem> fs);
 
     /**
     *  @brief

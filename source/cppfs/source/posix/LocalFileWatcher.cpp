@@ -18,7 +18,7 @@ namespace cppfs
 {
 
 
-LocalFileWatcher::LocalFileWatcher(FileWatcher & fileWatcher, std::shared_ptr<LocalFileSystem> fs)
+LocalFileWatcher::LocalFileWatcher(FileWatcher * fileWatcher, std::shared_ptr<LocalFileSystem> fs)
 : AbstractFileWatcherBackend(fileWatcher)
 , m_fs(fs)
 , m_inotify(-1)

@@ -22,15 +22,18 @@ class AbstractFileSystem;
 */
 class CPPFS_API AbstractFileWatcherBackend
 {
+    friend class FileWatcher;
+
+
 public:
     /**
     *  @brief
     *    Constructor
     *
     *  @param[in] fileWatcher
-    *    File watcher that owns the backend
+    *    File watcher that owns the backend (must NOT be null!)
     */
-    AbstractFileWatcherBackend(FileWatcher & fileWatcher);
+    AbstractFileWatcherBackend(FileWatcher * fileWatcher);
 
     /**
     *  @brief
@@ -86,7 +89,7 @@ protected:
 
 
 protected:
-    FileWatcher & m_fileWatcher; ///< File watcher that owns the backend
+    FileWatcher * m_fileWatcher; ///< File watcher that owns the backend (never null)
 };
 
 

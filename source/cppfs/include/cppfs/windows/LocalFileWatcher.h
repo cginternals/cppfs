@@ -26,11 +26,11 @@ public:
     *    Constructor
     *
     *  @param[in] fileWatcher
-    *    File watcher that owns the backend
+    *    File watcher that owns the backend (must NOT be null!)
     *  @param[in] fs
     *    File system that created this watcher
     */
-    LocalFileWatcher(FileWatcher & fileWatcher, std::shared_ptr<LocalFileSystem> fs);
+    LocalFileWatcher(FileWatcher * fileWatcher, std::shared_ptr<LocalFileSystem> fs);
 
     /**
     *  @brief

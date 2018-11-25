@@ -74,7 +74,7 @@ FileHandle SshFileSystem::open(std::string && path)
 std::unique_ptr<AbstractFileWatcherBackend> SshFileSystem::createFileWatcher(FileWatcher & fileWatcher)
 {
     return std::unique_ptr<AbstractFileWatcherBackend>(
-            new NullFileWatcher(fileWatcher, shared_from_this())
+            new NullFileWatcher(&fileWatcher, shared_from_this())
     );
 }
 

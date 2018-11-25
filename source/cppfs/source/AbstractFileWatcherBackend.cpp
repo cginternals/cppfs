@@ -8,7 +8,7 @@ namespace cppfs
 {
 
 
-AbstractFileWatcherBackend::AbstractFileWatcherBackend(FileWatcher & fileWatcher)
+AbstractFileWatcherBackend::AbstractFileWatcherBackend(FileWatcher * fileWatcher)
 : m_fileWatcher(fileWatcher)
 {
 }
@@ -19,7 +19,7 @@ AbstractFileWatcherBackend::~AbstractFileWatcherBackend()
 
 void AbstractFileWatcherBackend::onFileEvent(FileHandle & fh, FileEvent event)
 {
-    m_fileWatcher.onFileEvent(fh, event);
+    m_fileWatcher->onFileEvent(fh, event);
 }
 
 

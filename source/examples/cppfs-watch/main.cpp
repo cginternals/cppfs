@@ -62,15 +62,12 @@ int main(int argc, char * argv[])
     std::string path = paramPath.value();
     if (path.empty()) path = ".";
 
-    // Create file system watcher
-    FileWatcher watcher;
-
     // Open directory
     FileHandle dir = fs::open(path, &login);
     if (dir.isDirectory())
     {
         // Watch directory
-        watcher.add(dir);
+        FileWatcher watcher = dir.watch();
 
         // Create file event handler
         watcher.addHandler([] (FileHandle & fh, FileEvent event) {

@@ -26,7 +26,11 @@ FileWatcher::FileWatcher(AbstractFileSystem * fs)
 
 FileWatcher::FileWatcher(FileWatcher && fileWatcher)
 : m_backend(std::move(fileWatcher.m_backend))
+, m_eventHandlers(std::move(fileWatcher.m_eventHandlers))
+, m_ownEventHandlers(std::move(fileWatcher.m_ownEventHandlers))
 {
+    // Fix pointer to file watcher
+    m_backend->m_fileWatcher = this;
 }
 
 FileWatcher::~FileWatcher()
@@ -35,8 +39,15 @@ FileWatcher::~FileWatcher()
 
 FileWatcher & FileWatcher::operator=(FileWatcher && fileWatcher)
 {
-    m_backend = std::move(fileWatcher.m_backend);
+    // Move backend
+    m_backend          = std::move(fileWatcher.m_backend);
+    m_eventHandlers    = std::move(fileWatcher.m_eventHandlers);
+    m_ownEventHandlers = std::move(fileWatcher.m_ownEventHandlers);
 
+    // Fix pointer to file watcher
+    m_backend->m_fileWatcher = this;
+
+    // Done
     return *this;
 }
 
