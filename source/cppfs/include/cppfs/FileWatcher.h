@@ -124,8 +124,10 @@ public:
     *
     *  @param[in] fileHandle
     *    File handle
-    *  @param[in] mode
-    *    Watch mode (combination of FileEvent values)
+    *  @param[in] events
+    *    Events that are watched (combination of FileEvent values)
+    *  @param[in] recursive
+    *    Watch file system recursively? (only relevant if fileHandle points to a directory)
     *
     *  @remarks
     *    The file handle must belong to the same file system as the
@@ -134,7 +136,7 @@ public:
     *    single file system. Also note that file watching is not
     *    supported for remote file systems, such as SSH.
     */
-    void add(const FileHandle & fileHandle, unsigned int mode = FileCreated | FileRemoved | FileModified);
+    void add(const FileHandle & fileHandle, unsigned int events = FileCreated | FileRemoved | FileModified, RecursiveMode recursive = Recursive);
 
     /**
     *  @brief

@@ -45,7 +45,7 @@ AbstractFileSystem * FileWatcher::fs() const
     return m_backend ? m_backend->fs() : nullptr;
 }
 
-void FileWatcher::add(const FileHandle & fileHandle, unsigned int mode)
+void FileWatcher::add(const FileHandle & fileHandle, unsigned int events, RecursiveMode recursive)
 {
     // Check backend
     if (!m_backend) {
@@ -58,7 +58,7 @@ void FileWatcher::add(const FileHandle & fileHandle, unsigned int mode)
     }
 
     // Add file to watcher
-    m_backend->add(fileHandle, mode);
+    m_backend->add(fileHandle, events, recursive);
 }
 
 void FileWatcher::addHandler(FileEventHandler * eventHandler)

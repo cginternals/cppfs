@@ -53,10 +53,12 @@ public:
     *
     *  @param[in] fileHandle
     *    File handle
-    *  @param[in] mode
-    *    Watch mode (combination of FileEvent values)
+    *  @param[in] events
+    *    Events that are watched (combination of FileEvent values)
+    *  @param[in] recursive
+    *    Watch file system recursively? (only relevant if fileHandle points to a directory)
     */
-    virtual void add(const FileHandle & fileHandle, unsigned int mode) = 0;
+    virtual void add(const FileHandle & fileHandle, unsigned int events, RecursiveMode recursive) = 0;
 
     /**
     *  @brief

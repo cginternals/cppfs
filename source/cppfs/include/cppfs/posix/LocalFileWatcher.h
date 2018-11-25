@@ -6,6 +6,7 @@
 #include <map>
 
 #include <cppfs/AbstractFileWatcherBackend.h>
+#include <cppfs/FileHandle.h>
 
 
 namespace cppfs
@@ -41,14 +42,26 @@ public:
 
     // Virtual AbstractFileWatcherBackend functions
     virtual AbstractFileSystem * fs() const override;
-    virtual void add(const FileHandle & fileHandle, unsigned int mode) override;
+    virtual void add(const FileHandle & fileHandle, unsigned int events, RecursiveMode recursive) override;
     virtual void watch() override;
+
+
+protected:
+    /**
+    *  @brief
+    *    Watcher entry
+    */
+    struct Watcher {
+        FileHandle    fileHandle;
+        unsigned int  events;
+        RecursiveMode recursive;
+    };
 
 
 protected:
     std::shared_ptr<LocalFileSystem> m_fs;       ///< File system that created this watcher
     int                              m_inotify;  ///< File handle for the inotify instance
-    std::map<int, FileHandle>        m_watchers; ///< Map of watch handle -> file handle
+    std::map<int, Watcher>           m_watchers; ///< Map of watch handle -> file handle
 };
 
 

@@ -40,5 +40,15 @@ enum FileEvent
     FileModified = 0x04  ///< A file or directory has been modified
 };
 
+/**
+*  @brief
+*    Recursive mode for operation that can run recursively or non-recursively
+*/
+enum RecursiveMode
+{
+    NonRecursive = 0, ///< Run recursively
+    Recursive         ///< Run non-recursively
+};
+
 
 } // namespace cppfs
