@@ -26,7 +26,7 @@ AbstractFileSystem * NullFileWatcher::fs() const
     return m_fs.get();
 }
 
-void NullFileWatcher::add(const FileHandle &, unsigned int, RecursiveMode)
+void NullFileWatcher::add(FileHandle &, unsigned int, RecursiveMode)
 {
 }
 

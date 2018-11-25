@@ -44,7 +44,7 @@ AbstractFileSystem * LocalFileWatcher::fs() const
     return static_cast<AbstractFileSystem *>(m_fs.get());
 }
 
-void LocalFileWatcher::add(const FileHandle & fileHandle, unsigned int events, RecursiveMode recursive)
+void LocalFileWatcher::add(FileHandle & fileHandle, unsigned int events, RecursiveMode recursive)
 {
     // Get watch mode
     uint32_t flags = 0;

@@ -136,7 +136,7 @@ public:
     *    single file system. Also note that file watching is not
     *    supported for remote file systems, such as SSH.
     */
-    void add(const FileHandle & fileHandle, unsigned int events = FileCreated | FileRemoved | FileModified, RecursiveMode recursive = Recursive);
+    void add(FileHandle & fileHandle, unsigned int events = FileCreated | FileRemoved | FileModified, RecursiveMode recursive = Recursive);
 
     /**
     *  @brief

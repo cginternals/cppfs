@@ -45,7 +45,7 @@ AbstractFileSystem * FileWatcher::fs() const
     return m_backend ? m_backend->fs() : nullptr;
 }
 
-void FileWatcher::add(const FileHandle & fileHandle, unsigned int events, RecursiveMode recursive)
+void FileWatcher::add(FileHandle & fileHandle, unsigned int events, RecursiveMode recursive)
 {
     // Check backend
     if (!m_backend) {

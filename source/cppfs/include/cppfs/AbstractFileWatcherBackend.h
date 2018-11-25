@@ -58,7 +58,7 @@ public:
     *  @param[in] recursive
     *    Watch file system recursively? (only relevant if fileHandle points to a directory)
     */
-    virtual void add(const FileHandle & fileHandle, unsigned int events, RecursiveMode recursive) = 0;
+    virtual void add(FileHandle & fileHandle, unsigned int events, RecursiveMode recursive) = 0;
 
     /**
     *  @brief
