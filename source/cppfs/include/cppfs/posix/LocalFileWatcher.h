@@ -43,7 +43,7 @@ public:
     // Virtual AbstractFileWatcherBackend functions
     virtual AbstractFileSystem * fs() const override;
     virtual void add(FileHandle & fh, unsigned int events, RecursiveMode recursive) override;
-    virtual void watch() override;
+    virtual void watch(int timeoutMilliSeconds) override;
 
 
 protected:

@@ -1,5 +1,8 @@
 
+#include <atomic>
+#include <chrono>
 #include <iostream>
+#include <thread>
 
 #include <cppassist/cmdline/CommandLineProgram.h>
 #include <cppassist/cmdline/CommandLineAction.h>
@@ -37,6 +40,10 @@ int main(int argc, char * argv[])
     CommandLineOption opConfig("--config", "-c", "file", "Load configuration from file", CommandLineOption::Optional);
     action.add(&opConfig);
 
+    CommandLineOption opTime("--time", "-t", "seconds", "Stop watch loop after given time", CommandLineOption::Optional);
+    action.add(&opTime);
+    
+
     CommandLineParameter paramPath("path", CommandLineParameter::Optional);
     action.add(&paramPath);
 
@@ -49,48 +56,75 @@ int main(int argc, char * argv[])
         return 0;
     }
 
-    // Get login credentials
-    LoginCredentials login;
+    try {
+        // Get login credentials
+        LoginCredentials login;
 
-    std::string configFile = opConfig.value();
-    if (!configFile.empty())
-    {
-        login.load(configFile);
-    }
-
-    // Get path
-    std::string path = paramPath.value();
-    if (path.empty()) path = ".";
-
-    // Open directory
-    FileHandle dir = fs::open(path, &login);
-    if (dir.isDirectory())
-    {
-        // Watch directory
-        FileWatcher watcher = dir.watch();
-
-        // Create file event handler
-        watcher.addHandler([] (FileHandle & fh, FileEvent event) {
-            // Get file type
-            std::string type = (fh.isDirectory() ? "directory" : "file");
-
-            // Get operation
-            std::string operation = ( (event & FileCreated) ? "created" :
-                                    ( (event & FileRemoved) ? "removed" :
-                                                              "modified" ) );
-
-            // Log event
-            std::cout << "The " << type << " '" << fh.path() << "' was " << operation << "." << std::endl;
-        });
-
-        // Begin watching and printing events
-        while (true) {
-            watcher.watch();
+        std::string configFile = opConfig.value();
+        if (!configFile.empty())
+        {
+            login.load(configFile);
         }
-    }
-    else
-    {
-        std::cout << "'" << path << "' is not a valid directory." << std::endl;
+
+        // Get path
+        std::string path = paramPath.value();
+        if (path.empty()) path = ".";
+
+        // Open directory
+        FileHandle dir = fs::open(path, &login);
+        if (dir.isDirectory())
+        {
+            // Watch directory
+            FileWatcher watcher = dir.watch();
+
+            // Create file event handler
+            watcher.addHandler([] (FileHandle & fh, FileEvent event) {
+                // Get file type
+                std::string type = (fh.isDirectory() ? "directory" : "file");
+
+                // Get operation
+                std::string operation = ( (event & FileCreated) ? "created" :
+                                        ( (event & FileRemoved) ? "removed" :
+                                                                  "modified" ) );
+
+                // Log event
+                std::cout << "The " << type << " '" << fh.path() << "' was " << operation << "." << std::endl;
+            });
+
+            // Begin watching and printing events
+            std::string t = opTime.value();
+            if (t.empty()) {
+                while (true) {
+                    watcher.watch();
+                }
+            }
+            else {
+                auto t_sleep = std::stoi(t);
+                std::cout << "Will stop watching after " << t_sleep << " seconds..." << std::endl;
+
+                // Execute watch loop in a separate thread
+                std::atomic<bool> stop_thread{false};
+                std::thread t([&] {
+                    while (!stop_thread) {
+                        watcher.watch(50);  // Timeout 50 ms, so we can poll stop_thread variable
+                    }
+                });
+
+                // Zzzzz....
+                std::this_thread::sleep_for(std::chrono::seconds(t_sleep));
+
+                // Join watcher thread
+                stop_thread = true;
+                t.join();
+            }
+        }
+        else
+        {
+            std::cout << "'" << path << "' is not a valid directory." << std::endl;
+        }
+    } catch (std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+        return -1;
     }
 
     // Done

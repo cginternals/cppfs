@@ -50,7 +50,7 @@ void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode r
     uint32_t flags = 0;
     if (events & FileCreated)  flags |= IN_CREATE;
     if (events & FileRemoved)  flags |= IN_DELETE;
-    if (events & FileModified) flags |= IN_MODIFY;
+    if (events & FileModified) flags |= (IN_MODIFY | IN_ATTRIB);
 
     // Create watcher
     int handle = inotify_add_watch(m_inotify, fh.path().c_str(), flags);
@@ -78,12 +78,27 @@ void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode r
     m_watchers[handle].recursive  = recursive;
 }
 
-void LocalFileWatcher::watch()
+void LocalFileWatcher::watch(int timeoutMilliSeconds)
 {
     // Create buffer for receiving events
     size_t bufSize = 64 * (sizeof(inotify_event) + NAME_MAX);
     std::vector<char> buffer;
     buffer.resize(bufSize);
+
+    if (timeoutMilliSeconds >= 0) {
+        fd_set set;
+        struct timeval timeout;
+        timeout.tv_sec = timeoutMilliSeconds / 1000;
+        timeout.tv_usec = (timeoutMilliSeconds - timeout.tv_sec * 1000) * 1000;
+
+        FD_ZERO(&set); /* clear the set */
+        FD_SET(m_inotify, &set); /* add our file descriptor to the set */
+
+        int rv = select(m_inotify + 1, &set, NULL, NULL, &timeout);
+        if (rv <= 0) {
+            return;
+        }
+    }
 
     // Read events
     int size = read(m_inotify, buffer.data(), bufSize);
@@ -102,6 +117,7 @@ void LocalFileWatcher::watch()
                  if (event->mask & IN_CREATE) eventType = FileCreated;
             else if (event->mask & IN_DELETE) eventType = FileRemoved;
             else if (event->mask & IN_MODIFY) eventType = FileModified;
+            else if (event->mask & IN_ATTRIB) eventType = FileModified;
 
             // Get watcher
             auto & watcher = m_watchers[event->wd];
