@@ -3,6 +3,7 @@
 
 
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include <cppfs/AbstractFileWatcherBackend.h>
@@ -58,8 +59,10 @@ protected:
     };
 
 protected:
-    std::shared_ptr<LocalFileSystem> m_fs;        ///< File system that created this watcher
-    std::vector<Watcher>             m_watchers;  ///< Watchers
+    std::shared_ptr<LocalFileSystem> m_fs;            ///< File system that created this watcher
+    std::shared_ptr<void>            m_waitStopEvent; ///< Event to stop watch function
+    std::shared_ptr<void>            m_watchersCS;    ///< Watchers critical section
+    std::vector<Watcher>             m_watchers;      ///< Watchers
 };
 
 

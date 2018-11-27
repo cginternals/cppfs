@@ -4,18 +4,18 @@
 #include <iostream>
 #include <thread>
 
-#include <cppassist/cmdline/CommandLineProgram.h>
 #include <cppassist/cmdline/CommandLineAction.h>
-#include <cppassist/cmdline/CommandLineSwitch.h>
 #include <cppassist/cmdline/CommandLineOption.h>
 #include <cppassist/cmdline/CommandLineParameter.h>
+#include <cppassist/cmdline/CommandLineProgram.h>
+#include <cppassist/cmdline/CommandLineSwitch.h>
 
-#include <cppfs/cppfs-version.h>
-#include <cppfs/fs.h>
-#include <cppfs/LoginCredentials.h>
 #include <cppfs/FileHandle.h>
 #include <cppfs/FileIterator.h>
 #include <cppfs/FileWatcher.h>
+#include <cppfs/LoginCredentials.h>
+#include <cppfs/cppfs-version.h>
+#include <cppfs/fs.h>
 
 
 using namespace cppassist;
@@ -104,7 +104,7 @@ int main(int argc, char * argv[])
 
                 // Execute watch loop in a separate thread
                 std::atomic<bool> stop_thread{false};
-                std::thread t([&] {
+                std::thread thrd([&] {
                     while (!stop_thread) {
                         watcher.watch(50);  // Timeout 50 ms, so we can poll stop_thread variable
                     }
@@ -115,7 +115,7 @@ int main(int argc, char * argv[])
 
                 // Join watcher thread
                 stop_thread = true;
-                t.join();
+                thrd.join();
             }
         }
         else

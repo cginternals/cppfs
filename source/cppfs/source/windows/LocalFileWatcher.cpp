@@ -15,6 +15,19 @@ namespace
         std::shared_ptr<VOID> event;
         DWORD buffer[16384];
     };
+
+    // NB! Using a std::mutex resulted in spurious deadlocks using VS2017, whilst
+    // using CRITICAL_SECTION works fine.
+    struct ScopedCriticalSection
+    {
+        LPCRITICAL_SECTION m_pcs;
+        ScopedCriticalSection(LPCRITICAL_SECTION pcs) : m_pcs(pcs) {
+            ::EnterCriticalSection(m_pcs);
+        }
+        ~ScopedCriticalSection() {
+            ::LeaveCriticalSection(m_pcs);
+        }
+    };
 }
 
 namespace cppfs
@@ -24,11 +37,15 @@ namespace cppfs
 LocalFileWatcher::LocalFileWatcher(FileWatcher * fileWatcher, std::shared_ptr<LocalFileSystem> fs)
 : AbstractFileWatcherBackend(fileWatcher)
 , m_fs(fs)
+, m_waitStopEvent(::CreateEvent(NULL, TRUE, FALSE, NULL), ::CloseHandle)
+, m_watchersCS(new CRITICAL_SECTION())
 {
+    ::InitializeCriticalSection((LPCRITICAL_SECTION)m_watchersCS.get());
 }
 
 LocalFileWatcher::~LocalFileWatcher()
 {
+    ::DeleteCriticalSection((LPCRITICAL_SECTION)m_watchersCS.get());
     m_watchers.clear();
 }
 
@@ -52,8 +69,7 @@ void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode r
         throw std::runtime_error("failed to create directory listener");
 
     std::shared_ptr<void> hDirectory(hDir, ::CloseHandle);
-
-    std::shared_ptr<VOID> hEvent(::CreateEvent(NULL, TRUE, FALSE, NULL), ::CloseHandle);
+    std::shared_ptr<void> hEvent(::CreateEvent(NULL, TRUE, FALSE, NULL), ::CloseHandle);
     if (!hEvent)
         throw std::runtime_error("failed creating wait event");
 
@@ -67,12 +83,17 @@ void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode r
     w.events = events;
     w.recursive = recursive;
     w.platform = std::move(lw);
+
+    ::SetEvent(m_waitStopEvent.get());
+    ScopedCriticalSection lock((LPCRITICAL_SECTION)m_watchersCS.get());
     m_watchers.push_back(std::move(w));
 }
 
 void LocalFileWatcher::watch(int timeoutMilliSeconds)
 {
+    ScopedCriticalSection lock((LPCRITICAL_SECTION)m_watchersCS.get());
     std::vector<HANDLE> waitHandles;
+    waitHandles.push_back(m_waitStopEvent.get());
     for (auto it : m_watchers) {
         auto lw = reinterpret_cast<LocalWatcher*>(it.platform.get());
         waitHandles.push_back(lw->event.get());
@@ -80,6 +101,13 @@ void LocalFileWatcher::watch(int timeoutMilliSeconds)
         if (it.events & FileCreated)  flags |= FILE_NOTIFY_CHANGE_FILE_NAME;
         if (it.events & FileRemoved)  flags |= FILE_NOTIFY_CHANGE_FILE_NAME;
         if (it.events & FileModified) flags |= FILE_NOTIFY_CHANGE_LAST_WRITE;
+
+        DWORD dwBytes = 0;
+        if (!::GetOverlappedResult(it.handle.get(), &lw->ovl, &dwBytes, FALSE)) {
+            auto error = GetLastError();
+            if (error == ERROR_IO_INCOMPLETE)
+                continue;
+        }
 
         if (!::ReadDirectoryChangesW(
             it.handle.get(),
@@ -97,64 +125,70 @@ void LocalFileWatcher::watch(int timeoutMilliSeconds)
         }
     }
 
-    for (;;) {
-        auto waitResult = ::WaitForMultipleObjects(waitHandles.size(), waitHandles.data(), FALSE, timeoutMilliSeconds);
-        if (waitResult == WAIT_TIMEOUT) {
-            return;
-        }
+    auto waitResult = ::WaitForMultipleObjects(
+        waitHandles.size(),
+        waitHandles.data(),
+        FALSE,
+        timeoutMilliSeconds >= 0 ? timeoutMilliSeconds : INFINITE);
+    if (waitResult == WAIT_TIMEOUT) {
+        return;
+    }
+    if (waitResult == WAIT_OBJECT_0) {
+        ::ResetEvent(m_waitStopEvent.get());
+        return;
+    }
 
-        auto index = waitResult - WAIT_OBJECT_0;
-        if (index < 0 || index >= int(m_watchers.size()))
-            continue;
+    auto index = waitResult - (WAIT_OBJECT_0 + 1);
+    if (index < 0 || index >= int(m_watchers.size())) {
+        throw std::runtime_error("Wait returned result: " + std::to_string(waitResult));
+    }
 
-        Watcher& w = m_watchers[index];
-        auto lw = reinterpret_cast<LocalWatcher*>(w.platform.get());
-        DWORD dwBytes = 0;
-        if (::GetOverlappedResult(w.handle.get(), &lw->ovl, &dwBytes, FALSE) && dwBytes > 0) {
-            char fileName[32768];
-            char* p = (char*)lw->buffer;
-            for (;;) {
-                FILE_NOTIFY_INFORMATION* fni = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(p);
-                int ret = ::WideCharToMultiByte(CP_ACP,
-                    0,
-                    fni->FileName,
-                    fni->FileNameLength / sizeof(WCHAR),
-                    fileName,
-                    sizeof(fileName),
-                    NULL,
-                    NULL);
-                if (ret != 0) {
-                    std::string fname(fileName, fileName + ret);
-                    std::replace(fname.begin(), fname.end(), '\\', '/');
-                    FileEvent eventType = (FileEvent)0;
-                    switch (fni->Action) {
-                    case FILE_ACTION_ADDED:
-                        eventType = FileCreated;
-                        break;
-                    case FILE_ACTION_REMOVED:
-                        eventType = FileRemoved;
-                        break;
-                    case FILE_ACTION_MODIFIED:
-                        eventType = FileModified;
-                        break;
-                    default:
-                        break;
-                    }
-                    if (w.events & eventType) {
-                        // Get file handle
-                        FileHandle fh = w.fileHandle.open(fname);
-                        // Invoke callback function
-                        onFileEvent(fh, eventType);
-                    }
-                }
-                if (fni->NextEntryOffset == 0)
+    Watcher& w = m_watchers[index];
+    auto lw = reinterpret_cast<LocalWatcher*>(w.platform.get());
+    ::ResetEvent(lw->event.get());
+    DWORD dwBytes = 0;
+    if (::GetOverlappedResult(w.handle.get(), &lw->ovl, &dwBytes, FALSE) && dwBytes > 0) {
+        char fileName[32768];
+        char* p = (char*)lw->buffer;
+        for (;;) {
+            FILE_NOTIFY_INFORMATION* fni = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(p);
+            int ret = ::WideCharToMultiByte(CP_ACP,
+                0,
+                fni->FileName,
+                fni->FileNameLength / sizeof(WCHAR),
+                fileName,
+                sizeof(fileName),
+                NULL,
+                NULL);
+            if (ret != 0) {
+                std::string fname(fileName, fileName + ret);
+                std::replace(fname.begin(), fname.end(), '\\', '/');
+                FileEvent eventType = (FileEvent)0;
+                switch (fni->Action) {
+                case FILE_ACTION_ADDED:
+                    eventType = FileCreated;
                     break;
-                p += fni->NextEntryOffset;
+                case FILE_ACTION_REMOVED:
+                    eventType = FileRemoved;
+                    break;
+                case FILE_ACTION_MODIFIED:
+                    eventType = FileModified;
+                    break;
+                default:
+                    break;
+                }
+                if (w.events & eventType) {
+                    // Get file handle
+                    FileHandle fh = w.fileHandle.open(fname);
+                    // Invoke callback function
+                    onFileEvent(fh, eventType);
+                }
             }
+            if (fni->NextEntryOffset == 0)
+                break;
+            p += fni->NextEntryOffset;
         }
-        break;
     }
 }
-
 
 } // namespace cppfs
