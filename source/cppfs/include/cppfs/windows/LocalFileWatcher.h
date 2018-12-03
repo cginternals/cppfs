@@ -3,9 +3,11 @@
 
 
 #include <memory>
+#include <mutex>
+#include <vector>
 
 #include <cppfs/AbstractFileWatcherBackend.h>
-
+#include <cppfs/FileHandle.h>
 
 namespace cppfs
 {
@@ -41,11 +43,26 @@ public:
     // Virtual AbstractFileWatcherBackend functions
     virtual AbstractFileSystem * fs() const override;
     virtual void add(FileHandle & fh, unsigned int events, RecursiveMode recursive) override;
-    virtual void watch() override;
-
+    virtual void watch(int timeoutMilliSeconds) override;
 
 protected:
-    std::shared_ptr<LocalFileSystem> m_fs; ///< File system that created this watcher
+    /**
+    *  @brief
+    *    Watcher entry
+    */
+    struct Watcher {
+        std::shared_ptr<void> handle;
+        FileHandle            fileHandle;
+        unsigned int          events;
+        RecursiveMode         recursive;
+        std::shared_ptr<void> platform;
+    };
+
+protected:
+    std::shared_ptr<LocalFileSystem> m_fs;            ///< File system that created this watcher
+    std::shared_ptr<void>            m_waitStopEvent; ///< Event to stop watch function
+    std::shared_ptr<void>            m_watchersCS;    ///< Watchers critical section
+    std::vector<Watcher>             m_watchers;      ///< Watchers
 };
 
 

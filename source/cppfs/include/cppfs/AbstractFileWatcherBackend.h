@@ -65,14 +65,19 @@ public:
 
     /**
     *  @brief
-    *    Start watching files (blocking)
+    *    Start watching files
     *
+    *  @param[in] timeoutMilliSeconds
+    *    timeout value in milliseconds, if less than zero, timeout is infinite
+    * 
     *  @remarks
-    *    The function is supposed to block until one or more file system
-    *    events have occured. For each event, onFileEvent has to be called.
-    *    After all events have been processed, the function shall return.
+    *    This function shall watch the file system and block until one or more
+    *    events have occured, or if the timeout has been exceeded (timeout >= 0).
+    *    For each event, onFileEvent has to be called with the type of the event and
+    *    a file handle to the file or directory. After all events have been
+    *    processed, the function shall return.
     */
-    virtual void watch() = 0;
+    virtual void watch(int timeoutMilliSeconds) = 0;
 
 
 protected:

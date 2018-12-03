@@ -30,7 +30,7 @@ void NullFileWatcher::add(FileHandle &, unsigned int, RecursiveMode)
 {
 }
 
-void NullFileWatcher::watch()
+void NullFileWatcher::watch(int timeoutMilliSeconds)
 {
 }
 
