@@ -105,7 +105,7 @@ void FileWatcher::removeHandler(FileEventHandler * eventHandler)
     }
 }
 
-void FileWatcher::watch(int timeoutMilliSeconds)
+void FileWatcher::watch(int timeout)
 {
     // Check backend
     if (!m_backend) {
@@ -113,7 +113,7 @@ void FileWatcher::watch(int timeoutMilliSeconds)
     }
 
     // Watch files
-    m_backend->watch(timeoutMilliSeconds);
+    m_backend->watch(timeout);
 }
 
 void FileWatcher::onFileEvent(FileHandle & fh, FileEvent event)

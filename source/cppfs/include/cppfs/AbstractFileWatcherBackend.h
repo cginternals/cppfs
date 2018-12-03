@@ -67,9 +67,9 @@ public:
     *  @brief
     *    Start watching files
     *
-    *  @param[in] timeoutMilliSeconds
-    *    timeout value in milliseconds, if less than zero, timeout is infinite
-    * 
+    *  @param[in] timeout
+    *    Timeout value in milliseconds. If less than zero, timeout is infinite and the function blocks.
+    *
     *  @remarks
     *    This function shall watch the file system and block until one or more
     *    events have occured, or if the timeout has been exceeded (timeout >= 0).
@@ -77,7 +77,7 @@ public:
     *    a file handle to the file or directory. After all events have been
     *    processed, the function shall return.
     */
-    virtual void watch(int timeoutMilliSeconds) = 0;
+    virtual void watch(int timeout) = 0;
 
 
 protected:

@@ -1,11 +1,12 @@
 
 #include <cppfs/windows/LocalFileWatcher.h>
 
-#include <cppfs/windows/LocalFileSystem.h>
+#include <algorithm>
 
 #include <Windows.h>
 
-#include <algorithm>
+#include <cppfs/windows/LocalFileSystem.h>
+
 
 namespace
 {
@@ -29,6 +30,7 @@ namespace
         }
     };
 }
+
 
 namespace cppfs
 {
@@ -89,7 +91,7 @@ void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode r
     m_watchers.push_back(std::move(w));
 }
 
-void LocalFileWatcher::watch(int timeoutMilliSeconds)
+void LocalFileWatcher::watch(int timeout)
 {
     ScopedCriticalSection lock((LPCRITICAL_SECTION)m_watchersCS.get());
     std::vector<HANDLE> waitHandles;
@@ -129,7 +131,7 @@ void LocalFileWatcher::watch(int timeoutMilliSeconds)
         waitHandles.size(),
         waitHandles.data(),
         FALSE,
-        timeoutMilliSeconds >= 0 ? timeoutMilliSeconds : INFINITE);
+        timeout >= 0 ? timeout : INFINITE);
     if (waitResult == WAIT_TIMEOUT) {
         return;
     }

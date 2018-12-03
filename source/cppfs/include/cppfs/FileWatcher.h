@@ -175,13 +175,12 @@ public:
     *  @brief
     *    Start watching files
     *
-    *  @param[in] timeoutMilliSeconds
-    *    timeout value in milliseconds. If less than zero, timeout is infinite,
-    *    i.e. call will be blocking.
+    *  @param[in] timeout
+    *    Timeout value in milliseconds. If less than zero, timeout is infinite and the function blocks.
     *
     *  @remarks
     *    This function begins to watch the file system and blocks until one or more
-    *    events have occured, or the timeout (if set) has been exceeded.
+    *    events have occured, or the timeout (if set) has been exceeded (timeout >= 0).
     *    On every event, onFileEvent() is called with the type of the event and
     *    a file handle to the file or directory. Afterwards, the function returns.
     *    To listen to more events, call watch() again.

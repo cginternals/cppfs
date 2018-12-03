@@ -78,23 +78,27 @@ void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode r
     m_watchers[handle].recursive  = recursive;
 }
 
-void LocalFileWatcher::watch(int timeoutMilliSeconds)
+void LocalFileWatcher::watch(int timeout)
 {
     // Create buffer for receiving events
     size_t bufSize = 64 * (sizeof(inotify_event) + NAME_MAX);
     std::vector<char> buffer;
     buffer.resize(bufSize);
 
-    if (timeoutMilliSeconds >= 0) {
+    // Set timeout
+    if (timeout >= 0) {
+        // Create file descriptor set
         fd_set set;
-        struct timeval timeout;
-        timeout.tv_sec = timeoutMilliSeconds / 1000;
-        timeout.tv_usec = (timeoutMilliSeconds - timeout.tv_sec * 1000) * 1000;
+        FD_ZERO(&set);
+        FD_SET(m_inotify, &set);
 
-        FD_ZERO(&set); /* clear the set */
-        FD_SET(m_inotify, &set); /* add our file descriptor to the set */
+        // Convert timeout into timeval struct
+        struct timeval tval;
+        tval.tv_sec = timeout / 1000;
+        tval.tv_usec = (timeout - tval.tv_sec * 1000) * 1000;
 
-        int rv = select(m_inotify + 1, &set, NULL, NULL, &timeout);
+        // Set timeout on file descriptor
+        int rv = select(m_inotify + 1, &set, NULL, NULL, &tval);
         if (rv <= 0) {
             return;
         }
