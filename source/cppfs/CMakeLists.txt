@@ -76,7 +76,6 @@ set(headers
     ${include_path}/${localfs}/LocalFileSystem.h
     ${include_path}/${localfs}/LocalFileHandle.h
     ${include_path}/${localfs}/LocalFileIterator.h
-    ${include_path}/${localfs}/LocalFileWatcher.h
 )
 
 set(sources
@@ -105,8 +104,17 @@ set(sources
     ${source_path}/${localfs}/LocalFileSystem.cpp
     ${source_path}/${localfs}/LocalFileHandle.cpp
     ${source_path}/${localfs}/LocalFileIterator.cpp
-    ${source_path}/${localfs}/LocalFileWatcher.cpp
 )
+
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+    set(headers ${headers}
+        ${include_path}/linux/LocalFileWatcher.h
+    )
+
+    set(sources ${sources}
+        ${source_path}/linux/LocalFileWatcher.cpp
+    )
+endif()
 
 if (OPTION_BUILD_SSH_BACKEND)
     set(headers ${headers}
@@ -124,7 +132,7 @@ if (OPTION_BUILD_SSH_BACKEND)
         ${source_path}/ssh/SshInputStreamBuffer.cpp
         ${source_path}/ssh/SshOutputStreamBuffer.cpp
     )
-endif ()
+endif()
 
 # Group source files
 set(header_group "Header Files (API)")

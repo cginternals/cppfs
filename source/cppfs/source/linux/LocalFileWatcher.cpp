@@ -1,5 +1,5 @@
 
-#include <cppfs/posix/LocalFileWatcher.h>
+#include <cppfs/linux/LocalFileWatcher.h>
 
 #include <unistd.h>
 #include <limits.h>

@@ -3,8 +3,12 @@
 
 #include <cppfs/FileHandle.h>
 #include <cppfs/FileWatcher.h>
+#include <cppfs/AbstractFileWatcherBackend.h>
 #include <cppfs/posix/LocalFileHandle.h>
-#include <cppfs/posix/LocalFileWatcher.h>
+
+#ifdef SYSTEM_LINUX
+    #include <cppfs/linux/LocalFileWatcher.h>
+#endif
 
 
 namespace cppfs
@@ -35,9 +39,13 @@ FileHandle LocalFileSystem::open(std::string && path)
 
 std::unique_ptr<AbstractFileWatcherBackend> LocalFileSystem::createFileWatcher(FileWatcher & fileWatcher)
 {
+#ifdef SYSTEM_LINUX
     return std::unique_ptr<AbstractFileWatcherBackend>(
             new LocalFileWatcher(&fileWatcher, shared_from_this())
     );
+#else
+    return nullptr;
+#endif
 }
 
 
