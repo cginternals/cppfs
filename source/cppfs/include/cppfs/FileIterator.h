@@ -12,6 +12,7 @@ namespace cppfs
 {
 
 
+class AbstractFileSystem;
 class AbstractFileIteratorBackend;
 
 
@@ -33,7 +34,7 @@ public:
     *    Constructor
     *
     *  @param[in] backend
-    *    Concrete file handle backend
+    *    Concrete file iterator backend
     */
     FileIterator(std::unique_ptr<AbstractFileIteratorBackend> && backend);
 
@@ -41,8 +42,8 @@ public:
     *  @brief
     *    Copy constructor
     *
-    *  @param[in] fileHandle
-    *    Source handle
+    *  @param[in] fileIterator
+    *    Source iterator
     */
     FileIterator(const FileIterator & fileIterator);
 
@@ -50,8 +51,8 @@ public:
     *  @brief
     *    Move constructor
     *
-    *  @param[in] fileHandle
-    *    Source handle
+    *  @param[in] fileIterator
+    *    Source iterator
     */
     FileIterator(FileIterator && fileIterator);
 
@@ -66,7 +67,7 @@ public:
     *    Copy operator
     *
     *  @param[in] fileIterator
-    *    Source handle
+    *    Source iterator
     */
     FileIterator & operator=(const FileIterator & fileIterator);
 
@@ -108,6 +109,15 @@ public:
     *    'true' if iterators are not equal, else 'false'
     */
     bool operator!=(const FileIterator & it) const;
+
+    /**
+    *  @brief
+    *    Get file system
+    *
+    *  @return
+    *    File system (can be null)
+    */
+    AbstractFileSystem * fs() const;
 
 
 protected:

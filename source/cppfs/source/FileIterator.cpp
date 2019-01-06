@@ -107,5 +107,10 @@ bool FileIterator::operator!=(const FileIterator & it) const
     return !((*this) == it);
 }
 
+AbstractFileSystem * FileIterator::fs() const
+{
+    return m_backend ? m_backend->fs() : nullptr;
+}
+
 
 } // namespace cppfs

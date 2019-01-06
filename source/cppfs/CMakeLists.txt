@@ -56,9 +56,13 @@ set(headers
     ${include_path}/FileIterator.h
     ${include_path}/FileVisitor.h
     ${include_path}/FunctionalFileVisitor.h
+    ${include_path}/FileWatcher.h
+    ${include_path}/FileEventHandler.h
+    ${include_path}/FunctionalFileEventHandler.h
     ${include_path}/AbstractFileSystem.h
     ${include_path}/AbstractFileHandleBackend.h
     ${include_path}/AbstractFileIteratorBackend.h
+    ${include_path}/AbstractFileWatcherBackend.h
     ${include_path}/InputStream.h
     ${include_path}/OutputStream.h
     ${include_path}/LoginCredentials.h
@@ -81,9 +85,13 @@ set(sources
     ${source_path}/FileIterator.cpp
     ${source_path}/FileVisitor.cpp
     ${source_path}/FunctionalFileVisitor.cpp
+    ${source_path}/FileWatcher.cpp
+    ${source_path}/FileEventHandler.cpp
+    ${source_path}/FunctionalFileEventHandler.cpp
     ${source_path}/AbstractFileSystem.cpp
     ${source_path}/AbstractFileHandleBackend.cpp
     ${source_path}/AbstractFileIteratorBackend.cpp
+    ${source_path}/AbstractFileWatcherBackend.cpp
     ${source_path}/InputStream.cpp
     ${source_path}/OutputStream.cpp
     ${source_path}/LoginCredentials.cpp
@@ -97,6 +105,26 @@ set(sources
     ${source_path}/${localfs}/LocalFileHandle.cpp
     ${source_path}/${localfs}/LocalFileIterator.cpp
 )
+
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+    set(headers ${headers}
+        ${include_path}/linux/LocalFileWatcher.h
+    )
+
+    set(sources ${sources}
+        ${source_path}/linux/LocalFileWatcher.cpp
+    )
+endif()
+
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+    set(headers ${headers}
+        ${include_path}/windows/LocalFileWatcher.h
+    )
+
+    set(sources ${sources}
+        ${source_path}/windows/LocalFileWatcher.cpp
+    )
+endif()
 
 if (OPTION_BUILD_SSH_BACKEND)
     set(headers ${headers}
@@ -114,7 +142,7 @@ if (OPTION_BUILD_SSH_BACKEND)
         ${source_path}/ssh/SshInputStreamBuffer.cpp
         ${source_path}/ssh/SshOutputStreamBuffer.cpp
     )
-endif ()
+endif()
 
 # Group source files
 set(header_group "Header Files (API)")

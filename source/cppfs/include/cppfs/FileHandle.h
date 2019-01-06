@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 
-#include <cppfs/cppfs_api.h>
+#include <cppfs/cppfs.h>
 #include <cppfs/AbstractFileHandleBackend.h>
 
 
@@ -16,9 +16,11 @@ namespace cppfs
 {
 
 
+class AbstractFileSystem;
 class FileIterator;
 class FileVisitor;
 class Tree;
+class FileWatcher;
 
 
 /**
@@ -103,6 +105,15 @@ public:
     *    Source handle
     */
     FileHandle & operator=(FileHandle && fileHandle);
+
+    /**
+    *  @brief
+    *    Get file system
+    *
+    *  @return
+    *    File system (can be null)
+    */
+    AbstractFileSystem * fs() const;
 
     /**
     *  @brief
@@ -477,6 +488,26 @@ public:
     *    not a directory.
     */
     bool remove();
+
+    /**
+    *  @brief
+    *    Create file system watcher for this file handle
+    *
+    *  @param[in] events
+    *    Events that are watched (combination of FileEvent values)
+    *  @param[in] recursive
+    *    Watch file system recursively?
+    *
+    *  @return
+    *    File watcher
+    *
+    *  @remarks
+    *    This is a shortcut for creating a FileWatcher and adding file handles to watch.
+    *    It will only work if the file handle points to a valid directory.
+    *    To watch more than one directory at a time, use FileWatcher and add.
+    *    Avoid creating more than one FileWatcher, as OS limits can be reached.
+    */
+    FileWatcher watch(unsigned int events = FileCreated | FileRemoved | FileModified | FileAttrChanged, RecursiveMode recursive = Recursive);
 
     /**
     *  @brief

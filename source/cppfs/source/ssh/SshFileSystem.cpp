@@ -16,6 +16,7 @@
 #include <libssh2_sftp.h>
 
 #include <cppfs/FileHandle.h>
+#include <cppfs/AbstractFileWatcherBackend.h>
 #include <cppfs/ssh/SshFileHandle.h>
 
 
@@ -68,6 +69,11 @@ FileHandle SshFileSystem::open(std::string && path)
             new SshFileHandle(shared_from_this(), path)
         )
     );
+}
+
+std::unique_ptr<AbstractFileWatcherBackend> SshFileSystem::createFileWatcher(FileWatcher & fileWatcher)
+{
+    return nullptr;
 }
 
 void SshFileSystem::connect()

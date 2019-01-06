@@ -1,6 +1,8 @@
 
 #include <cppfs/AbstractFileSystem.h>
 
+#include <cppfs/FileWatcher.h>
+
 
 namespace cppfs
 {

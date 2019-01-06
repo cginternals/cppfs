@@ -2,6 +2,7 @@
 #pragma once
 
 
+#include <memory>
 #include <string>
 
 #include <cppfs/cppfs_api.h>
@@ -12,6 +13,8 @@ namespace cppfs
 
 
 class FileHandle;
+class FileWatcher;
+class AbstractFileWatcherBackend;
 
 
 /**
@@ -50,6 +53,18 @@ public:
     *    Path to file or directory
     */
     virtual FileHandle open(std::string && path) = 0;
+
+    /**
+    *  @brief
+    *    Create a watcher for the file system
+    *
+    *  @param[in] fileWatcher
+    *    File watcher that owns the backend
+    *
+    *  @return
+    *    Watcher backend (must NOT be null!)
+    */
+    virtual std::unique_ptr<AbstractFileWatcherBackend> createFileWatcher(FileWatcher & fileWatcher) = 0;
 };
 
 
