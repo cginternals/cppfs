@@ -116,6 +116,16 @@ if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     )
 endif()
 
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+    set(headers ${headers}
+        ${include_path}/windows/LocalFileWatcher.h
+    )
+
+    set(sources ${sources}
+        ${source_path}/windows/LocalFileWatcher.cpp
+    )
+endif()
+
 if (OPTION_BUILD_SSH_BACKEND)
     set(headers ${headers}
         ${include_path}/ssh/SshFileSystem.h
