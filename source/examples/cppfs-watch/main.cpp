@@ -1,8 +1,6 @@
 
-#include <atomic>
 #include <chrono>
 #include <iostream>
-#include <thread>
 
 #include <cppassist/cmdline/CommandLineAction.h>
 #include <cppassist/cmdline/CommandLineOption.h>
@@ -40,7 +38,7 @@ int main(int argc, char * argv[])
     CommandLineOption opConfig("--config", "-c", "file", "Load configuration from file", CommandLineOption::Optional);
     action.add(&opConfig);
 
-    CommandLineOption opTime("--timeout", "-t", "seconds", "Stop watch loop after given time", CommandLineOption::Optional);
+    CommandLineOption opTime("--timeout", "-t", "seconds", "Timeout after which to stop (in seconds)", CommandLineOption::Optional);
     action.add(&opTime);
 
     CommandLineParameter paramPath("path", CommandLineParameter::Optional);
@@ -55,6 +53,7 @@ int main(int argc, char * argv[])
         return 0;
     }
 
+    // Execute file watching
     try {
         // Get path
         std::string path = paramPath.value();
@@ -84,35 +83,38 @@ int main(int argc, char * argv[])
             // Begin watching and printing events
             std::string t = opTime.value();
             if (t.empty()) {
+                // No timeout given
                 while (true) {
                     watcher.watch();
                 }
             }
             else {
-                auto t_sleep = std::stoi(t);
-                std::cout << "Will stop watching after " << t_sleep << " seconds..." << std::endl;
+                // Get timeout
+                auto timeout = std::stoi(t);
+                std::cout << "Will stop watching after " << timeout << " seconds..." << std::endl;
 
-                // Execute watch loop in a separate thread
-                std::atomic<bool> stop_thread{false};
-                std::thread thrd([&] {
-                    while (!stop_thread) {
-                        watcher.watch(50);  // Timeout 50 ms, so we can poll stop_thread variable
-                    }
-                });
+                // Get current time
+                auto start = std::chrono::system_clock::now();
+                auto now   = std::chrono::system_clock::now();
 
-                // Zzzzz....
-                std::this_thread::sleep_for(std::chrono::seconds(t_sleep));
+                // Execute watch loop
+                while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - start).count() < timeout)
+                {
+                    // Timeout 500ms to revive the main loop
+                    watcher.watch(500);
 
-                // Join watcher thread
-                stop_thread = true;
-                thrd.join();
+                    // Check elapsed time
+                    now = std::chrono::system_clock::now();
+                }
             }
         }
         else
         {
+            // Invalid path specified
             std::cout << "'" << path << "' is not a valid directory." << std::endl;
         }
     } catch (std::exception& e) {
+        // Error during execution
         std::cerr << "Exception: " << e.what() << std::endl;
         return -1;
     }
