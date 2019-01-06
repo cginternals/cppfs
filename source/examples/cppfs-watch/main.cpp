@@ -40,9 +40,8 @@ int main(int argc, char * argv[])
     CommandLineOption opConfig("--config", "-c", "file", "Load configuration from file", CommandLineOption::Optional);
     action.add(&opConfig);
 
-    CommandLineOption opTime("--time", "-t", "seconds", "Stop watch loop after given time", CommandLineOption::Optional);
+    CommandLineOption opTime("--timeout", "-t", "seconds", "Stop watch loop after given time", CommandLineOption::Optional);
     action.add(&opTime);
-    
 
     CommandLineParameter paramPath("path", CommandLineParameter::Optional);
     action.add(&paramPath);
@@ -57,21 +56,12 @@ int main(int argc, char * argv[])
     }
 
     try {
-        // Get login credentials
-        LoginCredentials login;
-
-        std::string configFile = opConfig.value();
-        if (!configFile.empty())
-        {
-            login.load(configFile);
-        }
-
         // Get path
         std::string path = paramPath.value();
         if (path.empty()) path = ".";
 
         // Open directory
-        FileHandle dir = fs::open(path, &login);
+        FileHandle dir = fs::open(path);
         if (dir.isDirectory())
         {
             // Watch directory
