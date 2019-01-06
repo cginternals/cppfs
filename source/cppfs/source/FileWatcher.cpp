@@ -7,7 +7,6 @@
 #include <cppfs/FileHandle.h>
 #include <cppfs/FileEventHandler.h>
 #include <cppfs/AbstractFileSystem.h>
-#include <cppfs/null/NullFileWatcher.h>
 
 
 namespace cppfs
@@ -30,7 +29,9 @@ FileWatcher::FileWatcher(FileWatcher && fileWatcher)
 , m_ownEventHandlers(std::move(fileWatcher.m_ownEventHandlers))
 {
     // Fix pointer to file watcher
-    m_backend->m_fileWatcher = this;
+    if (m_backend) {
+        m_backend->m_fileWatcher = this;
+    }
 }
 
 FileWatcher::~FileWatcher()
@@ -45,7 +46,9 @@ FileWatcher & FileWatcher::operator=(FileWatcher && fileWatcher)
     m_ownEventHandlers = std::move(fileWatcher.m_ownEventHandlers);
 
     // Fix pointer to file watcher
-    m_backend->m_fileWatcher = this;
+    if (m_backend) {
+        m_backend->m_fileWatcher = this;
+    }
 
     // Done
     return *this;

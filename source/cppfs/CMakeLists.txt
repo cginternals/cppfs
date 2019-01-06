@@ -73,8 +73,6 @@ set(headers
     ${include_path}/Change.h
     ${include_path}/units.h
 
-    ${include_path}/null/NullFileWatcher.h
-
     ${include_path}/${localfs}/LocalFileSystem.h
     ${include_path}/${localfs}/LocalFileHandle.h
     ${include_path}/${localfs}/LocalFileIterator.h
@@ -103,8 +101,6 @@ set(sources
     ${source_path}/Tree.cpp
     ${source_path}/Diff.cpp
     ${source_path}/Change.cpp
-
-    ${source_path}/null/NullFileWatcher.cpp
 
     ${source_path}/${localfs}/LocalFileSystem.cpp
     ${source_path}/${localfs}/LocalFileHandle.cpp
