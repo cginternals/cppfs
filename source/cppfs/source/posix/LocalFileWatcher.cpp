@@ -44,7 +44,7 @@ AbstractFileSystem * LocalFileWatcher::fs() const
     return static_cast<AbstractFileSystem *>(m_fs.get());
 }
 
-void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode recursive)
+void LocalFileWatcher::add(FileHandle & dir, unsigned int events, RecursiveMode recursive)
 {
     // Get watch mode
     uint32_t flags = 0;
@@ -53,18 +53,18 @@ void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode r
     if (events & FileModified) flags |= (IN_MODIFY | IN_ATTRIB);
 
     // Create watcher
-    int handle = inotify_add_watch(m_inotify, fh.path().c_str(), flags);
+    int handle = inotify_add_watch(m_inotify, dir.path().c_str(), flags);
     if (handle < 0) {
         return;
     }
 
     // Watch directories recursively
-    if (fh.isDirectory() && recursive == Recursive) {
+    if (recursive == Recursive) {
         // List directory entries
-        for (auto it = fh.begin(); it != fh.end(); ++it)
+        for (auto it = dir.begin(); it != dir.end(); ++it)
         {
             // Check if entry is a directory
-            FileHandle fh2 = fh.open(*it);
+            FileHandle fh2 = dir.open(*it);
             if (fh2.isDirectory()) {
                 // Watch directory
                 add(fh2, events, recursive);
@@ -73,9 +73,9 @@ void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode r
     }
 
     // Associate watcher handle with file handle
-    m_watchers[handle].fileHandle = fh;
-    m_watchers[handle].events     = events;
-    m_watchers[handle].recursive  = recursive;
+    m_watchers[handle].dir       = dir;
+    m_watchers[handle].events    = events;
+    m_watchers[handle].recursive = recursive;
 }
 
 void LocalFileWatcher::watch(int timeout)
@@ -127,7 +127,7 @@ void LocalFileWatcher::watch(int timeout)
             auto & watcher = m_watchers[event->wd];
 
             // Get file handle
-            FileHandle fh = (event->len > 0 ? watcher.fileHandle.open(std::string(event->name)) : watcher.fileHandle);
+            FileHandle fh = (event->len > 0 ? watcher.dir.open(std::string(event->name)) : watcher.dir);
 
             // Watch new directories
             if (fh.isDirectory() && eventType == FileCreated && watcher.recursive == Recursive) {

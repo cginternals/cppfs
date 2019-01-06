@@ -120,14 +120,14 @@ public:
 
     /**
     *  @brief
-    *    Watch file handle
+    *    Watch directory
     *
-    *  @param[in] fh
-    *    File handle
+    *  @param[in] dir
+    *    Handle to directory that shall be watched
     *  @param[in] events
     *    Events that are watched (combination of FileEvent values)
     *  @param[in] recursive
-    *    Watch file system recursively? (only relevant if fh points to a directory)
+    *    Watch file system recursively?
     *
     *  @remarks
     *    The file handle must belong to the same file system as the
@@ -136,7 +136,7 @@ public:
     *    single file system. Also note that file watching is not
     *    supported for remote file systems, such as SSH.
     */
-    void add(FileHandle & fh, unsigned int events = FileCreated | FileRemoved | FileModified, RecursiveMode recursive = Recursive);
+    void add(FileHandle & dir, unsigned int events = FileCreated | FileRemoved | FileModified, RecursiveMode recursive = Recursive);
 
     /**
     *  @brief
@@ -180,12 +180,12 @@ public:
     *
     *  @remarks
     *    This function begins to watch the file system and blocks until one or more
-    *    events have occured, or the timeout (if set) has been exceeded (timeout >= 0).
+    *    events have occured, or the timeout has been exceeded (if timeout >= 0).
     *    On every event, onFileEvent() is called with the type of the event and
     *    a file handle to the file or directory. Afterwards, the function returns.
     *    To listen to more events, call watch() again.
     */
-    void watch(int timeoutMilliSeconds = -1);
+    void watch(int timeout = -1);
 
 
 protected:

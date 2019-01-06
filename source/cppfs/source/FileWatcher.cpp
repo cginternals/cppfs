@@ -56,20 +56,20 @@ AbstractFileSystem * FileWatcher::fs() const
     return m_backend ? m_backend->fs() : nullptr;
 }
 
-void FileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode recursive)
+void FileWatcher::add(FileHandle & dir, unsigned int events, RecursiveMode recursive)
 {
     // Check backend
     if (!m_backend) {
         return;
     }
 
-    // Check that file handle belongs to the same file system as the watcher
-    if (fh.fs() != fs()) {
+    // Check that file handle is a directory and belongs to the same file system as the watcher
+    if (!dir.isDirectory() || dir.fs() != fs()) {
         return;
     }
 
-    // Add file to watcher
-    m_backend->add(fh, events, recursive);
+    // Add directory to watcher
+    m_backend->add(dir, events, recursive);
 }
 
 void FileWatcher::addHandler(FileEventHandler * eventHandler)

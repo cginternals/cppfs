@@ -56,9 +56,9 @@ AbstractFileSystem * LocalFileWatcher::fs() const
     return static_cast<AbstractFileSystem *>(m_fs.get());
 }
 
-void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode recursive)
+void LocalFileWatcher::add(FileHandle & dir, unsigned int events, RecursiveMode recursive)
 {
-    HANDLE hDir = ::CreateFileA(fh.path().c_str(),       // pointer to the directory name
+    HANDLE hDir = ::CreateFileA(dir.path().c_str(),         // pointer to the directory name
                                       FILE_LIST_DIRECTORY,  // access (read/write) mode
                                       FILE_SHARE_READ       // share mode
                                       | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -80,11 +80,11 @@ void LocalFileWatcher::add(FileHandle & fh, unsigned int events, RecursiveMode r
     lw->ovl.hEvent = lw->event.get();
 
     Watcher w;
-    w.handle = std::move(hDirectory);
-    w.fileHandle = fh;
-    w.events = events;
+    w.handle    = std::move(hDirectory);
+    w.dir       = dir;
+    w.events    = events;
     w.recursive = recursive;
-    w.platform = std::move(lw);
+    w.platform  = std::move(lw);
 
     ::SetEvent(m_waitStopEvent.get());
     ScopedCriticalSection lock((LPCRITICAL_SECTION)m_watchersCS.get());
@@ -181,7 +181,8 @@ void LocalFileWatcher::watch(int timeout)
                 }
                 if (w.events & eventType) {
                     // Get file handle
-                    FileHandle fh = w.fileHandle.open(fname);
+                    FileHandle fh = w.dir.open(fname);
+
                     // Invoke callback function
                     onFileEvent(fh, eventType);
                 }

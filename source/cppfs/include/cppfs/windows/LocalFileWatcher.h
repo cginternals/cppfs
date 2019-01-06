@@ -42,7 +42,7 @@ public:
 
     // Virtual AbstractFileWatcherBackend functions
     virtual AbstractFileSystem * fs() const override;
-    virtual void add(FileHandle & fh, unsigned int events, RecursiveMode recursive) override;
+    virtual void add(FileHandle & dir, unsigned int events, RecursiveMode recursive) override;
     virtual void watch(int timeout) override;
 
 
@@ -53,7 +53,7 @@ protected:
     */
     struct Watcher {
         std::shared_ptr<void> handle;
-        FileHandle            fileHandle;
+        FileHandle            dir;
         unsigned int          events;
         RecursiveMode         recursive;
         std::shared_ptr<void> platform;
