@@ -35,9 +35,10 @@ enum FilePermissions
 */
 enum FileEvent
 {
-    FileCreated  = 0x01, ///< A file or directory has been created
-    FileRemoved  = 0x02, ///< A file or directory has been removed
-    FileModified = 0x04  ///< A file or directory has been modified
+    FileCreated     = 0x01, ///< A file or directory has been created
+    FileRemoved     = 0x02, ///< A file or directory has been removed
+    FileModified    = 0x04, ///< A file or directory has been modified
+    FileAttrChanged = 0x08  ///< Attributes on a file or directory have been modified
 };
 
 /**

@@ -48,9 +48,11 @@ void LocalFileWatcher::add(FileHandle & dir, unsigned int events, RecursiveMode 
 {
     // Get watch mode
     uint32_t flags = 0;
-    if (events & FileCreated)  flags |= IN_CREATE;
-    if (events & FileRemoved)  flags |= IN_DELETE;
-    if (events & FileModified) flags |= (IN_MODIFY | IN_ATTRIB);
+    if (events & FileCreated)     flags |= IN_CREATE;
+    if (events & FileRemoved)     flags |= IN_DELETE;
+    if (events & FileModified)    flags |= IN_MODIFY;
+    if (events & FileAttrChanged) flags |= IN_ATTRIB;
+
 
     // Create watcher
     int handle = inotify_add_watch(m_inotify, dir.path().c_str(), flags);
@@ -121,7 +123,7 @@ void LocalFileWatcher::watch(int timeout)
                  if (event->mask & IN_CREATE) eventType = FileCreated;
             else if (event->mask & IN_DELETE) eventType = FileRemoved;
             else if (event->mask & IN_MODIFY) eventType = FileModified;
-            else if (event->mask & IN_ATTRIB) eventType = FileModified;
+            else if (event->mask & IN_ATTRIB) eventType = FileAttrChanged;
 
             // Get watcher
             auto & watcher = m_watchers[event->wd];

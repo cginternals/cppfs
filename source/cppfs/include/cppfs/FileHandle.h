@@ -491,23 +491,23 @@ public:
 
     /**
     *  @brief
-    *    Create file system watcher for this file or directory
+    *    Create file system watcher for this file handle
     *
     *  @param[in] events
     *    Events that are watched (combination of FileEvent values)
     *  @param[in] recursive
-    *    Watch file system recursively? (only relevant if fh points to a directory)
+    *    Watch file system recursively?
     *
     *  @return
     *    File watcher
     *
     *  @remarks
     *    This is a shortcut for creating a FileWatcher and adding file handles to watch.
-    *    You should use this only to watch a single file or directory.
-    *    To watch more than one file at a time, use FileWatcher and add.
+    *    It will only work if the file handle points to a valid directory.
+    *    To watch more than one directory at a time, use FileWatcher and add.
     *    Avoid creating more than one FileWatcher, as OS limits can be reached.
     */
-    FileWatcher watch(unsigned int events = FileCreated | FileRemoved | FileModified, RecursiveMode recursive = Recursive);
+    FileWatcher watch(unsigned int events = FileCreated | FileRemoved | FileModified | FileAttrChanged, RecursiveMode recursive = Recursive);
 
     /**
     *  @brief

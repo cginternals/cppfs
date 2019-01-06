@@ -72,9 +72,10 @@ int main(int argc, char * argv[])
                 std::string type = (fh.isDirectory() ? "directory" : "file");
 
                 // Get operation
-                std::string operation = ( (event & FileCreated) ? "created" :
-                                        ( (event & FileRemoved) ? "removed" :
-                                                                  "modified" ) );
+                std::string operation = ( (event & FileCreated)     ? "created" :
+                                        ( (event & FileRemoved)     ? "removed" :
+                                        ( (event & FileAttrChanged) ? "attributes changed" :
+                                                                      "modified" ) ) );
 
                 // Log event
                 std::cout << "The " << type << " '" << fh.path() << "' was " << operation << "." << std::endl;

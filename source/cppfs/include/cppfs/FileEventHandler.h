@@ -76,6 +76,15 @@ protected:
     *    Handle to file or directory
     */
     virtual void onFileModified(FileHandle & fh);
+
+    /**
+    *  @brief
+    *    Called when file attributes have been modified
+    *
+    *  @param[in] fh
+    *    Handle to file or directory
+    */
+    virtual void onFileAttrChanged(FileHandle & fh);
 };
 
 

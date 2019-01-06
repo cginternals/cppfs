@@ -31,6 +31,10 @@ void FileEventHandler::onFileEvent(FileHandle & fh, FileEvent event)
             onFileModified(fh);
             break;
 
+        case FileAttrChanged:
+            onFileAttrChanged(fh);
+            break;
+
         default:
             break;
     }
@@ -45,6 +49,10 @@ void FileEventHandler::onFileRemoved(FileHandle &)
 }
 
 void FileEventHandler::onFileModified(FileHandle &)
+{
+}
+
+void FileEventHandler::onFileAttrChanged(FileHandle &)
 {
 }
 

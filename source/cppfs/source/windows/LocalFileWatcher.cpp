@@ -100,9 +100,10 @@ void LocalFileWatcher::watch(int timeout)
         auto lw = reinterpret_cast<LocalWatcher*>(it.platform.get());
         waitHandles.push_back(lw->event.get());
         DWORD flags = 0;
-        if (it.events & FileCreated)  flags |= FILE_NOTIFY_CHANGE_FILE_NAME;
-        if (it.events & FileRemoved)  flags |= FILE_NOTIFY_CHANGE_FILE_NAME;
-        if (it.events & FileModified) flags |= FILE_NOTIFY_CHANGE_LAST_WRITE;
+        if (it.events & FileCreated)     flags |= FILE_NOTIFY_CHANGE_FILE_NAME;
+        if (it.events & FileRemoved)     flags |= FILE_NOTIFY_CHANGE_FILE_NAME;
+        if (it.events & FileModified)    flags |= FILE_NOTIFY_CHANGE_LAST_WRITE;
+        if (it.events & FileAttrChanged) flags |= FILE_NOTIFY_CHANGE_ATTRIBUTES;
 
         DWORD dwBytes = 0;
         if (!::GetOverlappedResult(it.handle.get(), &lw->ovl, &dwBytes, FALSE)) {
