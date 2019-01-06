@@ -35,14 +35,14 @@ int main(int argc, char * argv[])
     CommandLineSwitch swHelp("--help", "-h", "Print help text", CommandLineSwitch::Optional);
     action.add(&swHelp);
 
-    CommandLineOption opConfig("--config", "-c", "file", "Load configuration from file", CommandLineOption::Optional);
-    action.add(&opConfig);
+    CommandLineSwitch swRecursive("--recursive", "-r", "Watcher directories recursively", CommandLineSwitch::Optional);
+    action.add(&swRecursive);
 
     CommandLineOption opTime("--timeout", "-t", "seconds", "Timeout after which to stop (in seconds)", CommandLineOption::Optional);
     action.add(&opTime);
 
-    CommandLineParameter paramPath("path", CommandLineParameter::Optional);
-    action.add(&paramPath);
+    action.setOptionalParametersAllowed(true);
+    action.setOptionalParameterName("path");
 
     // Parse command line
     program.parse(argc, argv);
@@ -55,64 +55,78 @@ int main(int argc, char * argv[])
 
     // Execute file watching
     try {
-        // Get path
-        std::string path = paramPath.value();
-        if (path.empty()) path = ".";
+        // Create file watcher
+        FileWatcher watcher;
 
-        // Open directory
-        FileHandle dir = fs::open(path);
-        if (dir.isDirectory())
+        // Get recursive mode
+        RecursiveMode recursive = swRecursive.activated() ? Recursive : NonRecursive;
+
+        // Get paths to watch
+        auto paths = action.optionalParameters();
+        if (paths.size() < 1) {
+            paths.push_back(".");
+        }
+
+        // Add directories to watcher
+        for (auto path : paths)
         {
-            // Watch directory
-            FileWatcher watcher = dir.watch();
+            // Open directory
+            FileHandle dir = fs::open(path);
+            if (dir.isDirectory())
+            {
+                std::cout << "Watching '" << path << "'" << std::endl;
 
-            // Create file event handler
-            watcher.addHandler([] (FileHandle & fh, FileEvent event) {
-                // Get file type
-                std::string type = (fh.isDirectory() ? "directory" : "file");
-
-                // Get operation
-                std::string operation = ( (event & FileCreated)     ? "created" :
-                                        ( (event & FileRemoved)     ? "removed" :
-                                        ( (event & FileAttrChanged) ? "attributes changed" :
-                                                                      "modified" ) ) );
-
-                // Log event
-                std::cout << "The " << type << " '" << fh.path() << "' was " << operation << "." << std::endl;
-            });
-
-            // Begin watching and printing events
-            std::string t = opTime.value();
-            if (t.empty()) {
-                // No timeout given
-                while (true) {
-                    watcher.watch();
-                }
+                // Watch directory
+                watcher.add(dir, FileCreated | FileRemoved | FileModified | FileAttrChanged, recursive);
             }
-            else {
-                // Get timeout
-                auto timeout = std::stoi(t);
-                std::cout << "Will stop watching after " << timeout << " seconds..." << std::endl;
-
-                // Get current time
-                auto start = std::chrono::system_clock::now();
-                auto now   = std::chrono::system_clock::now();
-
-                // Execute watch loop
-                while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - start).count() < timeout)
-                {
-                    // Timeout 500ms to revive the main loop
-                    watcher.watch(500);
-
-                    // Check elapsed time
-                    now = std::chrono::system_clock::now();
-                }
+            else
+            {
+                // Invalid directory
+                std::cout << "'" << path << "' is not a valid directory." << std::endl;
             }
         }
-        else
-        {
-            // Invalid path specified
-            std::cout << "'" << path << "' is not a valid directory." << std::endl;
+
+        // Create file event handler
+        watcher.addHandler([] (FileHandle & fh, FileEvent event) {
+            // Get file type
+            std::string type = (fh.isDirectory() ? "directory" : "file");
+
+            // Get operation
+            std::string operation = ( (event & FileCreated)     ? "created" :
+                                    ( (event & FileRemoved)     ? "removed" :
+                                    ( (event & FileAttrChanged) ? "attributes changed" :
+                                                                  "modified" ) ) );
+
+            // Log event
+            std::cout << "The " << type << " '" << fh.path() << "' was " << operation << "." << std::endl;
+        });
+
+        // Begin watching and printing events
+        std::string t = opTime.value();
+        if (t.empty()) {
+            // No timeout given
+            while (true) {
+                watcher.watch();
+            }
+        }
+        else {
+            // Get timeout
+            auto timeout = std::stoi(t);
+            std::cout << "Will stop watching after " << timeout << " seconds..." << std::endl;
+
+            // Get current time
+            auto start = std::chrono::system_clock::now();
+            auto now   = std::chrono::system_clock::now();
+
+            // Execute watch loop
+            while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - start).count() < timeout)
+            {
+                // Timeout 500ms to revive the main loop
+                watcher.watch(500);
+
+                // Check elapsed time
+                now = std::chrono::system_clock::now();
+            }
         }
     } catch (std::exception& e) {
         // Error during execution
