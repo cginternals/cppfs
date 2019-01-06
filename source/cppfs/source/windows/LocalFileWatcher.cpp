@@ -58,17 +58,21 @@ AbstractFileSystem * LocalFileWatcher::fs() const
 
 void LocalFileWatcher::add(FileHandle & dir, unsigned int events, RecursiveMode recursive)
 {
-    HANDLE hDir = ::CreateFileA(dir.path().c_str(),         // pointer to the directory name
-                                      FILE_LIST_DIRECTORY,  // access (read/write) mode
-                                      FILE_SHARE_READ       // share mode
-                                      | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                      NULL,                       // security descriptor
-                                      OPEN_EXISTING,              // how to create
-                                      FILE_FLAG_BACKUP_SEMANTICS  // file attributes
-                                      | FILE_FLAG_OVERLAPPED,
-                                      NULL);  // file with attributes to copy
-    if (hDir == INVALID_HANDLE_VALUE)
+    // Open directory
+    HANDLE hDir = ::CreateFileA(
+        dir.path().c_str(),                                     // Pointer to the directory name
+        FILE_LIST_DIRECTORY,                                    // Access (read/write) mode
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, // File share mode
+        NULL,                                                   // Security descriptor
+        OPEN_EXISTING,                                          // How to create
+        FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,      // File attributes
+        NULL                                                    // File with attributes to copy
+    );
+
+    // Check if directory could be opened
+    if (hDir == INVALID_HANDLE_VALUE) {
         throw std::runtime_error("failed to create directory listener");
+    }
 
     std::shared_ptr<void> hDirectory(hDir, ::CloseHandle);
     std::shared_ptr<void> hEvent(::CreateEvent(NULL, TRUE, FALSE, NULL), ::CloseHandle);
@@ -100,8 +104,8 @@ void LocalFileWatcher::watch(int timeout)
         auto lw = reinterpret_cast<LocalWatcher*>(it.platform.get());
         waitHandles.push_back(lw->event.get());
         DWORD flags = 0;
-        if (it.events & FileCreated)     flags |= FILE_NOTIFY_CHANGE_FILE_NAME;
-        if (it.events & FileRemoved)     flags |= FILE_NOTIFY_CHANGE_FILE_NAME;
+        if (it.events & FileCreated)     flags |= FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME;
+        if (it.events & FileRemoved)     flags |= FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME;
         if (it.events & FileModified)    flags |= FILE_NOTIFY_CHANGE_LAST_WRITE;
         if (it.events & FileAttrChanged) flags |= FILE_NOTIFY_CHANGE_ATTRIBUTES;
 
@@ -175,6 +179,7 @@ void LocalFileWatcher::watch(int timeout)
                     eventType = FileRemoved;
                     break;
                 case FILE_ACTION_MODIFIED:
+                case FILE_ACTION_RENAMED_NEW_NAME:
                     eventType = FileModified;
                     break;
                 default:
