@@ -11,7 +11,7 @@ FunctionalFileEventHandler::FunctionalFileEventHandler()
 }
 
 FunctionalFileEventHandler::FunctionalFileEventHandler(EventFunc funcFileEvent)
-: m_funcFileEvent(funcFileEvent)
+: m_funcFileEvent(std::move(funcFileEvent))
 {
 }
 

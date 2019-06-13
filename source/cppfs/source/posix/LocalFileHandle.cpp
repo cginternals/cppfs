@@ -18,12 +18,12 @@ namespace cppfs
 
 
 LocalFileHandle::LocalFileHandle(std::shared_ptr<LocalFileSystem> fs, const std::string & path)
-: LocalFileHandle(fs, std::string(path))
+: LocalFileHandle(std::move(fs), std::string(path))
 {
 }
 
 LocalFileHandle::LocalFileHandle(std::shared_ptr<LocalFileSystem> fs, std::string && path)
-: m_fs(fs)
+: m_fs(std::move(fs))
 , m_path(path)
 , m_fileInfo(nullptr)
 , m_linkInfo(nullptr)
