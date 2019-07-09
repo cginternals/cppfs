@@ -1,7 +1,7 @@
 
 #include <cppfs/windows/LocalFileIterator.h>
 
-#include <Windows.h>
+#include <windows.h>
 
 #include <cppfs/FilePath.h>
 #include <cppfs/windows/LocalFileSystem.h>
