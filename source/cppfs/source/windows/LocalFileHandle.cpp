@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-#include <Windows.h>
+#include <windows.h>
 
 #include <cppfs/cppfs.h>
 #include <cppfs/FilePath.h>
