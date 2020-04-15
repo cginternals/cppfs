@@ -158,7 +158,7 @@ std::unique_ptr<AbstractFileIteratorBackend> LocalFileHandle::begin() const
     return std::unique_ptr<AbstractFileIteratorBackend>(new LocalFileIterator(m_fs, m_path));
 }
 
-unsigned int LocalFileHandle::size() const
+uintmax_t LocalFileHandle::size() const
 {
     readFileInfo();
 

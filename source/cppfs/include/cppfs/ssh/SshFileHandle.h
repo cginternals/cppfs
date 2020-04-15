@@ -49,7 +49,7 @@ public:
     virtual bool isSymbolicLink() const override;
     virtual std::vector<std::string> listFiles() const override;
     virtual std::unique_ptr<AbstractFileIteratorBackend> begin() const override;
-    virtual unsigned int size() const override;
+    virtual uintmax_t size() const override;
     virtual unsigned int accessTime() const override;
     virtual unsigned int modificationTime() const override;
     virtual unsigned int userId() const override;

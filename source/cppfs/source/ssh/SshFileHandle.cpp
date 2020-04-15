@@ -185,7 +185,7 @@ std::unique_ptr<AbstractFileIteratorBackend> SshFileHandle::begin() const
     return std::unique_ptr<AbstractFileIteratorBackend>(new SshFileIterator(m_fs, m_path));
 }
 
-unsigned int SshFileHandle::size() const
+uintmax_t SshFileHandle::size() const
 {
     // Get file info
     readFileInfo();

@@ -135,7 +135,7 @@ public:
     *  @return
     *    Size of file
     */
-    unsigned int size() const;
+    uintmax_t size() const;
 
     /**
     *  @brief
@@ -144,7 +144,7 @@ public:
     *  @param[in] size
     *    Size of file
     */
-    void setSize(unsigned int size);
+    void setSize(uintmax_t size);
 
     /**
     *  @brief
@@ -342,7 +342,7 @@ protected:
     std::string   m_path;             ///< Path
     std::string   m_filename;         ///< Filename
     bool          m_directory;        ///< 'true' if directory, 'false' if file
-    unsigned int  m_size;             ///< File size
+    uintmax_t     m_size;             ///< File size
     unsigned int  m_accessTime;       ///< Time of last access
     unsigned int  m_modificationTime; ///< Time of last modification
     unsigned int  m_userId;           ///< User ID

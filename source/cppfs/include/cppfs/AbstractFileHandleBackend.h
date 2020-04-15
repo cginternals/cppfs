@@ -132,7 +132,7 @@ public:
     *  @return
     *    Size if handle points to a file, else 0
     */
-    virtual unsigned int size() const = 0;
+    virtual uintmax_t size() const = 0;
 
     /**
     *  @brief

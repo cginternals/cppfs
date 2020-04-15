@@ -258,7 +258,7 @@ public:
     *  @return
     *    Size if handle points to a file, else 0
     */
-    unsigned int size() const;
+    uintmax_t size() const;
 
     /**
     *  @brief

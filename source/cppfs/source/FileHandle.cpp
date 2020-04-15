@@ -226,7 +226,7 @@ FileIterator FileHandle::end() const
     return FileIterator();
 }
 
-unsigned int FileHandle::size() const
+uintmax_t FileHandle::size() const
 {
     return m_backend ? m_backend->size() : 0;
 }

@@ -79,12 +79,12 @@ void Tree::setDirectory(bool isDir)
     m_directory = isDir;
 }
 
-unsigned int Tree::size() const
+uintmax_t Tree::size() const
 {
     return m_size;
 }
 
-void Tree::setSize(unsigned int size)
+void Tree::setSize(uintmax_t size)
 {
     m_size = size;
 }
