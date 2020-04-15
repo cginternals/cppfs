@@ -89,7 +89,7 @@ void FileWatcher::addHandler(FileEventHandler * eventHandler)
 void FileWatcher::addHandler(EventFunc funcFileEvent)
 {
     // Create event handler
-    auto ptr = std::unique_ptr<FunctionalFileEventHandler>(new FunctionalFileEventHandler(funcFileEvent));
+    auto ptr = std::unique_ptr<FunctionalFileEventHandler>(new FunctionalFileEventHandler(std::move(funcFileEvent)));
 
     // Register event handler
     addHandler(ptr.get());

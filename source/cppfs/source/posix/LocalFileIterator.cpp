@@ -12,12 +12,12 @@ namespace cppfs
 
 
 LocalFileIterator::LocalFileIterator(std::shared_ptr<LocalFileSystem> fs, const std::string & path)
-: LocalFileIterator(fs, std::string(path))
+: LocalFileIterator(std::move(fs), std::string(path))
 {
 }
 
 LocalFileIterator::LocalFileIterator(std::shared_ptr<LocalFileSystem> fs, std::string && path)
-: m_fs(fs)
+: m_fs(std::move(fs))
 , m_path(path)
 , m_dir(nullptr)
 , m_entry(nullptr)

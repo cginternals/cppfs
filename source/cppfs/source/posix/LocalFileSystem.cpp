@@ -32,7 +32,7 @@ FileHandle LocalFileSystem::open(std::string && path)
 {
     return FileHandle(
         std::unique_ptr<AbstractFileHandleBackend>(
-            new LocalFileHandle(shared_from_this(), path)
+            new LocalFileHandle(shared_from_this(), std::move(path))
         )
     );
 }

@@ -13,13 +13,13 @@ FunctionalFileVisitor::FunctionalFileVisitor()
 }
 
 FunctionalFileVisitor::FunctionalFileVisitor(VisitFunc funcFileEntry)
-: m_funcFileEntry(funcFileEntry)
+: m_funcFileEntry(std::move(funcFileEntry))
 {
 }
 
 FunctionalFileVisitor::FunctionalFileVisitor(VisitFunc funcFile, VisitFunc funcDirectory)
-: m_funcFile(funcFile)
-, m_funcDirectory(funcDirectory)
+: m_funcFile(std::move(funcFile))
+, m_funcDirectory(std::move(funcDirectory))
 {
 }
 

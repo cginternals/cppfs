@@ -124,13 +124,13 @@ std::vector<std::string> FileHandle::listFiles() const
 
 void FileHandle::traverse(VisitFunc funcFileEntry)
 {
-    FunctionalFileVisitor visitor(funcFileEntry);
+    FunctionalFileVisitor visitor(std::move(funcFileEntry));
     traverse(visitor);
 }
 
 void FileHandle::traverse(VisitFunc funcFile, VisitFunc funcDirectory)
 {
-    FunctionalFileVisitor visitor(funcFile, funcDirectory);
+    FunctionalFileVisitor visitor(std::move(funcFile), std::move(funcDirectory));
     traverse(visitor);
 }
 
