@@ -83,18 +83,6 @@ CPPFS_API std::string base64(const std::string & str);
 */
 CPPFS_API std::string fromBase64(const std::string & base64);
 
-/**
-*  @brief
-*    Convert hash buffer into string
-*
-*  @param[in] hash
-*    Hash buffer
-*
-*  @return
-*    Hash string
-*/
-CPPFS_API std::string hashToString(const unsigned char * hash);
-
 
 } // namespace fs
 

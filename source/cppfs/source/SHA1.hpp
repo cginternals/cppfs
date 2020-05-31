@@ -160,56 +160,58 @@ inline static void buffer_to_block(const std::string &buffer, uint32_t block[16]
     }
 }
 
+namespace cppfs {
+    namespace fs {
+        inline std::string sha1digest(std::istream &is) {
+            uint32_t digest[5];
+            std::string buffer;
+            uint64_t transforms = 0;
+            digest[0] = 0x67452301;
+            digest[1] = 0xefcdab89;
+            digest[2] = 0x98badcfe;
+            digest[3] = 0x10325476;
+            digest[4] = 0xc3d2e1f0;
+            while (true) {
+                char sbuf[64];
+                is.read(sbuf, 64 - buffer.size());
+                buffer.append(sbuf, (std::size_t) is.gcount());
+                if (buffer.size() != 64) {
+                    break;
+                }
+                uint32_t block[16];
+                buffer_to_block(buffer, block);
+                transform(digest, block, transforms);
+                buffer.clear();
+            }
 
-std::string sha1(std::istream &is) {
-    uint32_t digest[5];
-    std::string buffer;
-    uint64_t transforms = 0;
-    digest[0] = 0x67452301;
-    digest[1] = 0xefcdab89;
-    digest[2] = 0x98badcfe;
-    digest[3] = 0x10325476;
-    digest[4] = 0xc3d2e1f0;
-    while (true) {
-        char sbuf[64];
-        is.read(sbuf, 64 - buffer.size());
-        buffer.append(sbuf, (std::size_t) is.gcount());
-        if (buffer.size() != 64) {
-            break;
+            uint64_t total_bits = (transforms * 64 + buffer.size()) * 8;
+            buffer += (char) 0x80;
+            size_t orig_size = buffer.size();
+            while (buffer.size() < 64) {
+                buffer += (char) 0x00;
+            }
+
+            uint32_t block[16];
+            buffer_to_block(buffer, block);
+
+            if (orig_size > 64 - 8) {
+                transform(digest, block, transforms);
+                for (size_t i = 0; i < 16 - 2; i++) {
+                    block[i] = 0;
+                }
+            }
+            block[16 - 1] = (uint32_t) total_bits;
+            block[16 - 2] = (uint32_t) (total_bits >> 32);
+            transform(digest, block, transforms);
+
+            std::ostringstream result;
+            for (unsigned int i : digest) {
+                result << std::hex << std::setfill('0') << std::setw(8);
+                result << i;
+            }
+
+            return result.str();
         }
-        uint32_t block[16];
-        buffer_to_block(buffer, block);
-        transform(digest, block, transforms);
-        buffer.clear();
     }
-
-    uint64_t total_bits = (transforms * 64 + buffer.size()) * 8;
-    buffer += (char) 0x80;
-    size_t orig_size = buffer.size();
-    while (buffer.size() < 64) {
-        buffer += (char) 0x00;
-    }
-
-    uint32_t block[16];
-    buffer_to_block(buffer, block);
-
-    if (orig_size > 64 - 8) {
-        transform(digest, block, transforms);
-        for (size_t i = 0; i < 16 - 2; i++) {
-            block[i] = 0;
-        }
-    }
-    block[16 - 1] = (uint32_t) total_bits;
-    block[16 - 2] = (uint32_t) (total_bits >> 32);
-    transform(digest, block, transforms);
-
-    std::ostringstream result;
-    for (unsigned int i : digest) {
-        result << std::hex << std::setfill('0') << std::setw(8);
-        result << i;
-    }
-
-    return result.str();
 }
-
 #endif //CPPFS_SHA1_HPP

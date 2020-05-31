@@ -26,6 +26,7 @@
 #include <cppfs/AbstractFileSystem.h>
 #include <cppfs/AbstractFileHandleBackend.h>
 #include <cppfs/AbstractFileIteratorBackend.h>
+#include "SHA1.hpp"
 
 
 namespace cppfs
@@ -278,42 +279,12 @@ std::string FileHandle::sha1() const
     {
         return "";
     }
-
-#ifdef CPPFS_USE_OpenSSL
-    // Open file
     auto inputStream = createInputStream();
     if (!inputStream)
     {
         return "";
     }
-
-    // Initialize hash
-    unsigned char hash[20];
-    SHA_CTX context;
-    SHA1_Init(&context);
-
-    // Read whole while
-    while (!inputStream->eof())
-    {
-        // Read a maximum of 1024 bytes at once
-        // Read data from file
-        std::array<char, 1024> buf;
-        inputStream->read(buf.data(), buf.size());
-
-        size_t count = inputStream->gcount();
-        if (count > 0)
-        {
-            // Update hash
-            SHA1_Update(&context, buf.data(), count);
-        } else break;
-    }
-
-    // Compute hash
-    SHA1_Final(hash, &context);
-    return fs::hashToString(hash);
-#else
-    return "";
-#endif
+    return fs::sha1digest(*inputStream);
 }
 
 std::string FileHandle::base64() const

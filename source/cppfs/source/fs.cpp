@@ -4,7 +4,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iterator>
-
+#include "SHA1.hpp"
 #include <basen/basen.hpp>
 
 #if defined(__APPLE__)
@@ -13,7 +13,6 @@
     #define SHA1 CC_SHA1
     #include <cppfs/ssh/SshFileSystem.h>
 #elif defined(CPPFS_USE_OpenSSL)
-    #include <openssl/sha.h>
     #include <cppfs/ssh/SshFileSystem.h>
 #endif
 
@@ -28,6 +27,7 @@
     #include <cppfs/windows/LocalFileSystem.h>
 #else
     #include <cppfs/posix/LocalFileSystem.h>
+
 #endif
 
 
@@ -102,21 +102,8 @@ FileHandle open(const std::string & path, const LoginCredentials * credentials)
 
 std::string sha1(const std::string & str)
 {
-#ifdef CPPFS_USE_OpenSSL
-    // Initialize hash
-    unsigned char hash[20];
-    SHA_CTX context;
-    SHA1_Init(&context);
-
-    // Update hash
-    SHA1_Update(&context, str.c_str(), str.size());
-
-    // Compute hash
-    SHA1_Final(hash, &context);
-    return hashToString(hash);
-#else
-    return "";
-#endif
+    std::istringstream s(str);
+    return sha1digest(s);
 }
 
 std::string base64(const std::string & str)
@@ -138,20 +125,6 @@ std::string fromBase64(const std::string & base64)
     // Return decoded string
     return str;
 }
-
-std::string hashToString(const unsigned char * hash)
-{
-    std::stringstream stream;
-    stream << std::hex << std::setfill('0') << std::setw(2);
-
-    for (int i=0; i<20; i++)
-    {
-        stream << static_cast<unsigned int>(hash[i]);
-    }
-
-    return stream.str();
-}
-
 
 } // namespace fs
 } // namespace cppfs
