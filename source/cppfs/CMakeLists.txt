@@ -100,7 +100,7 @@ set(sources
     ${source_path}/Tree.cpp
     ${source_path}/Diff.cpp
     ${source_path}/Change.cpp
-
+    ${source_path}/SHA1.hpp
     ${source_path}/${localfs}/LocalFileSystem.cpp
     ${source_path}/${localfs}/LocalFileHandle.cpp
     ${source_path}/${localfs}/LocalFileIterator.cpp
