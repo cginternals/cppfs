@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <sys/inotify.h>
+#include <sys/select.h>
 
 #include <cppfs/cppfs.h>
 #include <cppfs/FilePath.h>
