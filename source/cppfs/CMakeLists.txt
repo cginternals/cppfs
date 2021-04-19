@@ -72,6 +72,7 @@ set(headers
     ${include_path}/Diff.h
     ${include_path}/Change.h
     ${include_path}/units.h
+    ${include_path}/directorytraversal.h
 
     ${include_path}/${localfs}/LocalFileSystem.h
     ${include_path}/${localfs}/LocalFileHandle.h
@@ -100,6 +101,7 @@ set(sources
     ${source_path}/Tree.cpp
     ${source_path}/Diff.cpp
     ${source_path}/Change.cpp
+    ${source_path}/directorytraversal.cpp
 
     ${source_path}/${localfs}/LocalFileSystem.cpp
     ${source_path}/${localfs}/LocalFileHandle.cpp
