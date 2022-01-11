@@ -21,7 +21,7 @@ message(STATUS "Test ${target}")
 
 set(sources
     main.cpp
-    cppfs_test.cpp
+    FilePath_test.cpp
 )
 
 
