@@ -430,10 +430,16 @@ void FileHandle::copyDirectoryRec(FileHandle & dstDir)
     }
 }
 
-void FileHandle::removeDirectoryRec()
+void FileHandle::removeDirectoryRec(bool followSymlinks)
 {
     // Check directory
     if (!isDirectory()) {
+        return;
+    }
+
+    // Check symlink
+    if (isSymbolicLink() && !followSymlinks) {
+        remove();
         return;
     }
 
@@ -444,7 +450,10 @@ void FileHandle::removeDirectoryRec()
 
         if (fh.isDirectory())
         {
-            fh.removeDirectoryRec();
+            if (fh.isSymbolicLink() && !followSymlinks)
+                fh.remove();
+            else
+                fh.removeDirectoryRec(followSymlinks);
         }
 
         else if (fh.isFile())
@@ -454,7 +463,10 @@ void FileHandle::removeDirectoryRec()
     }
 
     // Remove directory
-    removeDirectory();
+    if (isSymbolicLink())
+        remove();
+    else
+        removeDirectory();
 }
 
 bool FileHandle::copy(FileHandle & dest)
