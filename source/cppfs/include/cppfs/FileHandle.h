@@ -413,8 +413,11 @@ public:
     /**
     *  @brief
     *    Remove directory recursively
+    *
+    *  @param[in] followSymlinks
+    *    to enter/follow symlink directories or not
     */
-    void removeDirectoryRec();
+    void removeDirectoryRec(bool followSymlinks=false);
 
     /**
     *  @brief

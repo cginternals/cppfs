@@ -272,6 +272,13 @@ std::string FilePath::resolved() const
     std::string name;
     while (std::getline(ss, name, '/'))
     {
+        // Ignore empty segments such as in "/usr/bin//../bin/bash"
+        // However, do not ignore a possibly empty segment at the start of a path
+        if (name.empty() && !parts.empty())
+        {
+            continue;
+        }
+
         parts.push_back(name);
     }
 
