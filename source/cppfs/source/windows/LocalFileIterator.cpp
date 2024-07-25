@@ -5,6 +5,7 @@
 
 #include <cppfs/FilePath.h>
 #include <cppfs/windows/LocalFileSystem.h>
+#include <cppfs/windows/UTF8Handler.h>
 
 
 namespace cppfs
@@ -78,7 +79,7 @@ std::string LocalFileIterator::name() const
     }
 
     // Return filename of current item
-	return std::string(static_cast<WIN32_FIND_DATA *>(m_findData)->cFileName);
+	return UTF8Convert_WtoUTF8(std::wstring(static_cast<WIN32_FIND_DATA *>(m_findData)->cFileName));
 }
 
 void LocalFileIterator::next()
@@ -97,7 +98,7 @@ void LocalFileIterator::readNextEntry()
 		{
 			// Open directory
 			std::string query = FilePath(m_path).fullPath() + "/*";
-			m_findHandle = FindFirstFileA(query.c_str(), static_cast<WIN32_FIND_DATA *>(m_findData));
+			m_findHandle = FindFirstFile(UTF8Handler::utf8_to_wstring(query).c_str(), static_cast<WIN32_FIND_DATA *>(m_findData));
 
 			// Abort if directory could not be opened
 			if (m_findHandle == INVALID_HANDLE_VALUE)
@@ -122,7 +123,7 @@ void LocalFileIterator::readNextEntry()
 		m_index++;
 
 		// Get filename
-		filename = std::string(static_cast<WIN32_FIND_DATA *>(m_findData)->cFileName);
+		filename = UTF8Handler::wstring_to_utf8(std::wstring(static_cast<WIN32_FIND_DATA *>(m_findData)->cFileName));
 	} while (filename == ".." || filename == ".");
 }
 

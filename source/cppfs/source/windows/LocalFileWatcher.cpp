@@ -5,7 +5,7 @@
 
 #include <cppfs/FilePath.h>
 #include <cppfs/windows/LocalFileSystem.h>
-
+#include <cppfs/windows/UTF8Handler.h>
 
 namespace
 {
@@ -64,8 +64,8 @@ AbstractFileSystem * LocalFileWatcher::fs() const
 void LocalFileWatcher::add(FileHandle & dir, unsigned int events, RecursiveMode recursive)
 {
     // Open directory
-    ::HANDLE dirHandle = ::CreateFileA(
-        dir.path().c_str(),                                     // Pointer to the directory name
+    ::HANDLE dirHandle = ::CreateFile(
+        UTF8Convert_UTF8toW(dir.path()).c_str(),                // Pointer to the directory name
         FILE_LIST_DIRECTORY,                                    // Access (read/write) mode
         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, // File share mode
         NULL,                                                   // Security descriptor
@@ -189,50 +189,36 @@ void LocalFileWatcher::watch(int timeout)
             // Get file event notification
             FILE_NOTIFY_INFORMATION * fileEvent = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(entry);
 
-            // Convert filename to 8-bit character string
-            char fileName[4096];
-            int numBytes = ::WideCharToMultiByte(CP_ACP,
-                0,
-                fileEvent->FileName,
-                fileEvent->FileNameLength / sizeof(WCHAR),
-                fileName,
-                sizeof(fileName),
-                NULL,
-                NULL);
+            // Get filename in unified format
+            std::string fname = FilePath(UTF8Handler::wstring_to_utf8(fileEvent->FileName)).path();
 
-            // Check if conversion was successful
-            if (numBytes != 0) {
-                // Get filename in unified format
-                std::string fname = FilePath(std::string(fileName, fileName + numBytes)).path();
+            // Determine event type
+            FileEvent eventType = (FileEvent)0;
+            switch (fileEvent->Action) {
+                case FILE_ACTION_ADDED:
+                    eventType = FileCreated;
+                    break;
 
-                // Determine event type
-                FileEvent eventType = (FileEvent)0;
-                switch (fileEvent->Action) {
-                    case FILE_ACTION_ADDED:
-                        eventType = FileCreated;
-                        break;
+                case FILE_ACTION_REMOVED:
+                    eventType = FileRemoved;
+                    break;
 
-                    case FILE_ACTION_REMOVED:
-                        eventType = FileRemoved;
-                        break;
-
-                    case FILE_ACTION_MODIFIED:
-                    case FILE_ACTION_RENAMED_NEW_NAME:
-                        eventType = FileModified;
-                        break;
+                case FILE_ACTION_MODIFIED:
+                case FILE_ACTION_RENAMED_NEW_NAME:
+                    eventType = FileModified;
+                    break;
                 
-                    default:
-                        break;
-                }
+                default:
+                    break;
+            }
 
-                // Check if event is watched for
-                if (watcher.events & eventType) {
-                    // Get file handle
-                    FileHandle fh = watcher.dir.open(fname);
+            // Check if event is watched for
+            if (watcher.events & eventType) {
+                // Get file handle
+                FileHandle fh = watcher.dir.open(fname);
 
-                    // Invoke callback function
-                    onFileEvent(fh, eventType);
-                }
+                // Invoke callback function
+                onFileEvent(fh, eventType);
             }
 
             // Get next event

@@ -119,10 +119,12 @@ endif()
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
     set(headers ${headers}
         ${include_path}/windows/LocalFileWatcher.h
+	    ${include_path}/windows/UTF8Handler.h
     )
 
     set(sources ${sources}
         ${source_path}/windows/LocalFileWatcher.cpp
+        ${source_path}/windows/UTF8Handler.cpp
     )
 endif()
 
@@ -188,6 +190,13 @@ set_target_properties(${target}
     SOVERSION ${META_VERSION_MAJOR}
 )
 
+if(WIN32 AND OPTION_WINDOWS_UTF8)
+	target_compile_options(${target}
+		PRIVATE
+		-DUNICODE
+		-D_UNICODE
+	)
+endif()
 
 #
 # Include directories

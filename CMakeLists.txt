@@ -70,7 +70,9 @@ option(OPTION_BUILD_DOCS               "Build documentation."                   
 option(OPTION_BUILD_EXAMPLES           "Build examples."                                        OFF)
 option(OPTION_BUILD_SSH_BACKEND        "Build SSH backend"                                      OFF)
 option(OPTION_FORCE_SYSTEM_DIR_INSTALL "Force system dir install"                               OFF)
-
+if(WIN32)
+	option(OPTION_WINDOWS_UTF8         "Build Windows UTF8 support"                             ON)
+endif()
 
 #
 # Declare project

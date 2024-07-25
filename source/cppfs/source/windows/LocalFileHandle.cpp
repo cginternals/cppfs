@@ -9,7 +9,7 @@
 #include <cppfs/FilePath.h>
 #include <cppfs/windows/LocalFileSystem.h>
 #include <cppfs/windows/LocalFileIterator.h>
-
+#include <cppfs/windows/UTF8Handler.h>
 
 namespace cppfs
 {
@@ -105,7 +105,7 @@ std::vector<std::string> LocalFileHandle::listFiles() const
     // Open directory
     WIN32_FIND_DATA findData;
     std::string query = FilePath(m_path).fullPath() + "/*";
-    HANDLE findHandle = FindFirstFileA(query.c_str(), &findData);
+    HANDLE findHandle = FindFirstFile(UTF8Convert_UTF8toW(query).c_str(), &findData);
 
     if (findHandle == INVALID_HANDLE_VALUE)
     {
@@ -116,7 +116,7 @@ std::vector<std::string> LocalFileHandle::listFiles() const
     do
     {
         // Get name
-        std::string name = findData.cFileName;
+        std::string name = UTF8Convert_WtoUTF8(findData.cFileName);
 
         // Ignore . and ..
         if (name != ".." && name != ".")
@@ -213,7 +213,7 @@ bool LocalFileHandle::createDirectory()
     if (exists()) return false;
 
     // Create directory
-    if (!CreateDirectoryA(m_path.c_str(), nullptr))
+    if (!CreateDirectory(UTF8Convert_UTF8toW(m_path).c_str(), nullptr))
     {
         return false;
     }
@@ -229,7 +229,7 @@ bool LocalFileHandle::removeDirectory()
     if (!isDirectory()) return false;
 
     // Remove directory
-    if (!RemoveDirectoryA(m_path.c_str()))
+    if (!RemoveDirectory(UTF8Convert_UTF8toW(m_path).c_str()))
     {
         return false;
     }
@@ -255,7 +255,7 @@ bool LocalFileHandle::copy(AbstractFileHandleBackend & dest)
     }
 
     // Copy file
-    if (!CopyFileA(src.c_str(), dst.c_str(), FALSE))
+    if (!CopyFile(UTF8Convert_UTF8toW(src).c_str(), UTF8Convert_UTF8toW(dst).c_str(), FALSE))
     {
         // Error!
         return false;
@@ -282,7 +282,7 @@ bool LocalFileHandle::move(AbstractFileHandleBackend & dest)
     }
 
     // Move file
-    if (!MoveFileA(src.c_str(), dst.c_str()))
+    if (!MoveFile(UTF8Convert_UTF8toW(src).c_str(), UTF8Convert_UTF8toW(dst).c_str()))
     {
         // Error!
         return false;
@@ -312,7 +312,7 @@ bool LocalFileHandle::createLink(AbstractFileHandleBackend & dest)
     }
 
     // Copy file
-    if (!CreateHardLinkA(dst.c_str(), src.c_str(), 0))
+    if (!CreateHardLink(UTF8Convert_UTF8toW(dst).c_str(), UTF8Convert_UTF8toW(src).c_str(), 0))
     {
         // Error!
         return false;
@@ -338,7 +338,7 @@ bool LocalFileHandle::createSymbolicLink(AbstractFileHandleBackend & dest)
     }
 
     // Copy file
-    if (!CreateSymbolicLinkA(dst.c_str(), src.c_str(), 0))
+    if (!CreateSymbolicLink(UTF8Convert_UTF8toW(dst).c_str(), UTF8Convert_UTF8toW(src).c_str(), 0))
     {
         // Error!
         return false;
@@ -357,7 +357,7 @@ bool LocalFileHandle::rename(const std::string & filename)
     std::string path = FilePath(FilePath(m_path).directoryPath()).resolve(filename).fullPath();
 
     // Rename
-    if (!MoveFileA(m_path.c_str(), path.c_str()))
+    if (!MoveFile(UTF8Convert_UTF8toW(m_path).c_str(), UTF8Convert_UTF8toW(path).c_str()))
     {
         // Error!
         return false;
@@ -377,7 +377,7 @@ bool LocalFileHandle::remove()
     if (!isFile()) return false;
 
     // Delete file
-    if (!DeleteFileA(m_path.c_str()))
+    if (!DeleteFile(UTF8Convert_UTF8toW(m_path).c_str()))
     {
         return false;
     }
@@ -406,7 +406,7 @@ void LocalFileHandle::readFileInfo() const
     m_fileInfo = (void *)new WIN32_FILE_ATTRIBUTE_DATA;
 
     // Get file info
-    if (!GetFileAttributesExA(m_path.c_str(), GetFileExInfoStandard, (WIN32_FILE_ATTRIBUTE_DATA*)m_fileInfo))
+    if (!GetFileAttributesEx(UTF8Convert_UTF8toW(m_path).c_str(), GetFileExInfoStandard, (WIN32_FILE_ATTRIBUTE_DATA*)m_fileInfo))
     {
         // Error!
         delete (WIN32_FILE_ATTRIBUTE_DATA *)m_fileInfo;
